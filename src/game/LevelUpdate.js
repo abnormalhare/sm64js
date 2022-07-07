@@ -7,7 +7,7 @@ import * as CourseTable from "../include/course_table"
 import { gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 
-import { fadeout_music } from "./SoundInit"
+import { fadeout_music, raise_background_noise } from "./SoundInit"
 
 import {
     ACT_FLAG_INTANGIBLE, ACT_UNINITIALIZED,
@@ -34,7 +34,7 @@ import {
     oBehParams, oPosX, oPosY, oPosZ, oMoveAngleYaw
 } from "../include/object_constants"
 
-import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3 } from "../levels/level_defines_constants"
+import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_CASTLE } from "../levels/level_defines_constants"
 
 import {
     WARP_TRANSITION_FADE_FROM_COLOR,
@@ -63,6 +63,7 @@ import {
     SOUND_OBJ_POUNDING_CANNON,
 } from "../include/sounds"
 
+import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 
 export const TIMER_CONTROL_SHOW  = 0
 export const TIMER_CONTROL_START = 1
@@ -382,19 +383,6 @@ class LevelUpdate {
         }
 
         return this.gHudDisplay.timer
-    }
-
-    pressed_pause() {
-        // let /*u32*/ val4 = get_dialog_id() >= 0
-        let /*u32*/ val4 = -1
-        let /*u32*/ intangible = (this.gMarioState.action & ACT_FLAG_INTANGIBLE) != 0
-
-        // if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
-        //     && (gPlayer1Controller.buttonPressed & START_BUTTON)) {
-        //     return 1
-        // }
-
-        return 0
     }
 
     warp_special(level) {
@@ -1072,9 +1060,31 @@ class LevelUpdate {
                 this.set_play_mode(PLAY_MODE_CHANGE_AREA)
             } else if (this.pressed_pause()) {
             //     lower_background_noise(1)
-            //     gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
-            //     this.set_play_mode(PLAY_MODE_PAUSED)
+                Camera.gCameraMovementFlags |= Camera.CAM_MOVE_PAUSE_SCREEN
+                this.set_play_mode(PLAY_MODE_PAUSED)
             }
+        }
+
+        return 0
+    }
+
+    play_mode_paused() {
+        if (Area.gMenuOptSelectIndex == Area.MENU_OPT_NONE) {
+            IngameMenu.set_menu_mode(IngameMenu.MENU_MODE_RENDER_PAUSE_SCREEN)
+        } else if (Area.gMenuOptSelectIndex == Area.MENU_OPT_DEFAULT) {
+            raise_background_noise(1)
+            Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_PAUSE_SCREEN
+            this.set_play_mode(PLAY_MODE_NORMAL)
+        } else { // MENU_OPT_EXIT_COURSE
+            if (window.gDebugLevelSelect) {
+                this.fade_into_special_warp(-9, 1)
+            } else {
+                this.initiate_warp(LEVEL_CASTLE, 1, 0x1F, 0)
+                this.fade_into_special_warp(0, 0)
+                Area.gSavedCourseNum = COURSE_NONE
+            }
+
+            Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_PAUSE_SCREEN
         }
 
         return 0
@@ -1166,6 +1176,18 @@ class LevelUpdate {
         }
 
         return changeLevel
+    }
+
+    pressed_pause() {
+        let dialogActive = IngameMenu.get_dialog_id() >= 0
+        let intangible = (this.gMarioState.action & ACT_FLAG_INTANGIBLE) != 0
+
+        if (!intangible && !dialogActive && /*!Area.gWarpTransition.isActive &&*/ this.sDelayedWarpOp == WARP_OP_NONE
+            && window.playerInput.buttonPressedStart) {
+                return true
+        }
+
+        return false
     }
 
     set_play_mode(playMode) {

@@ -688,3 +688,22 @@ export const dl_ia_text_end = [
     Gbi.gsDPSetTextureFilter(Gbi.G_TF_BILERP),
     gsSPEndDisplayList(),
 ].flat()
+
+const vertex_triangle = [
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,      8,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,     16,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+]
+
+export const dl_draw_triangle = [
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
+    Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
+    gsSPVertex(vertex_triangle, 3, 0),
+    gsSP1Triangle( 0,  1,  2, 0x0),
+    gsSPSetGeometryMode(G_LIGHTING),
+    Gbi.gsDPSetRenderMode(Gbi.G_RM_AA_ZB_OPA_SURF, Gbi.G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPEndDisplayList(),
+].flat()

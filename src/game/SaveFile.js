@@ -154,6 +154,7 @@ export let gWarpCheckpoint = null
 
 export let gMainMenuDataModified = false
 export let gSaveFileModified = false
+export let gSaveBuffer
 let gDummyFlags = 0
 
 // export const get_coin_score_age = (fileIndex, courseIndex) => {
@@ -244,6 +245,16 @@ export const save_file_get_course_star_count = (fileIndex, courseIndex) => {
     return count
 }
 
+export const save_file_get_total_star_count = (fileIndex, minCourse, maxCourse) => {
+    // Get standard course star count.
+    for (let count = 0; minCourse <= maxCourse; minCourse++) {
+        count += save_file_get_course_star_count(fileIndex, minCourse)
+    }
+
+    // Add castle secret star count.
+    return save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + count
+}
+
 /**
  * Return the bitset of obtained stars in the specified course.
  * If course is -1, return the bitset of obtained castle secret stars.
@@ -261,6 +272,6 @@ export const save_file_get_star_flags = (fileIndex, courseIndex) => {
     return starFlags
 }
 
-// export const save_file_get_course_coin_score(fileIndex, courseIndex) {
-//     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
-// }
+export const save_file_get_course_coin_score = (fileIndex, courseIndex) => {
+    return /* gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex]; */ 0
+}

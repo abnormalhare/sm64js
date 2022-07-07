@@ -319,6 +319,7 @@ export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
 export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
 export const G_RM_XLU_SURF_SURF2 = 0x00000000  // FIXME
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
+export const G_RM_TEX_EDGE_EDGE2 = 0xf0a7008
 
 export const G_RM_ZB_OPA_SURF_SURF2 = 0x552230
 export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
@@ -373,7 +374,15 @@ export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 export const G_RM_AA_TEX_EDGE            = 29
 export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
+export const G_RM_TEX_EDGE               = 32
+export const G_RM_TEX_EDGE2              = 33
 
+/*
+ * G_SETSCISSOR: interlace mode
+ */
+export const G_SC_NON_INTERLACE  = 0
+export const G_SC_ODD_INTERLACE  = 3
+export const G_SC_EVEN_INTERLACE = 2
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -611,6 +620,15 @@ export const gDPSetFillColor = (displaylist, color) => {
         words: {
             w0: G_SETFILLCOLOR,
             w1: { color }
+        }
+    })
+}
+
+export const gDPSetScissor = (displaylist, mode, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSCISSOR,
+            w1: { ulx, uly, mode, lrx, lry }
         }
     })
 }
@@ -909,6 +927,7 @@ const renderModesMap = [
     [G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2],
     [G_RM_OPA_SURF, G_RM_OPA_SURF2,                 G_RM_OPA_SURF_SURF2],
     [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],
+    [G_RM_TEX_EDGE, G_RM_TEX_EDGE2,                 G_RM_TEX_EDGE_EDGE2],
     [G_RM_CUSTOM_AA_ZB_XLU_SURF, G_RM_NOOP2,        G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2],
     [G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2,           G_RM_AA_TEX_EDGE_EDGE2],
     [G_RM_PASS, G_RM_AA_ZB_OPA_SURF2,               G_RM_PASS_OPA_SURF2]
@@ -1093,7 +1112,6 @@ export const gsSPTexture = (s, t, level, tile, on) => {
 }
 
 export const gSPPopMatrix = (pkt, n) => {
-    pkt = pkt.pop()
     pkt.push ({
         words: {
             w0: G_POPMTX,
