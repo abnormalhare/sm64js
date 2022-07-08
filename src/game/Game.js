@@ -10,6 +10,10 @@ const canvas = document.querySelector('#gameCanvas')
 class Game {
     constructor() {
         this.main_loop_init() /// thread5_game_loop_init
+        
+        this.gControllers = new Array(3)
+        this.gPlayer3Controller = this.gControllers[2]
+
         window.gGlobalTimer = 0
     }
 
@@ -87,7 +91,7 @@ class Game {
     }
 
     warp_to(level) {
-        LevelUpdate.fade_into_special_warp(level)
+        if (gLinker.Area.gWarpTransition.isActive != 1) LevelUpdate.fade_into_special_warp(level)
     }
 
     snapshot_location() {

@@ -1,6 +1,8 @@
 import { SOUND_BANK_COUNT } from "../include/sounds"
 import { SEQ_EVENT_SOLVE_PUZZLE } from "../include/seq_ids"
 
+export const SEQUENCE_ARGS = (priority, seqId) => {return ((priority << 8) | seqId)}
+
 export const SEQ_PLAYER_LEVEL            = 0  // Level background music
 export const SEQ_PLAYER_ENV              = 1  // Misc music like the puzzle jingle
 export const SEQ_PLAYER_SFX              = 2  // Sound effects

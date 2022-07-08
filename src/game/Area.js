@@ -10,6 +10,7 @@ import { HudInstance as Hud } from "./Hud"
 import { PrintInstance as Print } from "./Print"
 import { SCREEN_WIDTH } from "../include/config"
 import { oBehParams, ACTIVE_FLAG_DEACTIVATED } from "../include/object_constants"
+import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -35,7 +36,10 @@ class Area {
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
+        this.gCurrCourseNum
+        this.gCurrSaveFileNum = 1
         this.gLoadedGraphNodes = new Array(256)
+        this.gMenuOptSelectIndex
 
         this.D_8032CE74 = null
         this.D_8032CE78 = null
@@ -58,6 +62,16 @@ class Area {
         this.gWarpTransRed = 0
         this.gWarpTransGreen = 0
         this.gWarpTransBlue = 0
+
+        this.MENU_OPT_NONE = 0
+        this.MENU_OPT_1 = 1
+        this.MENU_OPT_2 = 2
+        this.MENU_OPT_3 = 3
+        this.MENU_OPT_DEFAULT = this.MENU_OPT_1
+
+        this.MENU_OPT_CONTINUE = this.MENU_OPT_1
+        this.MENU_OPT_EXIT_COURSE = this.MENU_OPT_2
+        this.MENU_OPT_CAMERA_ANGLE_R = this.MENU_OPT_3
 
     }
 
@@ -260,21 +274,17 @@ class Area {
             gSPViewport(gLinker.Game.gDisplayList, D_8032CF00)
             Hud.render_hud()
             Print.render_text_labels()
-            // do_cutscene_handler();
-            // print_displaying_credits_entry();
 
-            // gPauseScreenMode = render_menus_and_dialogs();
-
-            // if (gPauseScreenMode != 0) {
-            //     gSaveOptSelectIndex = gPauseScreenMode;
-            // }
+            this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs()
+            if (this.gMenuOptSelectIndex != this.MENU_OPT_NONE) {
+                this.gSaveOptSelectIndex = this.gMenuOptSelectIndex
+            }
 
             // if (D_8032CE78 != NULL) {
             //     make_viewport_clip_rect(D_8032CE78);
             // } else
             //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
             //                   SCREEN_HEIGHT - BORDER_HEIGHT);
-
             if (this.gWarpTransition.isActive) {
                 if (this.gWarpTransDelay == 0) {
 

@@ -7,7 +7,7 @@ import {
     LEVEL_SSL, LEVEL_BOB, LEVEL_SL, LEVEL_WDW, LEVEL_JRB, LEVEL_THI, LEVEL_TTC, LEVEL_RR, LEVEL_CASTLE_GROUNDS,
     LEVEL_BITDW, LEVEL_VCUTM, LEVEL_BITFS, LEVEL_SA, LEVEL_BITS, LEVEL_LLL, LEVEL_DDD, LEVEL_WF, LEVEL_ENDING,
     LEVEL_CASTLE_COURTYARD, LEVEL_PSS, LEVEL_COTMC, LEVEL_TOTWC, LEVEL_BOWSER_1, LEVEL_WMOTR, LEVEL_UNKNOWN_32,
-    LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_UNKNOWN_35, LEVEL_TTM, LEVEL_UNKNOWN_37, LEVEL_UNKNOWN_38
+    LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_UNKNOWN_35, LEVEL_TTM, LEVEL_UNKNOWN_37, LEVEL_UNKNOWN_38, LEVEL_MAX
 } from "../levels/level_defines_constants"
 
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -18,6 +18,7 @@ import { oPosY } from "../include/object_constants"
 import { SURFACE_DEATH_PLANE } from "../include/surface_terrains"
 import { sins, s16, int16 } from "../utils"
 import { HudInstance as Hud } from "./Hud"
+import { DIALOG_RESPONSE_NONE } from "./IngameMenu"
 
 
 export const DEGREES = (d) => {return s16(d * 0x10000 / 360)}
@@ -71,9 +72,6 @@ export const AREA_TTM_OUTSIDE        = LEVEL_AREA_INDEX(LEVEL_TTM, 1)
 const CAM_MODE_MARIO_ACTIVE          =  0x01
 const CAM_MODE_LAKITU_WAS_ZOOMED_OUT =  0x02
 const CAM_MODE_MARIO_SELECTED        =  0x04
-
-const CAM_SELECTION_MARIO = 1
-const CAM_SELECTION_FIXED = 2
 
 const CAM_ANGLE_MARIO  = 1
 const CAM_ANGLE_LAKITU = 2
@@ -358,6 +356,42 @@ class Camera {
 
         this.sOldPosition = [0, 0, 0]
         this.sOldFocus = [0, 0, 0]
+        this.sObjectCutscene = 0
+        this.gRecentCutscene = 0
+        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
+        this.sZoomOutAreaMasks = new Array()
+        this.sMarioCamState = this.gPlayerCameraState[0]
+    }
+
+    zoom_out_if_paused_and_outside(camera) {
+        let dist
+        let pitch
+        let yaw
+        let areaMaskIndex = this.gCurrLevelArea / 32
+        let areaBit = 1 << (((this.gCurrLevelArea & 0x10) / 4) + (((this.gCurrLevelArea & 0xF) - 1) & 3))
+
+        if (areaMaskIndex >= LEVEL_MAX / 2) {
+            areaMaskIndex = 0
+            areaBit = 0
+        }
+        if (this.gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
+            if (this.sFramesPaused >= 2) {
+                if (this.sZoomOutAreaMasks[areaMaskIndex] & areaBit) {
+                    camera.focus[0] = this.gCamera.areaCenX
+                    camera.focus[1] = (this.sMarioCamState.pos[1] + this.gCamera.areaCenY) / 2
+                    camera.focus[2] = this.gCamera.areaCenZ
+                    MathUtil.vec3f_get_dist_and_angle(camera.focus, this.sMarioCamState.pos, dist, pitch, yaw)
+                    MathUtil.vec3f_get_dist_and_angle(this.sMarioCamState.pos, camera.pos, 6000.0, 0x1000, yaw)
+                    if (Area.gCurrLevelNum != LEVEL_THI) {
+                        this.find_in_bounds_yaw_wdw_bob_thi(camera.pos, camera.focus, 0)
+                    }
+                }
+            } else {
+                this.sFramesPaused++
+            }
+        } else {
+            this.sFramesPaused = 0
+        }
     }
 
     select_mario_cam_mode() {
@@ -970,10 +1004,6 @@ class Camera {
     }
 
     update_camera(c) {
-        if (window.cheats.debug_camera_off == true) {
-            return
-        }
-
         this.gCamera = c
         this.update_camera_hud_status(c)
 
@@ -1211,6 +1241,38 @@ class Camera {
         MathUtil.vec3f_add(c.focus, pan)
     }
 
+    find_in_bounds_yaw_wdw_bob_thi(pos, origin, yaw) {
+        switch (this.gCurrLevelArea) {
+            case AREA_WDW_MAIN:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 4508.0, -3739.0, 4508.0, -3739.0)
+                break
+            case AREA_BOB:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 8000.0, -8000.0, 7050.0, -8000.0)
+                break
+            case AREA_THI_HUGE:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 8192.0, -8192.0, 8192.0, -8192.0)
+                break
+            case AREA_THI_TINY:
+                yaw = this.clamp_positions_and_find_yaw(pos, origin, 2458.0, -2458.0, 2458.0, -2458.0)
+                break
+        }
+        return yaw
+    }
+
+    trigger_cutscene_dialog(trigger) {
+        let result = 0
+
+        if (trigger == 1) {
+            this.start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE)
+        }
+        return result
+    }
+
+    start_object_cutscene_without_focus(cutscene) {
+        this.sObjectCutscene = cutscene
+        this.sCutsceneDialogResponse = DIALOG_RESPONSE_NONE
+        return 0
+    }
 
     handle_c_button_movement(c) {
         let cSideYaw
@@ -1910,6 +1972,7 @@ class Camera {
         graphNode.rollScreen = this.gLakituState.roll
         graphNode.pos = [...this.gLakituState.pos]
         graphNode.focus = [...this.gLakituState.focus]
+        this.zoom_out_if_paused_and_outside(graphNode)
 
     }
 

@@ -30,6 +30,7 @@ export const G_SETZIMG = 27
 export const G_SETCIMG = 28
 export const G_RDPLOADSYNC = 29
 export const G_TEXRECT = 30
+export const G_GEOMETRYMODE = 31
 
 
 /// Custom Opcodes
@@ -269,6 +270,16 @@ export const G_IM_SIZ_8b_BYTES  = 1
 export const G_IM_SIZ_16b_BYTES = 2
 export const G_IM_SIZ_32b_BYTES = 4
 
+export const G_IM_SIZ_4b_SHIFT = 2
+export const G_IM_SIZ_8b_SHIFT = 1
+export const G_IM_SIZ_16b_SHIFT = 0
+export const G_IM_SIZ_32b_SHIFT = 0
+
+export const G_IM_SIZ_4b_INCR = 3
+export const G_IM_SIZ_8b_INCR = 1
+export const G_IM_SIZ_16b_INCR = 0
+export const G_IM_SIZ_32b_INCR = 0
+
 export const G_IM_SIZ_INCR_TABLE = {
     1: 1,
     2: 0
@@ -308,6 +319,7 @@ export const G_RM_OPA_SURF_SURF2 = 0xf0a4000
 export const G_RM_AA_OPA_SURF_SURF2 = 0x552048
 export const G_RM_XLU_SURF_SURF2 = 0x00000000  // FIXME
 export const G_RM_AA_XLU_SURF_SURF2 = 0x5041c8
+export const G_RM_TEX_EDGE_EDGE2 = 0xf0a7008
 
 export const G_RM_ZB_OPA_SURF_SURF2 = 0x552230
 export const G_RM_AA_ZB_TEX_EDGE_NOOP2 = 0x443078
@@ -362,7 +374,15 @@ export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 export const G_RM_AA_TEX_EDGE            = 29
 export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
+export const G_RM_TEX_EDGE               = 32
+export const G_RM_TEX_EDGE2              = 33
 
+/*
+ * G_SETSCISSOR: interlace mode
+ */
+export const G_SC_NON_INTERLACE  = 0
+export const G_SC_ODD_INTERLACE  = 3
+export const G_SC_EVEN_INTERLACE = 2
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -485,6 +505,11 @@ export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
     rgb: [15, 15, 31, 1]
 }
 
+export const G_CC_FADE = { // FIXME (copied from DECALFADE)
+    alpha: [7, 7, 7, 5],
+    rgb: [15, 15, 31, 1]
+}
+
 export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
@@ -595,6 +620,15 @@ export const gDPSetFillColor = (displaylist, color) => {
         words: {
             w0: G_SETFILLCOLOR,
             w1: { color }
+        }
+    })
+}
+
+export const gDPSetScissor = (displaylist, mode, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSCISSOR,
+            w1: { ulx, uly, mode, lrx, lry }
         }
     })
 }
@@ -854,6 +888,15 @@ export const gsSPEndDisplayList = () => {
     }
 }
 
+/* export const gsSPGeometryMode = (c, s) => {
+    return {
+        words: {
+            w0: G_GEOMETRYMODE | ~c,
+            w1: s
+        }
+    }
+} */
+
 export const gsDPSetAlphaCompare = (newmode) => {
     return {
         words: {
@@ -884,6 +927,7 @@ const renderModesMap = [
     [G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2,        G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2],
     [G_RM_OPA_SURF, G_RM_OPA_SURF2,                 G_RM_OPA_SURF_SURF2],
     [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],
+    [G_RM_TEX_EDGE, G_RM_TEX_EDGE2,                 G_RM_TEX_EDGE_EDGE2],
     [G_RM_CUSTOM_AA_ZB_XLU_SURF, G_RM_NOOP2,        G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2],
     [G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2,           G_RM_AA_TEX_EDGE_EDGE2],
     [G_RM_PASS, G_RM_AA_ZB_OPA_SURF2,               G_RM_PASS_OPA_SURF2]
@@ -1067,6 +1111,15 @@ export const gsSPTexture = (s, t, level, tile, on) => {
   }
 }
 
+export const gSPPopMatrix = (pkt, n) => {
+    pkt.push ({
+        words: {
+            w0: G_POPMTX,
+            w1: { pkt, n }
+        }
+    })
+}
+
 export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
   return {
     words: {
@@ -1074,6 +1127,15 @@ export const gsDPSetTileSize = (t, uls, ult, lrs, lrt) => {
       w1: { t, uls, ult, lrs, lrt }
     }
   }
+}
+
+export const gDPSetTile = (pkt, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts) => {
+    pkt.push ({
+        words: {
+            w0: G_SETTILE,
+            w1: { pkt, fmt, siz, line, tmem, tile, palette, cmt, maskt, shiftt, cms, masks, shifts }
+        }
+    })
 }
 
 export const gsDPSetTextureImage = (format, size, width, imageData) => {

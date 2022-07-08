@@ -538,7 +538,6 @@ export const texture_menu_hud_char_hiragana_mi = []
 // 0x07009DD0
 export const texture_menu_hud_char_hira_dakuten_do = []
 // levels/menu/main_menu_seg7.09DD0.rgba16.png
-
 // 0x07009FD0
 export const texture_menu_hud_char_hiragana_no = []
 // levels/menu/main_menu_seg7.09FD0.rgba16.png
@@ -562,6 +561,16 @@ export const texture_menu_hud_char_katakana_n = []
 // 0x0700A9D0
 export const texture_menu_hud_char_kana_dakuten_do = []
 // levels/menu/main_menu_seg7.0A9D0.rgba16.png
+
+export const menu_hud_lut = [
+    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a,         texture_menu_hud_char_katakana_i, texture_menu_hud_char_katakana_ru,
+    texture_menu_hud_char_katakana_se,      texture_menu_hud_char_katakana_re,        texture_menu_hud_char_katakana_ku, texture_menu_hud_char_katakana_to,
+    texture_menu_hud_char_hiragana_wo,      texture_menu_hud_char_katakana_ko, texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
+    texture_menu_hud_char_hiragana_su,      texture_menu_hud_char_hiragana_ru,        texture_menu_hud_char_hiragana_ke, texture_menu_hud_char_katakana_ma,
+    texture_menu_hud_char_katakana_ri,       texture_menu_hud_char_katakana_o,        texture_menu_hud_char_katakana_su, texture_menu_hud_char_katakana_a,
+    texture_menu_hud_char_hiragana_mi,  texture_menu_hud_char_hira_dakuten_do,        texture_menu_hud_char_hiragana_no, texture_menu_hud_char_question,
+    texture_menu_hud_char_katakana_sa,       texture_menu_hud_char_katakana_u,         texture_menu_hud_char_katakana_n, texture_menu_hud_char_kana_dakuten_do,
+]
 
 // 0x0700AC40
 export const texture_menu_font_char_0 = []
@@ -767,8 +776,74 @@ export const texture_menu_font_char_cedilla_mayus = []
 export const texture_menu_font_char_colon = []
 // levels/menu/main_menu_seg7_eu.0B8C0.ia8.png
 
-// Menu small font print table
 // 0x0700CD08
+export const menu_font_lut = [
+    texture_menu_font_char_0, texture_menu_font_char_1, texture_menu_font_char_2, texture_menu_font_char_3,
+    texture_menu_font_char_4, texture_menu_font_char_5, texture_menu_font_char_6, texture_menu_font_char_7,
+    texture_menu_font_char_8, texture_menu_font_char_9, texture_menu_font_char_A, texture_menu_font_char_B,
+    texture_menu_font_char_C, texture_menu_font_char_D, texture_menu_font_char_E, texture_menu_font_char_F,
+    texture_menu_font_char_G, texture_menu_font_char_H, texture_menu_font_char_I, texture_menu_font_char_J,
+    texture_menu_font_char_K, texture_menu_font_char_L, texture_menu_font_char_M, texture_menu_font_char_N,
+    texture_menu_font_char_O, texture_menu_font_char_P, texture_menu_font_char_Q, texture_menu_font_char_R,
+    texture_menu_font_char_S, texture_menu_font_char_T, texture_menu_font_char_U, texture_menu_font_char_V,
+    texture_menu_font_char_W, texture_menu_font_char_X, texture_menu_font_char_Y, texture_menu_font_char_Z,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0, texture_menu_font_char_apostrophe, texture_menu_font_char_period,
+    texture_menu_font_char_mface1, texture_menu_font_char_mface2,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0, texture_menu_font_char_comma,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0, texture_menu_font_char_dash,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0, texture_menu_font_char_ampersand,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0,       0x0,       0x0,
+          0x0,       0x0, texture_menu_font_char_exclamation,       0x0,
+    texture_menu_font_char_question,       0x0,       0x0,       0x0,
+          0x0, texture_menu_font_char_coin, texture_menu_font_char_star_filled, texture_menu_font_char_multiply,
+          0x0,       0x0,       0x0,       0x0,
+]
+
 
 // 0x0700D108 - 0x0700D160
 export const dl_menu_ia8_text_begin = [

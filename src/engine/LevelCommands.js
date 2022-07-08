@@ -151,7 +151,7 @@ class LevelCommands {
     }
 
     blackout(bool) {
-        console.log("ignoring blackout()")
+        // console.log("ignoring blackout()") // what does this even do?
         this.sCurrentScript.index++
     }
 
@@ -167,7 +167,11 @@ class LevelCommands {
     }
 
     show_dialog(index,  dialog) {
-        console.log("ignoring show_dialog()")
+        if (this.sCurrAreaIndex != -1) {
+            if (index < 2) {
+                Area.gAreas[this.sCurrAreaIndex].dialog[index] = dialog
+            }
+        }
         this.sCurrentScript.index++
     }
 
@@ -237,8 +241,9 @@ class LevelCommands {
     }
 
     unload_area() {
+        ObjectListProcessor.clear_objects()
+        Area.clear_area_graph_nodes()
         Area.clear_areas()
-        //clear_area_graph_nodes -- call all node functions with init and clear command
         this.sCurrentScript.index++
     }
 
