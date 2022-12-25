@@ -2,7 +2,7 @@ import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProce
 import { oPosX, oPosY, oPosZ, oHomeX, oHomeY, oHomeZ, oForwardVel, oMoveAngleYaw, oVelY,
     oFaceAngleYaw, oFriction, oGravity, oGraphYOffset, oAction, OBJ_ACT_LAVA_DEATH, OBJ_ACT_DEATH_PLANE_DEATH,
     oAngleToMario, oTimer, oAnimState,
-    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, ACTIVE_FLAG_DEACTIVATED
+    oBehParams, oRespawnerModelToRespawn, oRespawnerMinSpawnDist, oRespawnerBehaviorToRespawn, ACTIVE_FLAG_DEACTIVATED, oVelX, oVelZ
      } from "../include/object_constants"
 import { sins, coss, int32, uint16, int16, random_uint16, random_float } from "../utils"
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
@@ -23,6 +23,17 @@ export const OBJ_COL_FLAGS_LANDED = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_V
 
 export let sObjFloor
 export let sOrientObjWithFloor = 1
+
+export const obj_move_xyz_using_fvel_and_yaw = (obj) => {
+    const o = ObjectListProc.gCurrentObject
+    
+    o.rawData[oVelX] = obj.rawData[oForwardVel] * sins(obj.rawData[oMoveAngleYaw])
+    o.rawData[oVelZ] = obj.rawData[oForwardVel] * coss(obj.rawData[oMoveAngleYaw])
+
+    obj.rawData[oPosX] += o.rawData[oVelX]
+    obj.rawData[oPosY] += obj.rawData[oVelY]
+    obj.rawData[oPosZ] += o.rawData[oVelZ]
+}
 
 export const is_point_within_radius_of_mario = (x, y, z, dist) => {
     const mGfxX = ObjectListProc.gMarioObject.gfx.pos[0]
@@ -47,10 +58,10 @@ export const is_point_close_to_object = (obj, x, y, z, dist) => {
 
     if ((x - objX) * (x - objX) + (y - objY) * (y - objY) + (z - objZ) * (z - objZ)
         < (dist * dist)) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 
@@ -140,10 +151,10 @@ export const obj_find_wall = (objNewX, objY, objNewZ, objVelX, objVelZ) => {
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, wall_nX, wall_nZ, objYawWrapper)
 
         o.rawData[oMoveAngleYaw] = atan2s(objYawWrapper.z, objYawWrapper.x)
-        return 0
+        return false
     }
 
-    return 1
+    return true
 }
 
 export const obj_update_pos_vel_xz = () => {
@@ -165,7 +176,7 @@ export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVel
     if (objFloor == null) {
         //! (OOB Object Crash) TRUNC overflow exception after 36 minutes
         o.rawData[oMoveAngleYaw] += int32(o.rawData[oMoveAngleYaw] + 32767.999200000002)
-        return 0
+        return false
     }
 
     const floor_nX = objFloor.normal.x
@@ -179,10 +190,10 @@ export const turn_obj_away_from_steep_floor = (objFloor, floorY, objVelX, objVel
         const objYawWrapper = {}
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, floor_nX, floor_nZ, objYawWrapper)
         o.rawData[oMoveAngleYaw] = atan2s(objYawWrapper.z, objYawWrapper.x)
-        return 0
+        return false
     }
 
-    return 1
+    return true
 }
 
 export const obj_orient_graph = (obj, normalX, normalY, normalZ) => {
@@ -335,22 +346,22 @@ export const obj_return_home_if_safe = (obj, homeX, y, homeZ, dist) => {
     const angleTowardsHome = int16(atan2s(homeDistZ, homeDistX))
 
     if (is_point_within_radius_of_mario(homeX, y, homeZ, dist) == 1) {
-        return 1
+        return true
     } else {
         obj.rawData[oMoveAngleYaw] = approach_symmetric(obj.rawData[oMoveAngleYaw], angleTowardsHome, 320)
     }
 
-    return 0
+    return false
 }
 
 export const obj_check_if_facing_toward_angle = (base, goal, range) => {
     const dAngle = uint16(goal) - uint16(base)
 
     if ((sins(-range) < sins(dAngle)) && (sins(dAngle) < sins(range)) && (coss(dAngle) > 0)) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 export const obj_check_floor_death = (collisionFlags, floor) => {
@@ -409,7 +420,7 @@ export const obj_spawn_yellow_coins = (obj, nCoins) => {
 
 export const obj_flicker_and_disappear = (obj, lifeSpan) => {
 
-    if (obj.rawData[oTimer] < lifeSpan) return 0
+    if (obj.rawData[oTimer] < lifeSpan) return false
 
     if (obj.rawData[oTimer] < lifeSpan + 40) {
 
@@ -421,9 +432,8 @@ export const obj_flicker_and_disappear = (obj, lifeSpan) => {
 
     } else {
         obj.activeFlags = 0
-        return 1
+        return true
     }
 
-    return 0
-
+    return false
 }

@@ -20,7 +20,7 @@ import { dist_between_objects, obj_angle_to_object, spawn_object_at_origin, obj_
          cur_obj_set_model, spawn_water_droplet
 } from "../game/ObjectHelpers"
 
-import { s16, s32, random_float } from "../utils"
+import { s16, s32, random_float, random_int16 } from "../utils"
 
 const obj_and_int = (object, field, value) => { object.rawData[field] &= s32(value) }
 const cur_obj_add_int = (field, value) => { gLinker.ObjectListProcessor.gCurrentObject.rawData[field] += value }
@@ -67,11 +67,7 @@ class BehaviorCommands {
 
         while (bhvProcResult == this.BHV_PROC_CONTINUE) {
             const bhvFunc = this.bhvScript.commands[this.bhvScript.index]
-            if (Array.isArray(bhvFunc)) {
-                throw "deprecated behavior format: " + bhvFunc[0]
-            } else {
-                bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
-            }
+            bhvProcResult = bhvFunc.command.call(this, bhvFunc.args)
         }
 
         // Increment the object's timer.
@@ -130,7 +126,7 @@ class BehaviorCommands {
     }
 
 
-// cmds
+    // cmds
     cmd_spawn_water_droplet(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         let params = args.params
@@ -248,6 +244,13 @@ class BehaviorCommands {
     set_random_float(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         gCurrentObject.rawData[args.field] = (args.range * random_float()) + args.minimum
+        this.bhvScript.index++
+        return this.BHV_PROC_CONTINUE
+    }
+
+    set_int_rand_rshift(args) {
+        const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+        gCurrentObject.rawData[args.field] = s32(args.range >> random_int16()) + args.minimum
         this.bhvScript.index++
         return this.BHV_PROC_CONTINUE
     }
@@ -452,7 +455,7 @@ class BehaviorCommands {
     }
 
     // Command 0x29: Spawns a child object with the specified model and behavior, plus a behavior param.
-    // Usage: SPAWN_CHILD_WITH_PARAM(bhvParam, modelID, behavior)
+    // Usage: SPAWN_CHILD_WITH_PARAM(bhvParam, model, behavior)
     spawn_child_with_param(args) {
         const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
         let behavior = args.behavior
@@ -601,6 +604,8 @@ export const ANIMATE = (...args)                   => {return {command: Beh.anim
 export const BEGIN = (...args)                     => {return {command: Beh.begin, args: {objListIndex: args[0], name: args[1]}}}
 export const BEGIN_LOOP = (...args)                => {return {command: Beh.begin_loop}}
 export const BEGIN_REPEAT = (...args)              => {return {command: Beh.begin_repeat, args: {count: args[0]}}}
+export const CLEAR_BIT_PARENT = (...args)          => {return {command: Beh.parent_bit_clear, args: {field: args[0], value: args[1]}}}
+export const CYLBOARD = (...args)                  => {return {command: Beh.cylboard}}
 export const BILLBOARD = (...args)                 => {return {command: Beh.billboard}}
 export const BREAK = (...args)                     => {return {command: Beh.break}}
 export const CALL = (...args)                      => {return {command: Beh.call, args: {script: args[0]}}}
@@ -634,7 +639,9 @@ export const SET_MODEL = (...args)                 => {return {command: Beh.set_
 export const SET_OBJ_PHYSICS = (...args)           => {return {command: Beh.set_obj_physics, args: {hitboxRadius: args[0], gravity: args[1], bounciness: args[2], dragStrenth: args[3], friction: args[4], buoyancy: args[5]}}}
 export const SET_RANDOM_INT = (...args)            => {return {command: Beh.set_random_int, args: {field: args[0], minimum: args[1], range: args[2]}}}
 export const SET_RANDOM_FLOAT = (...args)          => {return {command: Beh.set_random_float, args: {field: args[0], minimum: args[1], range: args[2]}}}
+export const SET_INT_RAND_RSHIFT = (...args)       => {return {command: Beh.set_int_rand_rshift, args: {field: args[0], minimum: args[1], rshift: args[2]}}}  
 export const SUM_FLOAT = (...args)                 => {return {command: Beh.sum_float, args: {dest: args[0], value1: args[1], value2: args[2]}}}
-export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {model: args[0], behavior: args[1], bhvParam: args[2]}}}
+export const SPAWN_CHILD = (...args)               => {return {command: Beh.spawn_child_with_param, args: {bhvParam: 0, model: args[0], behavior: args[1]}}}
+export const SPAWN_CHILD_WITH_PARAM = (...args)    => {return {command: Beh.spawn_child_with_param, args: {bhvParam: args[0], model: args[1], behavior: args[2]}}}
 export const SPAWN_OBJ = (...args)                 => {return {command: Beh.spawn_obj, args: {model: args[0], behavior: args[1]}}}
 export const SPAWN_WATER_DROPLET = (...args)       => {return {command: Beh.cmd_spawn_water_droplet, args: {params: args[0]}}}

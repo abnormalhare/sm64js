@@ -1356,8 +1356,8 @@ export const wdw_seg7_area_1_collision = [
     COL_TRI_STOP(),
     COL_SPECIAL_INIT(1),
     SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/ 3395, 1280, 384, /*yaw*/ 128),
-    //COL_WATER_BOX_INIT(1),
-    //COL_WATER_BOX(0, -3839, -3839, 4608, 4608, 31), Unimplemented rendering shadows on water exception
+    COL_WATER_BOX_INIT(1),
+    COL_WATER_BOX(0, -3839, -3839, 4608, 4608, 31),
     COL_END(),
 ].flat();
 

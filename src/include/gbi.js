@@ -64,7 +64,12 @@ export const G_TEXTURE_SCALE_FRAC =	16
 export const G_SCALE_FRAC	=	8
 export const G_ROTATE_FRAC = 16
 
-
+/*
+ * G_SETSCISSOR: interlace mode
+ */
+export const G_SC_NON_INTERLACE	 = 0
+export const G_SC_ODD_INTERLACE	 = 3
+export const G_SC_EVEN_INTERLACE = 2
 
 /*
  * G_SETOTHERMODE_L sft: shift count
@@ -207,6 +212,7 @@ export const SHADER_TEXEL1 = 7
 export const SHADER_OPT_ALPHA = (1 << 24)
 export const SHADER_OPT_FOG = (1 << 25)
 export const SHADER_OPT_TEXTURE_EDGE = (1 << 26)
+export const SHADER_OPT_NOISE = (1 << 27)
 
 /*
  * G_SETCOMBINE: color combine modes
@@ -376,13 +382,6 @@ export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
 export const G_RM_TEX_EDGE               = 32
 export const G_RM_TEX_EDGE2              = 33
-
-/*
- * G_SETSCISSOR: interlace mode
- */
-export const G_SC_NON_INTERLACE  = 0
-export const G_SC_ODD_INTERLACE  = 3
-export const G_SC_EVEN_INTERLACE = 2
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */

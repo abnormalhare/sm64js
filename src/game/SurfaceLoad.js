@@ -19,8 +19,11 @@ class SurfaceLoad {
         this.SPATIAL_PARTITION_CEILS = 1
         this.SPATIAL_PARTITION_WALLS = 2
 
-        // this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
-        // this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0).map(() => new Array(3).fill(0).map(() => new Object())))
+        this.NUM_CELLS = (2 * Surfaces.LEVEL_BOUNDARY_MAX / Surfaces.CELL_SIZE)
+        this.NUM_CELLS_INDEX = (this.NUM_CELLS - 1)
+
+        this.gStaticSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0))
+        this.gDynamicSurfacePartition = new Array(16).fill(0).map(() => new Array(16).fill(0))
 
     }
 
@@ -40,7 +43,7 @@ class SurfaceLoad {
     surf_has_no_cam_collision(surfaceType) {
         if (surfaceType == Surfaces.SURFACE_NO_CAM_COLLISION || surfaceType == Surfaces.SURFACE_NO_CAM_COL_VERY_SLIPPERY || surfaceType == Surfaces.SURFACE_SWITCH) {
             return Surfaces.SURFACE_FLAG_NO_CAM_COLLISION
-        } else return 0
+        } else return false
     }
 
     read_surface_data(vertexData, vertexIndices) {

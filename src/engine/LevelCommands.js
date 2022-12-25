@@ -61,7 +61,6 @@ class LevelCommands {
     }
 
     init_level() {
-        //console.log("init level")
         GeoLayout.gObjParentGraphNode = init_graph_node_start(null, GeoLayout.gObjParentGraphNode)
         ObjectListProcessor.clear_objects()
         Area.clear_areas()
@@ -279,7 +278,7 @@ class LevelCommands {
                 activeAreaIndex: this.sCurrAreaIndex,
                 behaviorArg: bharg,
                 behaviorScript: bhscript,
-                unk18: Area.gLoadedGraphNodes[model],
+                unk18: Area.gLoadedGraphNodes[model], // model
                 next: Area.gAreas[this.sCurrAreaIndex].objectSpawnInfos
             }
 

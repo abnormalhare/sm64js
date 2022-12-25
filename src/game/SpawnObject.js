@@ -136,7 +136,7 @@ class SpawnObject {
         // peek at first command
         if (Array.isArray(bhvScript[0]) && bhvScript[0][0] == 'BEGIN') {
             return bhvScript[0][1]
-        }else if (bhvScript[0].command == BhvCmds.begin) {
+        } else if (bhvScript[0].command == BhvCmds.begin) {
             return bhvScript[0].args.objListIndex
         } else {
             return ObjectListProc.OBJ_LIST_DEFAULT
@@ -176,9 +176,15 @@ class SpawnObject {
             objListIndex == ObjectListProc.OBJ_LIST_GENACTOR ||
             objListIndex == ObjectListProc.OBJ_LIST_PUSHABLE) {
                 this.snap_object_to_floor(obj)
-            }
-
+        }
         return obj
+    }
+
+    /**
+     * Mark an object to be unloaded at the end of the frame.
+     */
+    mark_obj_for_deletion(obj) {
+        obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED;
     }
 }
 

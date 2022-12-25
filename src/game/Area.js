@@ -8,6 +8,7 @@ import { gSPViewport } from "../include/gbi"
 import { render_screen_transition } from "./ScreenTransition"
 import { HudInstance as Hud } from "./Hud"
 import { PrintInstance as Print } from "./Print"
+import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 import { SCREEN_WIDTH } from "../include/config"
 import { oBehParams, ACTIVE_FLAG_DEACTIVATED } from "../include/object_constants"
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
@@ -30,16 +31,33 @@ const D_8032CF00 = {  /// default view port?
 
 const canvas = document.querySelector('#gameCanvas')
 
+export const MENU_OPT_NONE = 0
+export const MENU_OPT_1 = 1
+export const MENU_OPT_2 = 2
+export const MENU_OPT_3 = 3
+export const MENU_OPT_DEFAULT = MENU_OPT_1
+
+    // Course Pause Menu
+export const MENU_OPT_CONTINUE = MENU_OPT_1
+export const MENU_OPT_EXIT_COURSE = MENU_OPT_2
+export const MENU_OPT_CAMERA_ANGLE_R = MENU_OPT_3
+
+    // Save Menu
+export const MENU_OPT_SAVE_AND_CONTINUE = MENU_OPT_1
+export const MENU_OPT_SAVE_AND_QUIT = MENU_OPT_2
+export const MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3
+
 class Area {
     constructor() {
         this.gCurrentArea = null
         this.gAreas = Array(8).fill(0).map(() => { return { index: 0 } })
         this.gCurAreaIndex = 0
         this.gCurrLevelNum = 0
-        this.gCurrCourseNum
+        this.gCurrCourseNum = 0
+        this.gSavedCourseNum = 0
         this.gCurrSaveFileNum = 1
         this.gLoadedGraphNodes = new Array(256)
-        this.gMenuOptSelectIndex
+        this.gMenuOptSelectIndex = 0
 
         this.D_8032CE74 = null
         this.D_8032CE78 = null
@@ -274,10 +292,13 @@ class Area {
             gSPViewport(gLinker.Game.gDisplayList, D_8032CF00)
             Hud.render_hud()
             Print.render_text_labels()
+            IngameMenu.do_cutscene_handler();
+            // print_displaying_credits_entry();
 
-            this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs()
-            if (this.gMenuOptSelectIndex != this.MENU_OPT_NONE) {
-                this.gSaveOptSelectIndex = this.gMenuOptSelectIndex
+            this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs();
+
+            if (this.gPauseScreenMode != 0) {
+                this.gSaveOptSelectIndex = this.gPauseScreenMode;
             }
 
             // if (D_8032CE78 != NULL) {

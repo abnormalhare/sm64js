@@ -1,13 +1,13 @@
 import * as _Linker from "./Linker"
-import { AreaInstance as Area } from "./Area"
-import { COURSE_NONE } from "../levels/course_defines"
+import { AreaInstance as Area, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./Area"
+import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { gLevelToCourseNumTable } from "./SaveFile"
+import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
-
-import { fadeout_music, raise_background_noise } from "./SoundInit"
+import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN } from "./IngameMenu"
+import { fadeout_music } from "./SoundInit"
 
 import {
     ACT_FLAG_INTANGIBLE, ACT_UNINITIALIZED,
@@ -29,6 +29,8 @@ import {
     ACT_WATER_IDLE,
     ACT_INTRO_CUTSCENE,
 } from "./Mario"
+
+import { GameInstance as Game } from "../game/Game"
 
 import {
     oBehParams, oPosX, oPosY, oPosZ, oMoveAngleYaw
@@ -62,6 +64,7 @@ import {
     SOUND_MOVING_AIM_CANNON,
     SOUND_OBJ_POUNDING_CANNON,
 } from "../include/sounds"
+import { SET_BACKGROUND_MUSIC } from "../engine/LevelCommands"
 
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
 
@@ -233,7 +236,7 @@ class LevelUpdate {
                 return this.sWarpBhvSpawnType[i][1]
             }
         }
-        return 0
+        return false
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
@@ -248,7 +251,7 @@ class LevelUpdate {
         // this.gSpecialTripleJump = 0
 
         Mario.init_mario_from_save_file()
-        // disable_warp_checkpoint();
+        disable_warp_checkpoint();
         // save_file_move_cap_to_default_location();
         Camera.select_mario_cam_mode()
         // set_yoshi_as_not_dead();
@@ -264,7 +267,7 @@ class LevelUpdate {
         Area.gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1]
 
         // if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
-        //     return 0;
+        //     return false;
         // }
 
         if (Area.gCurrLevelNum != LEVEL_BOWSER_1 && Area.gCurrLevelNum != LEVEL_BOWSER_2
@@ -276,18 +279,18 @@ class LevelUpdate {
 
         if (Area.gSavedCourseNum != Area.gCurrCourseNum) {
             Area.gSavedCourseNum = Area.gCurrCourseNum
-            // disable_warp_checkpoint();
+            disable_warp_checkpoint();
         }
 
-        // if (Area.gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
-        //     return 0;
-        // }
+        if (Area.gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
+            return false;
+        }
 
         // if (gDebugLevelSelect && !gShowProfiler) {
-        //     return 0;
+        //     return false;
         // }
 
-        return 1
+        return true
     }
 
     lvl_init_or_update(initOrUpdate) {
@@ -355,7 +358,7 @@ class LevelUpdate {
         // if (gMarioState.action == ACT_INTRO_CUTSCENE) {
         //     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE)
         // }
-        return 1
+        return true
     }
 
 
@@ -385,9 +388,24 @@ class LevelUpdate {
         return this.gHudDisplay.timer
     }
 
+    pressed_pause() {
+        let /*u32*/ val4 = IngameMenu.get_dialog_id() >= 0
+        let /*u32*/ intangible = (this.gMarioState.action & ACT_FLAG_INTANGIBLE) != 0
+
+        if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
+            && (window.playerInput.buttonPressedStart)) {
+            return true
+        }
+
+        return false
+    }
+
     warp_special(level) {
         this.sCurrPlayMode = PLAY_MODE_CHANGE_LEVEL
         this.warpSpecialLevel = level
+        this.gMarioState.health = 0x880
+        this.gMarioState.hurtCounter = 0
+        this.gMarioState.healCounter = 0
     }
 
     fade_into_special_warp(level, color) {
@@ -585,7 +603,7 @@ class LevelUpdate {
                 break
         }
 
-        // if (!gCurrDemoInput) {
+        if (Game.gCurrDemoInput == null) {
         //     set_background_music(Area.gCurrentArea.musicParam, Area.gCurrentArea.musicParam2, 0)
 
         //     if (gMarioState.flags & MARIO_METAL_CAP) {
@@ -611,7 +629,7 @@ class LevelUpdate {
         //             || this.sWarpDest.nodeId == 30)) {
         //         play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource)
         //     }
-        // }
+        }
     }
 
 // used for warps inside one level
@@ -1060,12 +1078,30 @@ class LevelUpdate {
                 this.set_play_mode(PLAY_MODE_CHANGE_AREA)
             } else if (this.pressed_pause()) {
             //     lower_background_noise(1)
-                Camera.gCameraMovementFlags |= Camera.CAM_MOVE_PAUSE_SCREEN
+                Camera.gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
                 this.set_play_mode(PLAY_MODE_PAUSED)
             }
         }
 
-        return 0
+        return false
+    }
+
+    play_mode_paused() {
+        if (Area.gMenuOptSelectIndex == MENU_OPT_NONE) {
+            IngameMenu.set_menu_mode(MENU_MODE_RENDER_PAUSE_SCREEN)
+         } else if (Area.gMenuOptSelectIndex == MENU_OPT_DEFAULT) {
+            // raise_background_noise(1);
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN
+            this.set_play_mode(PLAY_MODE_NORMAL)
+        } else {
+            this.initiate_warp(LEVEL_CASTLE, 1, 0x1F, 0)
+            this.fade_into_special_warp(0, 0)
+            Area.gSavedCourseNum = COURSE_NONE
+
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN
+        }
+
+        return 0;
     }
 
     play_mode_paused() {
@@ -1122,7 +1158,7 @@ class LevelUpdate {
             this.set_play_mode(PLAY_MODE_NORMAL)
         }
 
-        return 0
+        return false
     }
 
     /**
@@ -1145,7 +1181,7 @@ class LevelUpdate {
             }
         }
 
-        return 0
+        return false
     }
 
 

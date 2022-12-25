@@ -171,6 +171,7 @@ const platform_on_track_act_move_along_track = () => {
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
     let initialAngle
+    let pxWrapper
 
     if (!o.rawData[oPlatformOnTrackIsNotSkiLift]) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR3)
@@ -203,7 +204,9 @@ const platform_on_track_act_move_along_track = () => {
             }
 
             // Spawn a new track ball if necessary
-            if (approach_f32_ptr(o.rawData[oPlatformOnTrackDistMovedSinceLastBall], 300.0, o.rawData[oForwardVel])) {
+            pxWrapper = { px: o.rawData[oPlatformOnTrackDistMovedSinceLastBall] }
+            if (approach_f32_ptr(pxWrapper, 300.0, o.rawData[oForwardVel])) {
+                o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
                 o.rawData[oPlatformOnTrackDistMovedSinceLastBall] -= 300.0
 
                 o.rawData[oHomeX] = o.rawData[oPosX]
@@ -212,6 +215,8 @@ const platform_on_track_act_move_along_track = () => {
                 o.rawData[oPlatformOnTrackBaseBallIndex] = o.rawData[oPlatformOnTrackBaseBallIndex] + 1
 
                 platform_on_track_update_pos_or_spawn_ball(5, o.rawData[oHomeX], o.rawData[oHomeY], o.rawData[oHomeZ])
+            } else {
+                o.rawData[oPlatformOnTrackDistMovedSinceLastBall] = pxWrapper.px
             }
         }
 
@@ -320,6 +325,8 @@ const platform_on_track_rock_ski_lift = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
 
+    let pxWrapper
+
     switch (o.rawData[oAction]) {
         case PLATFORM_ON_TRACK_ACT_INIT:
             platform_on_track_act_init()
@@ -346,7 +353,9 @@ const platform_on_track_rock_ski_lift = () => {
             o.rawData[oPlatformOnTrackWasStoodOn] = true
         }
 
-        approach_f32_ptr(o.rawData[oPlatformOnTrackOffsetY], 0.0, 0.5)
+        pxWrapper = { px: o.rawData[oPlatformOnTrackOffsetY] }
+        approach_f32_ptr(pxWrapper, 0.0, 0.5)
+        o.rawData[oPlatformOnTrackOffsetY] = pxWrapper.px
         o.rawData[oPosY] += o.rawData[oPlatformOnTrackOffsetY]
     }
 }

@@ -1,3 +1,4 @@
+import * as _Linker from "../../game/Linker"
 import { ObjectListProcessorInstance as ObjectListProc } from "../ObjectListProcessor"
 import { spawn_object, cur_obj_become_intangible, cur_obj_become_tangible } from "../ObjectHelpers"
 import { MODEL_SPARKLES } from "../../include/model_ids"
@@ -43,10 +44,10 @@ const coin_step = (collisionFlagsPtr) => {
 
     if ((collisionFlagsPtr.value & 0x1) != 0 && (collisionFlagsPtr.value & 0x8) == 0) {
         ///cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP)
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const moving_coin_flicker = () => {
@@ -93,3 +94,6 @@ export const bhv_moving_yellow_coin_loop = () => {
     }
 
 }
+
+gLinker.bhv_moving_yellow_coin_init = bhv_moving_yellow_coin_init
+gLinker.bhv_moving_yellow_coin_loop = bhv_moving_yellow_coin_loop

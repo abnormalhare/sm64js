@@ -47,12 +47,16 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          ACT_SOFT_BACKWARD_GROUND_KB,
          ACT_FORWARD_AIR_KB,
          ACT_SOFT_FORWARD_GROUND_KB,
-         MARIO_NORMAL_CAP
+         MARIO_NORMAL_CAP,
+         ACT_WAITING_FOR_DIALOG,
+         ACT_GRABBED
 } from "./Mario"
-
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
-import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL, SOUND_MENU_STAR_SOUND } from "../include/sounds"
+import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL,
+         SOUND_MENU_STAR_SOUND, SOUND_MARIO_OOOF, SOUND_MARIO_ON_FIRE,
+         SOUND_MARIO_ATTACKED, SOUND_GENERAL_FLAME_OUT
+} from "../include/sounds"
 
 import {
     DIALOG_022, DIALOG_023, DIALOG_024, DIALOG_025, DIALOG_026, DIALOG_027, DIALOG_028, DIALOG_029
@@ -62,8 +66,7 @@ import * as MarioConstants from "../include/mario_constants"
 
 import { oInteractType, oInteractStatus, oMarioPoleUnk108, oMarioPoleYawVel, oMarioPolePos,
          oInteractionSubtype, oDamageOrCoinValue, oPosX, oPosY, oPosZ, oMoveAngleYaw,
-         oBehParams,
-         oForwardVel
+         oBehParams, oForwardVel, oMarioBurnTimer
 } from "../include/object_constants"
 
 import { atan2s, sqrtf } from "../engine/math_util"
@@ -91,7 +94,7 @@ import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     SAVE_FLAG_CAP_ON_KLEPTO,
     SAVE_FLAG_CAP_ON_UKIKI,
     save_file_collect_star_or_key,
- } from "./SaveFile"
+} from "./SaveFile"
 import { MODEL_NONE } from "../include/model_ids"
 
 
@@ -225,7 +228,7 @@ const check_lava_boost = (m) => {
             m.hurtCounter += (m.flags & MARIO_CAP_ON_HEAD) ? 12 : 18
         }
 
-        //update_mario_sound_and_camera(m)
+        update_mario_sound_and_camera(m)
         drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0)
     }
 }
@@ -273,7 +276,7 @@ const interact_coin = (m, o) => {
         /// TODO spawn star
     }
 
-    return 0
+    return false
 }
 
 const interact_star_or_key = (m, /*interactType,*/ o) => {
@@ -330,10 +333,8 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
         //     fadeout_level_music(126);
         // }
 
-        play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject);
-// #ifndef VERSION_JP
+        play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.gfx.cameraToObject)
         update_mario_sound_and_camera(m)
-// #endif
 
         if (grandStar) {
             return set_mario_action(m, ACT_JUMBO_STAR_CUTSCENE, 0)
@@ -381,7 +382,7 @@ export const interact_warp = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const interact_warp_door = (m, o) => {
@@ -402,7 +403,7 @@ export const interact_warp_door = (m, o) => {
                 }
                 sDisplayingDoorText = 1
 
-                return 0
+                return false
             }
 
             doorAction = ACT_UNLOCKING_KEY_DOOR
@@ -411,13 +412,13 @@ export const interact_warp_door = (m, o) => {
         if (warpDoorId == 2 && !(saveFlags & SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) {
             if (!(saveFlags & SAVE_FLAG_HAVE_KEY_1)) {
                 if (!sDisplayingDoorText) {
-                      // Moat door skip was intended confirmed
+                    // Moat door skip was intended confirmed
                     set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG,
                                      (saveFlags & SAVE_FLAG_HAVE_KEY_2) ? DIALOG_023 : DIALOG_022)
                 }
                 sDisplayingDoorText = 1
 
-                return 0
+                return false
             }
 
             doorAction = ACT_UNLOCKING_KEY_DOOR
@@ -440,7 +441,7 @@ export const interact_warp_door = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 export const get_door_save_file_flag = (door) => {
@@ -547,7 +548,7 @@ export const interact_door = (m, o) => {
         return set_mario_action(m, ACT_ENTERING_STAR_DOOR, should_push_or_pull_door(m, o))
     }
 
-    return 0
+    return false
 }
 
 const interact_cannon_base = (m, o) => {
@@ -559,7 +560,7 @@ const interact_cannon_base = (m, o) => {
         return set_mario_action(m, ACT_IN_CANNON, 0)
     }
 
-    return 0
+    return false
 }
 
 const interact_bounce_top = (m, o) => {
@@ -586,24 +587,24 @@ const interact_bounce_top = (m, o) => {
         }
 
     } else if (take_damage_and_knock_back(m, o)) {
-        return 1
+        return true
     }
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
-    return 0
+    return false
 
 }
 
 const interact_damage = (m, o) => {
-    if (take_damage_and_knock_back(m, o)) return 1
+    if (take_damage_and_knock_back(m, o)) return true
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
 
-    return 0
+    return false
 }
 
 const interact_breakable = (m, o) => {
@@ -625,24 +626,62 @@ const interact_breakable = (m, o) => {
                 break
         }
 
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const interact_mr_blizzard = (m, o) => {
     if (take_damage_and_knock_back(m, o)) {
-        return 1
+        return true
     }
 
     if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
         sDelayInvincTimer = 1
     }
 
-    return 0
+    return false
 }
 
+const interact_hit_from_below = (m, o) => {
+    let interaction
+
+    if (m.flags & MARIO_METAL_CAP) {
+        interaction = INT_FAST_ATTACK_OR_SHELL
+    } else {
+        interaction = determine_interaction(m, o)
+    }
+
+    if (interaction & INT_ANY_ATTACK) {
+        // queue_rumble_data(5, 80)
+        attack_object(o, interaction)
+        bounce_back_from_attack(m, interaction)
+
+        if (interaction & INT_HIT_FROM_BELOW) {
+            hit_object_from_below(m, o)
+        }
+
+        if (interaction & INT_HIT_FROM_ABOVE) {
+            if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_TWIRL_BOUNCE) {
+                bounce_off_object(m, o, 80.0)
+                reset_mario_pitch(m)
+                // play_sound(SOUND_MARIO_TWIRL_BOUNCE, m.marioObj.gfx.cameraToObject)
+                return drop_and_set_mario_action(m, ACT_TWIRLING, 0)
+            } else {
+                bounce_off_object(m, o, 30.0)
+            }
+        }
+    } else if (take_damage_and_knock_back(m, o)) {
+        return true
+    }
+
+    if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
+        sDelayInvincTimer = true
+    }
+
+    return false
+}
 
 export const interact_cap = (m, o) => {
    let /*u32*/capFlag = get_mario_cap_flag(o)
@@ -691,10 +730,10 @@ export const interact_cap = (m, o) => {
             play_cap_music(capMusic)
         }
 
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 const interact_grabbable = (m, o) => {
@@ -706,19 +745,21 @@ const interact_grabbable = (m, o) => {
         if (interaction & (INT_KICK | INT_TRIP)) {
             attack_object(o, interaction)
             bounce_back_from_attack(m, interaction)
-            return 0
+            return false
         }
     }
 
     if (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO) {
-        throw "unimplemented object grabs mario - interact_grabbable"
+        if (check_object_grab_mario(m, o)) {
+            return true
+        }
     }
 
     if (able_to_grab_object(m, o)) {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_NOT_GRABBABLE)) {
             m.interactObj = o
             m.input |= INPUT_INTERACT_OBJ_GRABBABLE
-            return 1
+            return true
         }
     }
 
@@ -726,7 +767,7 @@ const interact_grabbable = (m, o) => {
         push_mario_out_of_object(m, o, -5.0)
     }
 
-    return 0
+    return false
 }
 
 
@@ -734,22 +775,22 @@ const mario_can_talk = (m, arg) => {
     let val6
 
     if ((m.action & ACT_FLAG_IDLE) != 0x00000000) {
-        return 1
+        return true
     }
 
     if (m.action == ACT_WALKING) {
         if (arg) {
-            return 1
+            return true
         }
 
-        val6 = m.marioObj.gfx.unk38.animID
+        val6 = m.marioObj.gfx.animInfo.animID
 
         if (val6 == 0x0080 || val6 == 0x007F || val6 == 0x006C) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
 const check_read_sign = (m, o) => {
@@ -769,7 +810,7 @@ const check_read_sign = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const check_npc_talk = (m, o) => {
@@ -787,7 +828,7 @@ const check_npc_talk = (m, o) => {
     }
 
     push_mario_out_of_object(m, o, -10.0)
-    return 0
+    return false
 }
 
 const interact_text = (m, o) => {
@@ -802,6 +843,24 @@ const interact_text = (m, o) => {
     }
 
     return interact
+}
+
+const check_object_grab_mario = (m, o) => { // commented out because game broke aaa
+    if ((!(m.action & (ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ATTACKING)) || !sInvulnerable) && (o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
+        if (object_facing_mario(m, o, 0x2AAA)) {
+            mario_stop_riding_and_holding(m)
+            o.rawData[oInteractStatus] = INT_STATUS_INTERACTED | INT_STATUS_GRABBED_MARIO
+
+            m.faceAngle[1] = o.rawData[oMoveAngleYaw]
+            m.interactObj = o
+            m.usedObj = o
+
+            update_mario_sound_and_camera(m)
+            play_sound(SOUND_MARIO_OOOF, m.marioObj.gfx.cameraToObject)
+
+            return set_mario_action(m, ACT_GRABBED, 0)
+        }
+    }
 }
 
 const interact_pole = (m, o) => {
@@ -831,7 +890,7 @@ const interact_pole = (m, o) => {
         }
     }
 
-    return 0
+    return false
 }
 
 const interact_flame = (m, o) => {
@@ -846,11 +905,11 @@ const interact_flame = (m, o) => {
 
         if ((m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
             || m.waterLevel - m.pos[1] > 50.0) {
-            //play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject);
+            play_sound(SOUND_GENERAL_FLAME_OUT, m.marioObj.gfx.cameraToObject);
         } else {
-            m.marioObj.oMarioBurnTimer = 0
-            //update_mario_sound_and_camera(m)
-            //play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject);
+            m.marioObj.rawData[oMarioBurnTimer] = 0
+            update_mario_sound_and_camera(m)
+            play_sound(SOUND_MARIO_ON_FIRE, m.marioObj.gfx.cameraToObject);
 
             if ((m.action & ACT_FLAG_AIR) && m.vel[1] <= 0.0) {
                 burningAction = ACT_BURNING_FALL
@@ -997,13 +1056,13 @@ const interact_shock = (m, o) => {
         m.interactObj = o
 
         take_damage_from_interact_object(m)
-        //play_sound(SOUND_MARIO_ATTACKED, m.marioObj.gfx.cameraToObject);
+        play_sound(SOUND_MARIO_ATTACKED, m.marioObj.gfx.cameraToObject)
         //queue_rumble_data(70, 60)
 
         if (m.action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
             return drop_and_set_mario_action(m, ACT_WATER_SHOCKED, 0)
         } else {
-            //update_mario_sound_and_camera(m)
+            update_mario_sound_and_camera(m)
             return drop_and_set_mario_action(m, ACT_SHOCKED, actionArg)
         }
     }
@@ -1019,18 +1078,18 @@ const able_to_grab_object = (m, o) => {
 
     if (action == ACT_DIVE_SLIDE || action == ACT_DIVE) {
         if (!(o.rawData[oInteractionSubtype] & INT_SUBTYPE_GRABS_MARIO)) {
-            return 1
+            return true
         }
     } else if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING) {
         if (m.actionArg < 2) {
-            return 1
+            return true
         }
     }
 
-    return 0
+    return false
 }
 
-const mario_obj_angle_to_object = (m, o) => {
+export const mario_obj_angle_to_object = (m, o) => {
     const dx = o.rawData[oPosX] - m.pos[0]
     const dz = o.rawData[oPosZ] - m.pos[2]
 
@@ -1237,7 +1296,7 @@ export const get_mario_cap_flag = (capObject) => {
         return MARIO_VANISH_CAP
     }
 
-    return 0
+    return false
 }
 
 
@@ -1253,10 +1312,10 @@ const object_facing_mario = (m, o, angleRange) => {
     let dAngle = s16(angleToMario - o.rawData[oMoveAngleYaw])
 
     if (-angleRange <= dAngle && dAngle <= angleRange) {
-        return 1
+        return true
     }
 
-    return 0
+    return false
 }
 
 
@@ -1267,13 +1326,6 @@ const determine_interaction = (m, o) => {
     let dYawToObject = mario_obj_angle_to_object(m, o) - m.faceAngle[1]
     dYawToObject = dYawToObject > 32767 ? dYawToObject - 65536 : dYawToObject
     dYawToObject = dYawToObject < -32768 ? dYawToObject + 65536 : dYawToObject
-
-    // hack: make water punch actually do something
-    if (m.action == ACT_WATER_PUNCH && o.rawData[oInteractType] & INTERACT_PLAYER) {
-        if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
-            return INT_PUNCH
-        }
-    }
 
     if (action & ACT_FLAG_ATTACKING) {
         if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING || action == ACT_JUMP_KICK) {
@@ -1439,7 +1491,7 @@ export const take_damage_and_knock_back = (m, o) => {
 
     }
 
-    return 0
+    return false
 
 }
 
@@ -1488,7 +1540,7 @@ const sInteractionHandlers = [
     { interactType: INTERACT_SHOCK, handler: interact_shock },
     { interactType: INTERACT_BOUNCE_TOP2, handler: null },
     { interactType: INTERACT_MR_BLIZZARD, handler: interact_mr_blizzard },
-    { interactType: INTERACT_HIT_FROM_BELOW, handler: null },
+    { interactType: INTERACT_HIT_FROM_BELOW, handler: interact_hit_from_below },
     { interactType: INTERACT_BOUNCE_TOP, handler: interact_bounce_top },
     { interactType: INTERACT_DAMAGE, handler: interact_damage },
     { interactType: INTERACT_POLE, handler: interact_pole },

@@ -378,24 +378,27 @@ export class n64GfxProcessor {
 
     import_texture_rgba16(tile) {
         const rgba32_buf = []
-        for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
-            const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
+        try {
+            for (let i = 0; i < this.rdp.loaded_texture[tile].size_bytes / 2; i++) {
+                const col16 = (this.rdp.loaded_texture[tile].textureData[2 * i] << 8) | this.rdp.loaded_texture[tile].textureData[2 * i + 1]
+                const a = col16 & 1
+                const r = (col16 >> 11) & 0x1f
+                const g = (col16 >> 6) & 0x1f
+                const b = (col16 >> 1) & 0x1f
 
-            const a = col16 & 1
-            const r = (col16 >> 11) & 0x1f
-            const g = (col16 >> 6) & 0x1f
-            const b = (col16 >> 1) & 0x1f
+                rgba32_buf.push(this.scale_5_8(r))
+                rgba32_buf.push(this.scale_5_8(g))
+                rgba32_buf.push(this.scale_5_8(b))
+                rgba32_buf.push(a ? 255 : 0)
+            }
 
-            rgba32_buf.push(this.scale_5_8(r))
-            rgba32_buf.push(this.scale_5_8(g))
-            rgba32_buf.push(this.scale_5_8(b))
-            rgba32_buf.push(a ? 255 : 0)
+            const width = this.rdp.texture_tile.line_size_bytes / 2
+            const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
+
+            WebGL.upload_texture(rgba32_buf, width, height)
+        } catch (except) {
+            console.log("ERROR: unimported texture:", except)
         }
-
-        const width = this.rdp.texture_tile.line_size_bytes / 2
-        const height = this.rdp.loaded_texture[tile].size_bytes / this.rdp.texture_tile.line_size_bytes
-
-        WebGL.upload_texture(rgba32_buf, width, height)
 
     }
 
@@ -543,12 +546,14 @@ export class n64GfxProcessor {
         let use_alpha = (this.rdp.other_mode_l & (Gbi.G_BL_A_MEM << 18)) == 0
         const use_fog = (this.rdp.other_mode_l >>> 30) == Gbi.G_BL_CLR_FOG
         const texture_edge = (this.rdp.other_mode_l & Gbi.CVG_X_ALPHA) == Gbi.CVG_X_ALPHA
+        const use_noise = this.rdp.other_mode_h[Gbi.G_MDSFT_ALPHACOMPARE] == Gbi.G_AC_DITHER
 
         if (texture_edge) use_alpha = true
 
         if (use_alpha) cc_id |= Gbi.SHADER_OPT_ALPHA
         if (use_fog) cc_id |= Gbi.SHADER_OPT_FOG
         if (texture_edge) cc_id |= Gbi.SHADER_OPT_TEXTURE_EDGE
+        if (use_noise) cc_id |= Gbi.SHADER_OPT_NOISE
 
         if (!use_alpha) cc_id &= ~0xfff000
 

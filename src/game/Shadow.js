@@ -7,7 +7,7 @@ import { atan2s } from "../engine/math_util"
 import { coss, sins } from "../utils"
 import { make_vertex, round_float } from "./GeoMisc"
 import * as Gbi from "../include/gbi"
-import { dl_shadow_circle, dl_shadow_square, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../common_gfx/segment2"
+import { dl_shadow_circle, dl_shadow_square, dl_shadow_9_verts, dl_shadow_end, dl_shadow_4_verts } from "../bin/segment2"
 import { FLOOR_LOWER_LIMIT_SHADOW } from "../include/surface_terrains"
 import { oFaceAngleYaw } from "../include/object_constants"
 
@@ -65,8 +65,8 @@ const atan2_deg = (a, b) => {
 const correct_shadow_solidity_for_animations = (isLuigi, initialSolidity, shadow) => {
     if (ObjectListProc.gMarioObject.length > 1) throw "not implemented multiple mario shadow"
     const player = ObjectListProc.gMarioObject
-    const animFrame = player.gfx.unk38.animFrame
-    switch (player.gfx.unk38.animID) {
+    const animFrame = player.gfx.animInfo.animFrame
+    switch (player.gfx.animInfo.animID) {
         default: return SHADOW_SOLIDITY_NOT_YET_SET
     }
 }
@@ -90,7 +90,7 @@ const dim_shadow_with_distance = (solidity, distFromFloor) => {
 const get_water_level_below_shadow = (s) => {
     let waterLevel = SurfaceCollision.find_water_level(s.parentX, s.parentZ)
     if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
-        return 0
+        return false
     } else if (s.parentY >= waterLevel && s.floorHeight <= waterLevel) {
         gShadowAboveWaterOrLava = true
         return waterLevel
@@ -111,6 +111,7 @@ const scale_shadow_with_distance = (initial, distFromFloor) => {
 }
 
 const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
+    let waterLevel;
     s.parentX = xPos
     s.parentY = yPos
     s.parentZ = zPos
@@ -118,8 +119,8 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
     const floorGeometry = {}
     s.floorHeight = SurfaceCollision.find_floor_height_and_data(s.parentX, s.parentY, s.parentZ, floorGeometry)
 
-    if (gLinker.Area.gEnvironmentRegions) {
-        let waterLevel = get_water_level_below_shadow(s)
+    if (gLinker.ObjectListProcessor.gEnvironmentRegions != null) {
+        waterLevel = get_water_level_below_shadow(s)
     }
 
     if (gShadowAboveWaterOrLava) {
@@ -131,7 +132,7 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
         s.floorNormalZ = 0
         s.floorOriginOffset = -waterLevel
     } else {
-        if (s.floorHeight < -10000.0 || floorGeometry.normalY <= 0.0) return 1
+        if (s.floorHeight < -10000.0 || floorGeometry.normalY <= 0.0) return true
 
         s.floorNormalX = floorGeometry.normalX
         s.floorNormalY = floorGeometry.normalY
@@ -155,7 +156,7 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
         s.floorTilt = 90.0 - atan2_deg(floorSteepness, s.floorNormalY)
     }
 
-    return 0
+    return false
 }
 
 const get_vertex_coords = (index, shadowVertexType, coords) => {
@@ -400,7 +401,7 @@ const get_shadow_height_solidity = (xPos, yPos, zPos, p) => {  // *shadowHeight,
     p.shadowHeight = SurfaceCollision.find_floor_height_and_data(xPos, yPos, zPos, {})
 
     if (p.shadowHeight < FLOOR_LOWER_LIMIT_SHADOW) {
-        return 1
+        return true
     } else {
         waterLevel = SurfaceCollision.find_water_level(xPos, zPos)
 
@@ -410,7 +411,7 @@ const get_shadow_height_solidity = (xPos, yPos, zPos, p) => {  // *shadowHeight,
             p.solidity = 200
         }
     }
-    return 0
+    return false
 }
 
 /**

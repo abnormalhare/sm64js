@@ -134,6 +134,14 @@ class ObjectListProcessor {
         this.gCCMEnteredSlide = 0
         this.gCheckingSurfaceCollisionsForCamera = 0
         this.gMarioShotFromCannon = 0
+        this.gFindFloorIncludeSurfaceIntangible
+        this.gNumFindFloorMisses = 0
+        this.gEnvironmentRegions = 0
+        this.gNumCalls = {
+            floor: 0,
+            ceil: 0,
+            wall: 0,
+        }
         this.gObjectLists = new Array(13).fill(0).map((e, i) => { 
             const headObj = {}
             headObj.name = i
@@ -206,7 +214,7 @@ class ObjectListProcessor {
 
         }
 
-        return 0
+        return false
     }
 
     unload_deactivated_objects() {
@@ -234,10 +242,8 @@ class ObjectListProcessor {
         if (!(this.gCurrentObject.rawData[oActiveParticleFlags] & activeParticleFlag)) {
             this.gCurrentObject.rawData[oActiveParticleFlags] |= activeParticleFlag
             let particle
-            if (activeParticleFlag != 2048) {
-                particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
-                obj_copy_pos_and_angle(particle, this.gCurrentObject)
-            }
+            particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
+            obj_copy_pos_and_angle(particle, this.gCurrentObject)
         }
     }
 

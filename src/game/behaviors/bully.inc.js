@@ -1,5 +1,3 @@
-// bully.inc.c
-
 import { play_puzzle_jingle } from "../../audio/external"
 import { GRAPH_RENDER_INVISIBLE } from "../../engine/graph_node"
 import { MODEL_BULLY, MODEL_YELLOW_COIN } from "../../include/model_ids"
@@ -127,7 +125,7 @@ const bully_act_knockback = () => {
         o.rawData[oMoveAngleYaw] = o.rawData[oFaceAngleYaw]
         obj_turn_toward_object(o, gMarioObject, 16, 0x500)
     } else {
-        o.gfx.unk38.animFrame = 0
+        o.gfx.animInfo.animFrame = 0
     }
 
     if (o.rawData[oBullyKBTimerAndMinionKOCounter] == 18) {
@@ -174,7 +172,7 @@ const bully_backup_check = (collisionFlags) => {
 const bully_play_stomping_sound = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
 
-    let animFrame = o.gfx.unk38.animFrame
+    let animFrame = o.gfx.animInfo.animFrame
 
     switch (o.rawData[oAction]) {
         case BULLY_ACT_PATROL:

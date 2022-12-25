@@ -151,9 +151,14 @@ document.getElementById("mapSelect").addEventListener('change', () => {
     }
 })
 
+window.cheats = {
+    disableFallDamage: false,
+    disableSlopePhysics: false,
+    healOnWarp: false
+}
+
 const startGame = () => {
     gameStarted = true
-    window.cheats = {}
 
     document.getElementById("startbutton").classList.remove('btn-success')
     document.getElementById("startbutton").classList.add('btn-light')

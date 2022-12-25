@@ -12,7 +12,7 @@ export const ACTIVE_FLAG_IN_DIFFERENT_ROOM      =  (1 <<  3) // 0x0008
 export const ACTIVE_FLAG_UNIMPORTANT            =  (1 <<  4) // 0x0010
 export const ACTIVE_FLAG_INITIATED_TIME_STOP    =  (1 <<  5) // 0x0020
 export const ACTIVE_FLAG_MOVE_THROUGH_GRATE     =  (1 <<  6) // 0x0040
-export const ACTIVE_FLAG_UNK7                   =  (1 <<  7) // 0x0080
+export const ACTIVE_FLAG_DITHERED_ALPHA         =  (1 <<  7) // 0x0080
 export const ACTIVE_FLAG_UNK8                   =  (1 <<  8) // 0x0100
 export const ACTIVE_FLAG_UNK9                   =  (1 <<  9) // 0x0200
 export const ACTIVE_FLAG_UNK10                  =  (1 << 10) // 0x0400
@@ -97,6 +97,20 @@ export const HELD_FREE = 0
 export const HELD_HELD = 1
 export const HELD_THROWN = 2
 export const HELD_DROPPED = 3
+
+/* oDialogState */
+export const DIALOG_STATUS_ENABLE_TIME_STOP  = 0
+export const DIALOG_STATUS_INTERRUPT         = 1
+export const DIALOG_STATUS_START_DIALOG      = 2
+export const DIALOG_STATUS_STOP_DIALOG       = 3
+export const DIALOG_STATUS_DISABLE_TIME_STOP = 4
+
+export const DIALOG_FLAG_NONE              = 0
+export const DIALOG_FLAG_TURN_TO_MARIO     = (1 << 0) // 0x01 // cutscene only
+export const DIALOG_FLAG_TEXT_DEFAULT      = (1 << 1) // 0x02
+export const DIALOG_FLAG_TEXT_RESPONSE     = (1 << 2) // 0x04 // non-cutscene only
+export const DIALOG_FLAG_UNK_CAPSWITCH     = (1 << 3) // 0x08 // not defined
+export const DIALOG_FLAG_TIME_STOP_ENABLED = (1 << 4) // 0x10
 
 export const oFlags                       = 0x01
 export const oDialogResponse              = 0x02
@@ -1143,6 +1157,17 @@ export const oWaterLevelPillarDrained  = 0x1C
 export const oWaterLevelTriggerUnkF4             = 0x1B
 export const oWaterLevelTriggerTargetWaterLevel  = 0x1C
 
+/* Water level diamond */
+    /* oAction */
+    // Loading
+export const WATER_LEVEL_DIAMOND_ACT_INIT               = 0
+    // Idling when Mario isn't inside its hitbox
+export const WATER_LEVEL_DIAMOND_ACT_IDLE               = 1
+    // While the water level is changing
+export const WATER_LEVEL_DIAMOND_ACT_CHANGE_WATER_LEVEL = 2
+    // After the water level has changed but Mario hasn't left its hitbox yet
+export const WATER_LEVEL_DIAMOND_ACT_IDLE_SPINNING      = 3
+
 /* Water Objects */
 export const oWaterObjUnkF4   = 0x1B
 export const oWaterObjUnkF8   = 0x1C
@@ -1206,7 +1231,6 @@ export const oWoodenPostSpeedY            = 0x1D
 export const oWoodenPostMarioPounding     = 0x1E
 export const oWoodenPostOffsetY           = 0x1F
 
-
 /* oAction */
 export const CHAIN_CHOMP_ACT_UNINITIALIZED = 0
 export const CHAIN_CHOMP_ACT_MOVE = 1
@@ -1215,6 +1239,11 @@ export const CHAIN_CHOMP_ACT_UNLOAD_CHAIN = 2
 /* oSubAction */
 export const CHAIN_CHOMP_SUB_ACT_TURN = 0
 export const CHAIN_CHOMP_SUB_ACT_LUNGE = 1
+
+/* Mad piano */
+    /* oAction */
+    export const MAD_PIANO_ACT_WAIT   = 0
+    export const MAD_PIANO_ACT_ATTACK = 1
 
 /* Moving Yellow Coin */
     /* oAction */
@@ -1259,6 +1288,12 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     export const GOOMBA_ACT_ATTACKED_MARIO = 1
     export const GOOMBA_ACT_JUMP = 2
 
+/* BBH Merry-Go-Round */
+    /* gMarioCurrentRoom */
+    export const BBH_NEAR_MERRY_GO_ROUND_ROOM = 10
+    export const BBH_DYNAMIC_SURFACE_ROOM     = 0
+    export const BBH_OUTSIDE_ROOM             = 13
+
 /* Bob-omb */
     /* oBehParams2ndByte */
     export const BOBOMB_BP_STYPE_GENERIC = 0
@@ -1301,3 +1336,18 @@ export const WOODEN_POST_BP_NO_COINS_MASK = 0x0000FF00
     /* oBehParams2ndByte */
     export const CAMERA_LAKITU_BP_FOLLOW_CAMERA = 0
     export const CAMERA_LAKITU_BP_INTRO         = 1
+
+/* BBH Haunted Bookshelf */
+    /* oAction */
+    export const HAUNTED_BOOKSHELF_ACT_IDLE   = 0
+    export const HAUNTED_BOOKSHELF_ACT_RECEDE = 1
+
+/* WDW Arrow Lift */
+    /* oAction */
+    export const ARROW_LIFT_ACT_IDLE        = 0
+    export const ARROW_LIFT_ACT_MOVING_AWAY = 1
+    export const ARROW_LIFT_ACT_MOVING_BACK = 2
+
+    /* status */
+    export const ARROW_LIFT_NOT_DONE_MOVING = 0
+    export const ARROW_LIFT_DONE_MOVING     = 1

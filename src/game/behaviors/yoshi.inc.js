@@ -6,12 +6,13 @@ import { cur_obj_play_sound_2 } from "../SpawnSound"
 import { s16, random_float } from "../../utils"
 import { atan2s } from "../../engine/math_util"
 import { oPosX, oPosY, oPosZ, oVelY, oMoveAngleYaw, oForwardVel, oHomeX, oHomeY, oHomeZ, oAction,
-oTimer, oInteractStatus, oInteractionSubtype, oGravity, oFriction, oBuoyancy } from "../../include/object_constants"
+         oTimer, oInteractStatus, oInteractionSubtype, oGravity, oFriction, oBuoyancy, oAngleToMario } from "../../include/object_constants"
 import { MODEL_YOSHI } from "../../include/model_ids"
 import { SOUND_GENERAL_YOSHI_WALK, SOUND_GENERAL_ENEMY_ALERT1, SOUND_GENERAL_COLLECT_1UP,
-SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
+         SOUND_MENU_YOSHI_GAIN_LIVES } from "../../include/sounds"
 import { INT_SUBTYPE_NPC, INT_STATUS_INTERACTED } from "../Interaction"
 import { ACTIVE_FLAG_DEACTIVATED } from "../../include/object_constants"
+import { play_puzzle_jingle } from "../../audio/external"
 
 
 /* Yoshi */
@@ -49,7 +50,7 @@ const bhv_yoshi_init = () => {
 
 const yoshi_walk_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
-   let /*s16*/sp24 = o.gfx.unk38.animFrame
+   let /*s16*/sp24 = o.gfx.animInfo.animFrame
 
     o.rawData[oForwardVel] = 10.0
     let sp26 = object_step()
@@ -127,7 +128,7 @@ const yoshi_talk_loop = () => {
 }
 
 // void yoshi_walk_and_jump_off_roof_loop(void) {
-//     s16 sp26 = o->.gfx.unk38.animFrame;
+//     s16 sp26 = o->.gfx.animInfo.animFrame;
 
 //     o->oForwardVel = 10.0f;
 //     object_step();

@@ -2,7 +2,6 @@ import * as _Linker from "../../game/Linker"
 import { oVelX, oVelZ, oPosX, oPosZ, oUnkBC, oMoveAngleYaw, oAction, oTimer, oInteractStatus } from "../../include/object_constants"
 import { cur_obj_nearest_object_with_behavior, cur_obj_become_tangible, cur_obj_become_intangible } from "../ObjectHelpers"
 import { coss, sins, s16 } from "../../utils"
-import { bhvStarDoor } from "../BehaviorData"
 // star_door.c.inc
 
 const star_door_update_pos = () => {
@@ -17,7 +16,7 @@ export const bhv_star_door_loop = () => {
     const o = gLinker.ObjectListProcessor.gCurrentObject
     let UNUSED = new Array(8)
     let sp18
-    sp18 = cur_obj_nearest_object_with_behavior(o, bhvStarDoor)
+    sp18 = cur_obj_nearest_object_with_behavior(o, gLinker.behaviors.bhvStarDoor)
     switch (o.rawData[oAction]) {
         case 0:
             cur_obj_become_tangible()
@@ -27,7 +26,7 @@ export const bhv_star_door_loop = () => {
                 o.rawData[oAction] = 1
             break
         case 1:
-            if (o.rawData[oTimer] == 0 && (s16)(o.rawData[oMoveAngleYaw]) >= 0) {
+            if (o.rawData[oTimer] == 0 && s16(o.rawData[oMoveAngleYaw]) >= 0) {
                 //cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_OPEN);
                 //queue_rumble_data(35, 30);
             }
@@ -42,7 +41,7 @@ export const bhv_star_door_loop = () => {
                 o.rawData[oAction]++
             break
         case 3:
-            if (o.rawData[oTimer] == 0 && (s16)(o.rawData[oMoveAngleYaw]) >= 0) {
+            if (o.rawData[oTimer] == 0 && s16(o.rawData[oMoveAngleYaw]) >= 0) {
                 //cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_CLOSE);
                 //queue_rumble_data(35, 30);
             }
