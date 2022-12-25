@@ -179,6 +179,13 @@ class SpawnObject {
         }
         return obj
     }
+
+    /**
+     * Mark an object to be unloaded at the end of the frame.
+     */
+    mark_obj_for_deletion(obj) {
+        obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED;
+    }
 }
 
 export const SpawnObjectInstance = new SpawnObject()

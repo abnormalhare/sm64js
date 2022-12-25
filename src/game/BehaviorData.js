@@ -116,6 +116,7 @@ import * as _water_mist               from "./behaviors/water_mist.inc"
 import * as _water_mist_particle      from "./behaviors/water_mist_particle.inc"
 import * as _water_objs               from "./behaviors/water_objs.inc"
 import * as _water_splashes_and_waves from "./behaviors/water_splashes_and_waves.inc"
+import * as _wdw_water_level          from "./behaviors/wdw_water_level.inc"
 import * as _white_puff               from "./behaviors/white_puff.inc"
 import * as _white_puff_explode       from "./behaviors/white_puff_explode.inc"
 import * as _yoshi                    from "./behaviors/yoshi.inc"
@@ -1464,6 +1465,24 @@ export const bhvBoo = [
     GOTO('bhvGhostHuntBoo', 1),
 ]
 
+export const bhvWaterLevelDiamond = [
+    BEGIN(OBJ_LIST_SURFACE),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_HITBOX(/*Radius*/ 70, /*Height*/ 30),
+    SET_FLOAT(oCollisionDistance, 200),
+    SET_INT(oIntangibleTimer, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_water_level_diamond_loop'),
+    END_LOOP(),
+]
+
+export const bhvInitializeChangingWaterLevel = [
+    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_init_changing_water_level_loop'),
+    END_LOOP(),
+]
+
 export const bhvMerryGoRoundBooManager = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvMerryGoRoundBooManager'),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -2760,6 +2779,7 @@ gLinker.behaviors.bhvHiddenStaircaseStep = bhvHiddenStaircaseStep
 gLinker.behaviors.bhvHorStarParticleSpawner = bhvHorStarParticleSpawner
 gLinker.behaviors.bhvHomingAmp = bhvHomingAmp
 gLinker.behaviors.bhvIdleWaterWave = bhvIdleWaterWave
+gLinker.behaviors.bhvInitializeChangingWaterLevel = bhvInitializeChangingWaterLevel
 gLinker.behaviors.bhvInstantActiveWarp = bhvInstantActiveWarp
 gLinker.behaviors.bhvInvisibleObjectsUnderBridge = bhvInvisibleObjectsUnderBridge
 gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
@@ -2805,6 +2825,7 @@ gLinker.behaviors.bhvSnowParticleSpawner = bhvSnowParticleSpawner
 gLinker.behaviors.bhvSparkle = bhvSparkle
 gLinker.behaviors.bhvSparkleParticleSpawner = bhvSparkleParticleSpawner
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
+gLinker.behaviors.bhvSpawnedStar = bhvSpawnedStar
 gLinker.behaviors.bhvSpawnedStarNoLevelExit = bhvSpawnedStarNoLevelExit
 gLinker.behaviors.bhvSpinAirborneCircleWarp = bhvSpinAirborneCircleWarp
 gLinker.behaviors.bhvSparkleSpawn = bhvSparkleSpawn
@@ -2837,6 +2858,7 @@ gLinker.behaviors.bhvWaterBombSpawner = bhvWaterBombSpawner
 gLinker.behaviors.bhvWaterDroplet = bhvWaterDroplet
 gLinker.behaviors.bhvWaterDropletSplash = bhvWaterDropletSplash
 gLinker.behaviors.bhvWaterfallSoundLoop = bhvWaterfallSoundLoop
+gLinker.behaviors.bhvWaterLevelDiamond = bhvWaterLevelDiamond
 gLinker.behaviors.bhvWaterLevelPillar = bhvWaterLevelPillar
 gLinker.behaviors.bhvWaterMist = bhvWaterMist
 gLinker.behaviors.bhvWaterMist2 = bhvWaterMist2

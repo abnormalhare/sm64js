@@ -1157,6 +1157,17 @@ export const oWaterLevelPillarDrained  = 0x1C
 export const oWaterLevelTriggerUnkF4             = 0x1B
 export const oWaterLevelTriggerTargetWaterLevel  = 0x1C
 
+/* Water level diamond */
+    /* oAction */
+    // Loading
+export const WATER_LEVEL_DIAMOND_ACT_INIT               = 0
+    // Idling when Mario isn't inside its hitbox
+export const WATER_LEVEL_DIAMOND_ACT_IDLE               = 1
+    // While the water level is changing
+export const WATER_LEVEL_DIAMOND_ACT_CHANGE_WATER_LEVEL = 2
+    // After the water level has changed but Mario hasn't left its hitbox yet
+export const WATER_LEVEL_DIAMOND_ACT_IDLE_SPINNING      = 3
+
 /* Water Objects */
 export const oWaterObjUnkF4   = 0x1B
 export const oWaterObjUnkF8   = 0x1C

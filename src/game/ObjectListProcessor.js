@@ -136,6 +136,7 @@ class ObjectListProcessor {
         this.gMarioShotFromCannon = 0
         this.gFindFloorIncludeSurfaceIntangible
         this.gNumFindFloorMisses = 0
+        this.gEnvironmentRegions = 0
         this.gNumCalls = {
             floor: 0,
             ceil: 0,

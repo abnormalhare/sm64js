@@ -1,12 +1,12 @@
 import * as _Linker from "./Linker"
-import { AreaInstance as Area } from "./Area"
+import { AreaInstance as Area, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./Area"
 import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
 import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
-
+import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN } from "./IngameMenu"
 import { fadeout_music } from "./SoundInit"
 
 import {
@@ -36,7 +36,7 @@ import {
     oBehParams, oPosX, oPosY, oPosZ, oMoveAngleYaw
 } from "../include/object_constants"
 
-import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3 } from "../levels/level_defines_constants"
+import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_BOWSER_3, LEVEL_CASTLE } from "../levels/level_defines_constants"
 
 import {
     WARP_TRANSITION_FADE_FROM_COLOR,
@@ -388,14 +388,13 @@ class LevelUpdate {
     }
 
     pressed_pause() {
-        // let /*u32*/ val4 = get_dialog_id() >= 0
-        let /*u32*/ val4 = -1
+        let /*u32*/ val4 = IngameMenu.get_dialog_id() >= 0
         let /*u32*/ intangible = (this.gMarioState.action & ACT_FLAG_INTANGIBLE) != 0
 
-        // if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
-        //     && (gPlayer1Controller.buttonPressed & START_BUTTON)) {
-        //     return true
-        // }
+        if (!intangible && !val4 && !Area.gWarpTransition.isActive && this.sDelayedWarpOp == WARP_OP_NONE
+            && (window.playerInput.buttonPressedStart)) {
+            return true
+        }
 
         return false
     }
@@ -1078,12 +1077,30 @@ class LevelUpdate {
                 this.set_play_mode(PLAY_MODE_CHANGE_AREA)
             } else if (this.pressed_pause()) {
             //     lower_background_noise(1)
-            //     gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
-            //     this.set_play_mode(PLAY_MODE_PAUSED)
+                Camera.gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN
+                this.set_play_mode(PLAY_MODE_PAUSED)
             }
         }
 
         return false
+    }
+
+    play_mode_paused() {
+        if (Area.gMenuOptSelectIndex == MENU_OPT_NONE) {
+            IngameMenu.set_menu_mode(MENU_MODE_RENDER_PAUSE_SCREEN)
+         } else if (Area.gMenuOptSelectIndex == MENU_OPT_DEFAULT) {
+            // raise_background_noise(1);
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN
+            this.set_play_mode(PLAY_MODE_NORMAL)
+        } else {
+            this.initiate_warp(LEVEL_CASTLE, 1, 0x1F, 0)
+            this.fade_into_special_warp(0, 0)
+            Area.gSavedCourseNum = COURSE_NONE
+
+            Camera.gCameraMovementFlags &= ~CAM_MOVE_PAUSE_SCREEN
+        }
+
+        return 0;
     }
 
 

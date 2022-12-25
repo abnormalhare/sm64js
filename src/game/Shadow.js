@@ -111,6 +111,7 @@ const scale_shadow_with_distance = (initial, distFromFloor) => {
 }
 
 const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
+    let waterLevel;
     s.parentX = xPos
     s.parentY = yPos
     s.parentZ = zPos
@@ -118,8 +119,8 @@ const init_shadow = (s, xPos, yPos, zPos, shadowScale, overwriteSolidity) => {
     const floorGeometry = {}
     s.floorHeight = SurfaceCollision.find_floor_height_and_data(s.parentX, s.parentY, s.parentZ, floorGeometry)
 
-    if (gLinker.Area.gEnvironmentRegions) {
-        let waterLevel = get_water_level_below_shadow(s)
+    if (gLinker.ObjectListProcessor.gEnvironmentRegions != null) {
+        waterLevel = get_water_level_below_shadow(s)
     }
 
     if (gShadowAboveWaterOrLava) {

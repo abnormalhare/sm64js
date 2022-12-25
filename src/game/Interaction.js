@@ -51,7 +51,6 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          ACT_WAITING_FOR_DIALOG,
          ACT_GRABBED
 } from "./Mario"
-
 import { WARP_OP_WARP_OBJECT, WARP_OP_WARP_FLOOR } from "./LevelUpdate"
 
 import { SOUND_MARIO_EEUH, SOUND_MARIO_WAAAOOOW, SOUND_OBJ_BULLY_METAL,
@@ -1327,13 +1326,6 @@ const determine_interaction = (m, o) => {
     let dYawToObject = mario_obj_angle_to_object(m, o) - m.faceAngle[1]
     dYawToObject = dYawToObject > 32767 ? dYawToObject - 65536 : dYawToObject
     dYawToObject = dYawToObject < -32768 ? dYawToObject + 65536 : dYawToObject
-
-    // hack: make water punch actually do something
-    if (m.action == ACT_WATER_PUNCH && o.rawData[oInteractType] & INTERACT_PLAYER) {
-        if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
-            return INT_PUNCH
-        }
-    }
 
     if (action & ACT_FLAG_ATTACKING) {
         if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING || action == ACT_JUMP_KICK) {

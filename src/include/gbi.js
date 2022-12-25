@@ -64,7 +64,12 @@ export const G_TEXTURE_SCALE_FRAC =	16
 export const G_SCALE_FRAC	=	8
 export const G_ROTATE_FRAC = 16
 
-
+/*
+ * G_SETSCISSOR: interlace mode
+ */
+export const G_SC_NON_INTERLACE	 = 0
+export const G_SC_ODD_INTERLACE	 = 3
+export const G_SC_EVEN_INTERLACE = 2
 
 /*
  * G_SETOTHERMODE_L sft: shift count
@@ -374,7 +379,8 @@ export const G_RM_CUSTOM_AA_ZB_XLU_SURF2 = 28
 export const G_RM_AA_TEX_EDGE            = 29
 export const G_RM_AA_TEX_EDGE2           = 30
 export const G_RM_PASS                   = 31
-
+export const G_RM_TEX_EDGE               = 32
+export const G_RM_TEX_EDGE2              = 33
 
 //G_MOVEWORD types
 export const G_MW_MATRIX = 0x00 /* NOTE: also used by movemem */
@@ -498,6 +504,11 @@ export const G_CC_DECALRGB2 = {  // FIXME (copied from G_CC_DECALRGB)
 }
 
 export const G_CC_FADEA = {  // FIXME (copied from MODULATEIFADEA)
+    alpha: [1, 7, 5, 7],
+    rgb: [1, 15, 4, 7]
+}
+
+export const G_CC_FADE = {  // FIXME (copied from MODULATEIFADEA)
     alpha: [1, 7, 5, 7],
     rgb: [1, 15, 4, 7]
 }
@@ -1169,6 +1180,15 @@ export const gsDPLoadTextureBlock = (timg, fmt, siz, width, height, pal, cms, cm
             0, G_TX_RENDERTILE, pal, cmt, maskt, shiftt, cms, masks, shifts),
         gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, ((width) - 1) << G_TEXTURE_IMAGE_FRAC, ((height) - 1) << G_TEXTURE_IMAGE_FRAC)
     ]
+}
+
+export const gDPSetScissor = (displaylist, mode, ulx, uly, lrx, lry) => {
+    displaylist.push({
+        words: {
+            w0: G_SETSCISSOR,
+            w1: { mode, ulx, uly, lrx, lry}
+        }
+    })
 }
 
 export const gsDPSetTexturePersp  = () => {return []}  // FIXME
