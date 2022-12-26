@@ -66,8 +66,6 @@ import {
 } from "../include/sounds"
 import { SET_BACKGROUND_MUSIC } from "../engine/LevelCommands"
 
-import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
-
 export const TIMER_CONTROL_SHOW  = 0
 export const TIMER_CONTROL_START = 1
 export const TIMER_CONTROL_STOP  = 2
@@ -1102,28 +1100,6 @@ class LevelUpdate {
         }
 
         return 0;
-    }
-
-    play_mode_paused() {
-        if (Area.gMenuOptSelectIndex == Area.MENU_OPT_NONE) {
-            IngameMenu.set_menu_mode(IngameMenu.MENU_MODE_RENDER_PAUSE_SCREEN)
-        } else if (Area.gMenuOptSelectIndex == Area.MENU_OPT_DEFAULT) {
-            raise_background_noise(1)
-            Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_PAUSE_SCREEN
-            this.set_play_mode(PLAY_MODE_NORMAL)
-        } else { // MENU_OPT_EXIT_COURSE
-            if (window.gDebugLevelSelect) {
-                this.fade_into_special_warp(-9, 1)
-            } else {
-                this.initiate_warp(LEVEL_CASTLE, 1, 0x1F, 0)
-                this.fade_into_special_warp(0, 0)
-                Area.gSavedCourseNum = COURSE_NONE
-            }
-
-            Camera.gCameraMovementFlags &= ~Camera.CAM_MOVE_PAUSE_SCREEN
-        }
-
-        return 0
     }
 
 

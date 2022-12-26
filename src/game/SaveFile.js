@@ -253,8 +253,9 @@ export const save_file_get_course_star_count = (fileIndex, courseIndex) => {
 
 export const save_file_get_total_star_count = (fileIndex, minCourse, maxCourse) => {
     // Get standard course star count.
-    for (let count = 0; minCourse <= maxCourse; minCourse++) {
-        count += save_file_get_course_star_count(fileIndex, minCourse)
+    let count = 0
+    while (minCourse <= maxCourse) {
+        count += save_file_get_course_star_count(fileIndex, minCourse); minCourse++
     }
 
     // Add castle secret star count.

@@ -430,16 +430,16 @@ export const main_hud_lut = [
     texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
     texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
     texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
-    texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
+    texture_hud_char_G, texture_hud_char_H, texture_hud_char_I,                0x0,
     texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
-    texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
-    texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
-    texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
-    texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
-    texture_hud_char_percent,                 0x0,                      0x0,                  0x0,
-                      0x0,                   0x0,                      0x0,                  0x0,
-                      0x0,                   0x0, texture_hud_char_multiply, texture_hud_char_coin,
-    texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
+    texture_hud_char_O, texture_hud_char_P,                0x0, texture_hud_char_R,
+    texture_hud_char_S, texture_hud_char_T, texture_hud_char_U,                0x0,
+    texture_hud_char_W,                0x0, texture_hud_char_Y,                0x0,
+                   0x0,                0x0,                0x0,                0x0,
+                   0x0,                0x0,                0x0,                0x0,
+                   0x0,                0x0,                0x0,                0x0,
+                   0x0,                0x0, texture_hud_char_multiply, texture_hud_char_coin,
+    texture_hud_char_mario_head, texture_hud_char_star,    0x0,                0x0,
     texture_hud_char_apostrophe, texture_hud_char_double_quote,
 ]
 
@@ -614,27 +614,27 @@ export const dl_waterbox_end = [
 ].flat()
 
 const vertex_text_bg_box = [
-    [[[     0,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[   130,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[   130,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
+    [[     0,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,    -80,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[   130,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
 ];
 
 export const dl_draw_text_bg_box = [
-    gsDPPipeSync(),
-    gsSPClearGeometryMode(G_LIGHTING),
-    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    Gbi.gsDPPipeSync(),
+    Gbi.gsSPClearGeometryMode(G_LIGHTING),
+    Gbi.gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
     Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
-    gsSPVertex(vertex_text_bg_box, 4, 0),
-    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-    gsSPEndDisplayList(),
+    Gbi.gsSPVertex(vertex_text_bg_box, 4, 0),
+    Gbi.gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    Gbi.gsSPEndDisplayList(),
 ].flat()
 
 const vertex_ia8_char = [
-    [[[     0,      0,      0], 0, [     0,    256], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     8,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     8,     16,      0], 0, [   480,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     0,     16,      0], 0, [   480,    256], [0xff, 0xff, 0xff, 0xff]]],
+    [[     0,      0,      0], 0, [     0,    256], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,     16,      0], 0, [   480,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,     16,      0], 0, [   480,    256], [0xff, 0xff, 0xff, 0xff]],
 ]
 
 export const dl_ia_text_begin = [
@@ -671,9 +671,9 @@ export const dl_ia_text_end = [
 ].flat()
 
 const vertex_triangle = [
-    [[[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     8,      8,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
-    [[[     0,     16,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]]],
+    [[     0,      0,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     8,      8,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
+    [[     0,     16,      0], 0, [     0,      0], [0xff, 0xff, 0xff, 0xff]],
 ]
 
 export const dl_draw_triangle = [

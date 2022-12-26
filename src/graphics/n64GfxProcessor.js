@@ -816,6 +816,18 @@ export class n64GfxProcessor {
         this.rdp.combine_mode = saved_combine_mode
     }
 
+    sp_pop_matrix(count) {
+        while (count) {
+            if (this.rsp.modelview_matrix_stack_size > 0) {
+                this.rsp.modelview_matrix_stack_size--;
+                if (this.rsp.modelview_matrix_stack_size > 0) {
+                    this.matrix_mul(this.rsp.MP_matrix, this.rsp.modelview_matrix_stack[this.rsp.modelview_matrix_stack_size - 1], this.rsp.P_matrix);
+                }
+            }
+            count--
+        }
+    }
+
     sp_texture(s, t) {
         this.rsp.texture_scaling_factor = { s, t }
     }
@@ -1040,6 +1052,8 @@ export class n64GfxProcessor {
                     break
                 case Gbi.G_MOVEMEM:
                     this.sp_movemem(args.type, args.data, args.index)
+                    break
+                case Gbi.G_POPMTX:
                     break
                 case Gbi.G_MTX:
                     this.sp_matrix(args.parameters, args.matrix)

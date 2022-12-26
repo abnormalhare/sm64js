@@ -13,8 +13,6 @@ const TARGET_VOLUME_IS_PRESENT_FLAG = 0x80
 const TARGET_VOLUME_VALUE_MASK = 0x7f
 const TARGET_VOLUME_UNSET = 0x00
 
-export const SEQUENCE_ARGS = (priority, seqId) => {return (priority << 8) | seqId}
-
 const sSoundMovingSpeed = new Array(SOUND_BANK_COUNT)
 let sBackgroundMusicMaxTargetVolume = 0
 export const gGlobalSoundSource = [0.0, 0.0, 0.0]
