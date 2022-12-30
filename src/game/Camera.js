@@ -192,7 +192,7 @@ const CAM_MOVE_STARTED_EXITING_C_UP   = 0x0200
 const CAM_MOVE_UNKNOWN_11             = 0x0400
 const CAM_MOVE_INIT_CAMERA            = 0x0800
 const CAM_MOVE_ALREADY_ZOOMED_OUT     = 0x1000
-const CAM_MOVE_C_UP_MODE              = 0x2000
+export const CAM_MOVE_C_UP_MODE              = 0x2000
 const CAM_MOVE_SUBMERGED              = 0x4000
 export const CAM_MOVE_PAUSE_SCREEN           = 0x8000
 
@@ -4125,28 +4125,28 @@ class Camera {
                 this.sHandheldShakeInc = 0.04;
                 break;
             case HAND_CAM_SHAKE_LOW: // Lowest magnitude
-                sHandheldShakeMag = 0x300;
-                sHandheldShakeInc = 0.06;
+                this.sHandheldShakeMag = 0x300;
+                this.sHandheldShakeInc = 0.06;
                 break;
             case HAND_CAM_SHAKE_HIGH: // Highest mag and inc
-                sHandheldShakeMag = 0x1000;
-                sHandheldShakeInc = 0.1;
+                this.sHandheldShakeMag = 0x1000;
+                this.sHandheldShakeInc = 0.1;
                 break;
             case HAND_CAM_SHAKE_UNUSED: // Never used
-                sHandheldShakeMag = 0x600;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x600;
+                this.sHandheldShakeInc = 0.07;
                 break;
             case HAND_CAM_SHAKE_HANG_OWL: // exactly the same as UNUSED...
-                sHandheldShakeMag = 0x600;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x600;
+                this.sHandheldShakeInc = 0.07;
                 break;
             case HAND_CAM_SHAKE_STAR_DANCE: // Slightly steadier than HANG_OWL and UNUSED
-                sHandheldShakeMag = 0x400;
-                sHandheldShakeInc = 0.07;
+                this.sHandheldShakeMag = 0x400;
+                this.sHandheldShakeInc = 0.07;
                 break;
             default:
-                sHandheldShakeMag = 0x0;
-                sHandheldShakeInc = 0.0;
+                this.sHandheldShakeMag = 0x0;
+                this.sHandheldShakeInc = 0.0;
         }
     }
 
@@ -4167,9 +4167,9 @@ class Camera {
             vec3f_set(shakeOffset, 0.0, 0.0, 0.0)
         } else {
             for (let i = 0; i < 4; i++) {
-                shakeSpline[i][0] = sHandheldShakeSpline[i].point[0]
-                shakeSpline[i][1] = sHandheldShakeSpline[i].point[1]
-                shakeSpline[i][2] = sHandheldShakeSpline[i].point[2]
+                shakeSpline[i][0] = this.sHandheldShakeSpline[i].point[0]
+                shakeSpline[i][1] = this.sHandheldShakeSpline[i].point[1]
+                shakeSpline[i][2] = this.sHandheldShakeSpline[i].point[2]
             }
             this.evaluate_cubic_spline(this.sHandheldShakeTime, shakeOffset, shakeSpline[0], shakeSpline[1], shakeSpline[2], shakeSpline[3])
             this.sHandheldShakeTimer += this.sHandheldShakeInc
@@ -6877,8 +6877,8 @@ class Camera {
     }
 
     intro_peach_move_camera_start_to_pipe(c, positionSpline, focusSpline) {
-        let offset = [0, 0, 0]
         const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+
 
         /**
          * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
@@ -6894,7 +6894,7 @@ class Camera {
         this.rotate_in_xz(c.focus, c.focus, DEGREES(-180))
         this.rotate_in_xz(c.pos, c.pos, DEGREES(-180))
 
-        vec3f_set(offset, -1328.0, 26.0, 4664.0)
+        let offset = [-1328.0, 26.0, 4664.0]
         MathUtil.vec3f_add(c.focus, offset)
         MathUtil.vec3f_add(c.pos, offset)
 
@@ -6906,7 +6906,7 @@ class Camera {
     play_sound_peach_reading_letter(c) { play_sound(SOUND_PEACH_DEAR_MARIO, gGlobalSoundSource) }
 
     cutscene_intro_peach_start_to_pipe_spline(c) {
-        if (this.intro_peach_move_camera_start_to_pipe(c, this.sIntroStartToPipePosition, this.sIntroStartToPipePosition) != 0) {
+        if (this.intro_peach_move_camera_start_to_pipe(c, this.sIntroStartToPipePosition, this.sIntroStartToPipeFocus) != 0) {
             this.gCmaeraMovementFlags &= ~CAM_MOVE_C_UP_MODE
             this.gCutsceneTimer = CUTSCENE_LOOP
         }
@@ -6916,7 +6916,7 @@ class Camera {
         if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
             vec3f_copy(this.gLakituState.goalPos, c.pos)
             vec3f_copy(this.gLakituState.goalFocus, c.focus)
-            sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+            this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
             this.gCutsceneTimer = CUTSCENE_STOP
             c.cutscene = 0
         }
@@ -6954,10 +6954,13 @@ class Camera {
         this.play_sound_intro_turn_on_hud = this.play_sound_intro_turn_on_hud.bind(this)
         this.cutscene_intro_peach_start_flying_music = this.cutscene_intro_peach_start_flying_music.bind(this)
         this.cutscene_intro_peach_clear_cutscene_status = this.cutscene_intro_peach_clear_cutscene_status.bind(this)
+        this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
 
         this.cutscene_event(this.play_sound_intro_turn_on_hud, c, 818, 818)
         this.cutscene_spawn_obj(6, 1)
-        this.cutscene_event(this.cutscene_intro_peach_start_flying_music, c, 0, -1)
+        this.cutscene_event(this.cutscene_intro_peach_start_to_pipe_spline, c, 0, -1)
+        this.cutscene_event(this.cutscene_intro_peach_start_flying_music, c, 0, 0)
+        
         this.cutscene_event(this.cutscene_intro_peach_clear_cutscene_status, c, 0, 717)
         this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
         this.sCutsceneVars[1].point[1] = 400.0

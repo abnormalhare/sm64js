@@ -64,8 +64,6 @@ const intro_lakitu_set_pos_and_focus = (obj, offset, focus) => {
         splineFinished++;
     }
 
-    console.log(newFocus, newOffset)
-
     obj.rawData[oIntroLakituSplineSegment] = wrapper.splineSegment
     obj.rawData[oIntroLakituSplineSegmentProgress] = wrapper.progress
 
@@ -152,13 +150,13 @@ export const bhv_intro_lakitu_loop = () => {
             o.rawData[oMoveAngleYaw] += 0x200
             o.rawData[oIntroLakituUnk100] = Camera.approach_f32_asymptotic(o.rawData[oIntroLakituUnk100], 100.0, 0.03)
             o.rawData[oFaceAnglePitch] = atan2s(200.0, o.rawData[oPosY] - 400.0)
-            o.rawData[oFaceAngleYaw] = Camera.approach_f32_asymptotic(o.rawData[oFaceAngleYaw], o.rawData[oMoveAngleYaw] + 0x8000, 4)
-            vec3f_set_dist_and_angle(sp58, sp4C, o.rawData[oIntroLakituUnk100], o.rawData[oMoveAngleYaw], 0, o.rawData[oMoveAngleYaw])
+            o.rawData[oFaceAngleYaw] = Camera.approach_s16_asymptotic(o.rawData[oFaceAngleYaw], o.rawData[oMoveAngleYaw] + 0x8000, 4)
+            vec3f_set_dist_and_angle(sp58, sp4C, o.rawData[oIntroLakituUnk100], 0, o.rawData[oMoveAngleYaw])
             sp4C[1] += 150.0 * coss(o.rawData[oIntroLakituUnk104])
             o.rawData[oIntroLakituUnk104] += o.rawData[oIntroLakituUnk108]
-            o.rawData[oIntroLakituUnk108] += Camera.approach_f32_asymptotic(o.rawData[oIntroLakituUnk108], 512.0, 0.05)
+            o.rawData[oIntroLakituUnk108] = Camera.approach_f32_asymptotic(o.rawData[oIntroLakituUnk108], 512.0, 0.05)
             sp4C[0] += o.rawData[oIntroLakituUnk10C]
-            o.rawData[oIntroLakituUnk10C] += Camera.approach_f32_asymptotic(o.rawData[oIntroLakituUnk10C], 0.0, 0.05)
+            o.rawData[oIntroLakituUnk10C] = Camera.approach_f32_asymptotic(o.rawData[oIntroLakituUnk10C], 0.0, 0.05)
             Camera.vec3f_to_object_pos(o, sp4C)
 
             if (o.rawData[oTimer] == 31) {

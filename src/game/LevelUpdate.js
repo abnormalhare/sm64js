@@ -4,7 +4,7 @@ import { COURSE_NONE, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/c
 import * as Mario from "./Mario"
 import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { disable_warp_checkpoint, gLevelToCourseNumTable, save_file_get_star_flags, SAVE_FLAG_HAVE_VANISH_CAP } from "./SaveFile"
+import { disable_warp_checkpoint, gLevelToCourseNumTable, save_file_exists, save_file_get_star_flags, SAVE_FLAG_HAVE_VANISH_CAP } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN } from "./IngameMenu"
 import { fadeout_music } from "./SoundInit"
@@ -267,7 +267,7 @@ class LevelUpdate {
                     Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                 } else if (true) { // !gDebugLevelSelect) {
                     if (this.gMarioState.action != ACT_UNINITIALIZED) {
-                        if (save_file_exists(gCurrSaveFileNum - 1)) {
+                        if (false /*save_file_exists(Area.gCurrSaveFileNum - 1)*/) {
                             Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                         } else {
                             Mario.set_mario_action(this.gMarioState, ACT_INTRO_CUTSCENE, 0)
