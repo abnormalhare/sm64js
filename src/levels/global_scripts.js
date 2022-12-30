@@ -59,6 +59,7 @@ import { cannon_lid_seg8_dl_080048E0              } from "../actors/cannon_lid/m
 import { exclamation_box_outline_seg8_dl_08025F08 } from "../actors/exclamation_box_outline/model.inc"
 import { whirlpool_seg5_dl_05013CB8               } from "../actors/whirlpool/model.inc"
 import { king_bobomb_geo } from "../actors/king_bobomb/geo.inc"
+import { peach_geo } from "../actors/peach/geo.inc"
 
 
 export const script_func_global_1 = () => { return [
@@ -168,7 +169,7 @@ export const script_func_global_10 = () => { return [
 
 export const script_func_global_11 = () => { return [
     LOAD_MODEL_FROM_GEO(MODEL.BIRDS,                   birds_geo),
-    // LOAD_MODEL_FROM_GEO(MODEL.PEACH,                   peach_geo),
+    LOAD_MODEL_FROM_GEO(MODEL.PEACH,                   peach_geo),
     LOAD_MODEL_FROM_GEO(MODEL.YOSHI,                   yoshi_geo),
     RETURN(),
 ]}

@@ -1,4 +1,4 @@
-import { ObjectListProcessorInstance as ObjectListProc } from "./ObjectListProcessor"
+import { ObjectListProcessorInstance as ObjectListProc, OBJECT_POOL_CAPACITY } from "./ObjectListProcessor"
 import { BehaviorCommandsInstance as BhvCmds } from "../engine/BehaviorCommands"
 import { init_graph_node, geo_add_child, GRAPH_RENDER_INVISIBLE, GRAPH_NODE_TYPE_OBJECT, geo_remove_child, GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_ACTIVE } from "../engine/graph_node"
 import { ACTIVE_FLAG_ACTIVE, ACTIVE_FLAG_UNK8, RESPAWN_INFO_TYPE_NULL, ACTIVE_FLAG_UNIMPORTANT, OBJ_MOVE_ON_GROUND, oIntangibleTimer, oDamageOrCoinValue, oHealth, oCollisionDistance, oDrawingDistance, oDistanceToMario, oRoom, oFloorHeight, oPosX, oPosY, oPosZ, ACTIVE_FLAGS_DEACTIVATED } from "../include/object_constants"
@@ -96,7 +96,7 @@ class SpawnObject {
         obj.next.prev = obj.prev
         obj.prev.next = obj.next
     }
-
+    
     unload_object(obj) {
         obj.activeFlags = ACTIVE_FLAGS_DEACTIVATED
         obj.prevObj = null

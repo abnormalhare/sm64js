@@ -30,6 +30,8 @@ export const play_secondary_music = (seqId, bgMusicVolume, volume, fadeTimer) =>
 export const func_80321080 = (fadeTimer) => {
 }
 
+export const stop_sounds_in_continuous_banks = () => {}
+
 /**
  * Plays the puzzle jingle. Plays the dadada dadada *dadada* jingle
  * that usually plays when you solve a "puzzle", like chests, talking to

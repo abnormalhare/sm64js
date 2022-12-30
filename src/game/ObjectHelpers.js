@@ -587,7 +587,17 @@ export const obj_set_gfx_pos_at_obj_pos = (obj1, obj2) => {
     obj1.gfx.angle[2] = obj2.rawData[oMoveAngleRoll] & 0xFFFF
 }
 
-const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
+export const cur_obj_shake_y = (amount) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject
+    //! Technically could cause a bit of drift, but not much
+    if (o.rawData[oTimer] % 2 == 0) {
+        o.rawData[oPosY] += amount;
+    } else {
+        o.rawData[oPosY] -= amount;
+    }
+}
+
+export const obj_translate_local = (obj, posIndex, localTranslateIndex) => {
     const dx = obj.rawData[localTranslateIndex + 0]
     const dy = obj.rawData[localTranslateIndex + 1]
     const dz = obj.rawData[localTranslateIndex + 2]
@@ -2190,6 +2200,13 @@ export const bhv_init_room = () => {
         }
     } else {
         o.rawData[oRoom] = -1
+    }
+}
+
+export const cur_obj_spawn_loot_blue_coin = () => {
+    if (o.rawData[oNumLootCoins] >= 5) {
+        spawn_object(o, MODEL_BLUE_COIN, gLinker.behaviors.bhvMrIBlueCoin)
+        o.rawData[oNumLootCoins] -= 5
     }
 }
 

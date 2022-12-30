@@ -9,7 +9,7 @@ export const bhv_pound_white_puffs_init = () => {
     spawn_mist_from_global()
 }
 
-const spawn_mist_from_global = () => {
+export const spawn_mist_from_global = () => {
     cur_obj_spawn_particles(D_8032F3CC)
 }
 

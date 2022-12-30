@@ -799,7 +799,7 @@ export const oMrIUnkFC   = 0x1D
 export const oMrIUnk100  = 0x1E
 export const oMrIUnk104  = 0x1F
 export const oMrIUnk108  = 0x20
-export const oMrISize    = 0x21
+export const oMrIScale   = 0x21
 export const oMrIUnk110  = 0x22
 
 /* Object Respawner */

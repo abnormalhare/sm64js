@@ -1,12 +1,14 @@
 // Parameters: dialog enum ID, (unused), lines per box, left offset, width
 
+import { t } from "../../include/text_strings"
+
 const DEFINE_DIALOG = (id, unused, linesPerBox, leftOffset, width, str) => {
     return {str: str, linesPerBox: linesPerBox, leftOffset: leftOffset, width: width}
 }
 
 export const DIALOG_NONE = -1
 
-export const DIALOG_000 = DEFINE_DIALOG('DIALOG_000', 1, 6, 30, 200, ("\
+export const DIALOG_000 = DEFINE_DIALOG('DIALOG_000', 1, 6, 30, 200, t("\
 Wow! You're smack in the\n\
 middle of the battlefield.\n\
 You'll find the Power\n\
@@ -26,7 +28,7 @@ can talk to some other\n\
 characters by facing them\n\
 and pressing [B]."))
 
-export const DIALOG_001 = DEFINE_DIALOG('DIALOG_001', 1, 4, 95, 200, ("\
+export const DIALOG_001 = DEFINE_DIALOG('DIALOG_001', 1, 4, 95, 200, t("\
 Watch out! If you wander\n\
 around here, you're liable\n\
 to be plastered by a\n\
@@ -47,7 +49,7 @@ Please come back to see\n\
 me after you've retrieved\n\
 the Power Star!"))
 
-export const DIALOG_002 = DEFINE_DIALOG('DIALOG_002', 1, 4, 95, 200, ("\
+export const DIALOG_002 = DEFINE_DIALOG('DIALOG_002', 1, 4, 95, 200, t("\
 Hey, you! It's dangerous\n\
 ahead, so listen up! Take\n\
 my advice.\n\
@@ -65,7 +67,7 @@ and we're on your side.\n\
 You can talk to us\n\
 whenever you'd like to!"))
 
-export const DIALOG_003 = DEFINE_DIALOG('DIALOG_003', 1, 5, 95, 200, ("\
+export const DIALOG_003 = DEFINE_DIALOG('DIALOG_003', 1, 5, 95, 200, t("\
 Thank you, Mario! The Big\n\
 Bob-omb is nothing but a\n\
 big dud now! But the\n\
@@ -81,7 +83,7 @@ waiting for you. Be sure\n\
 to talk to them--they'll\n\
 set up cannons for you."))
 
-export const DIALOG_004 = DEFINE_DIALOG('DIALOG_004', 1, 3, 95, 200, ("\
+export const DIALOG_004 = DEFINE_DIALOG('DIALOG_004', 1, 3, 95, 200, t("\
 We're peace-loving\n\
 Bob-ombs, so we don't use\n\
 cannons.\n\
@@ -92,7 +94,7 @@ We'll prepare all of the\n\
 cannons in this course for\n\
 you to use. Bon Voyage!"))
 
-export const DIALOG_005 = DEFINE_DIALOG('DIALOG_005', 1, 3, 30, 200, ("\
+export const DIALOG_005 = DEFINE_DIALOG('DIALOG_005', 1, 3, 30, 200, t("\
 Hey, Mario! Is it true\n\
 that you beat the Big\n\
 Bob-omb? Cool!\n\
@@ -112,7 +114,7 @@ Ready....\n\
 \n\
 //Go!////Don't Go"))
 
-export const DIALOG_006 = DEFINE_DIALOG('DIALOG_006', 1, 3, 30, 200, ("\
+export const DIALOG_006 = DEFINE_DIALOG('DIALOG_006', 1, 3, 30, 200, t("\
 Hey!!! Don't try to scam\n\
 ME. You've gotta run\n\
 the whole course.\n\
@@ -120,14 +122,14 @@ Later. Look me up when\n\
 you want to race for\n\
 real."))
 
-export const DIALOG_007 = DEFINE_DIALOG('DIALOG_007', 1, 5, 30, 200, ("\
+export const DIALOG_007 = DEFINE_DIALOG('DIALOG_007', 1, 5, 30, 200, t("\
 Hufff...fff...pufff...\n\
 Whoa! You...really...are...\n\
 fast! A human blur!\n\
 Here you go--you've won\n\
 it, fair and square!"))
 
-export const DIALOG_008 = DEFINE_DIALOG('DIALOG_008', 1, 4, 30, 200, ("\
+export const DIALOG_008 = DEFINE_DIALOG('DIALOG_008', 1, 4, 30, 200, t("\
 BEWARE OF CHAIN CHOMP\n\
 Extreme Danger!\n\
 Get close and press [C]^\n\
@@ -141,7 +143,7 @@ them, a Power Star will\n\
 appear in the meadow\n\
 across the bridge."))
 
-export const DIALOG_009 = DEFINE_DIALOG('DIALOG_009', 1, 5, 30, 200, ("\
+export const DIALOG_009 = DEFINE_DIALOG('DIALOG_009', 1, 5, 30, 200, t("\
 Long time, no see! Wow,\n\
 have you gotten fast!\n\
 Have you been training\n\
@@ -158,7 +160,7 @@ Ready?\n\
 \n\
 //Go//// Don't Go"))
 
-export const DIALOG_010 = DEFINE_DIALOG('DIALOG_010', 1, 4, 30, 200, ("\
+export const DIALOG_010 = DEFINE_DIALOG('DIALOG_010', 1, 4, 30, 200, t("\
 You've stepped on the\n\
 Wing Cap Switch. Wearing\n\
 the Wing Cap, you can\n\
@@ -171,7 +173,7 @@ Would you like to Save?\n\
 \n\
 //Yes////No"))
 
-export const DIALOG_011 = DEFINE_DIALOG('DIALOG_011', 1, 4, 30, 200, ("\
+export const DIALOG_011 = DEFINE_DIALOG('DIALOG_011', 1, 4, 30, 200, t("\
 You've just stepped on\n\
 the Metal Cap Switch!\n\
 The Metal Cap makes\n\
@@ -184,7 +186,7 @@ Would you like to Save?\n\
 \n\
 //Yes////No"))
 
-export const DIALOG_012 = DEFINE_DIALOG('DIALOG_012', 1, 4, 30, 200, ("\
+export const DIALOG_012 = DEFINE_DIALOG('DIALOG_012', 1, 4, 30, 200, t("\
 You've just stepped on\n\
 the Vanish Cap Switch.\n\
 The Vanish Cap makes\n\
@@ -197,14 +199,14 @@ Would you like to Save?\n\
 \n\
 //Yes////No"))
 
-export const DIALOG_013 = DEFINE_DIALOG('DIALOG_013', 1, 5, 30, 200, ("\
+export const DIALOG_013 = DEFINE_DIALOG('DIALOG_013', 1, 5, 30, 200, t("\
 You've collected 100\n\
 coins! Mario gains more\n\
 power from the castle.\n\
 Do you want to Save?\n\
 //Yes////No"))
 
-export const DIALOG_014 = DEFINE_DIALOG('DIALOG_014', 1, 4, 30, 200, ("\
+export const DIALOG_014 = DEFINE_DIALOG('DIALOG_014', 1, 4, 30, 200, t("\
 Wow! Another Power Star!\n\
 Mario gains more courage\n\
 from the power of the\n\
@@ -213,7 +215,7 @@ Do you want to Save?\n\
 \n\
 //You Bet//Not Now"))
 
-export const DIALOG_015 = DEFINE_DIALOG('DIALOG_015', 1, 4, 30, 200, ("\
+export const DIALOG_015 = DEFINE_DIALOG('DIALOG_015', 1, 4, 30, 200, t("\
 You can punch enemies to\n\
 knock them down. Press [A]\n\
 to jump, [B] to punch.\n\
@@ -223,12 +225,12 @@ press [B], too. To throw\n\
 something you're holding,\n\
 press [B] again."))
 
-export const DIALOG_016 = DEFINE_DIALOG('DIALOG_016', 1, 3, 30, 200, ("\
+export const DIALOG_016 = DEFINE_DIALOG('DIALOG_016', 1, 3, 30, 200, t("\
 Hop on the shiny shell and\n\
 ride wherever you want to\n\
 go! Shred those enemies!"))
 
-export const DIALOG_017 = DEFINE_DIALOG('DIALOG_017', 1, 4, 30, 200, ("\
+export const DIALOG_017 = DEFINE_DIALOG('DIALOG_017', 1, 4, 30, 200, t("\
 I'm the Big Bob-omb, lord\n\
 of all blasting matter,\n\
 king of ka-booms the\n\
@@ -254,17 +256,17 @@ the back and hurl me to\n\
 this royal turf? I think\n\
 that you cannot!"))
 
-export const DIALOG_018 = DEFINE_DIALOG('DIALOG_018', 1, 4, 30, 200, ("\
+export const DIALOG_018 = DEFINE_DIALOG('DIALOG_018', 1, 4, 30, 200, t("\
 I'm sleeping because...\n\
 ...I'm sleepy. I don't\n\
 like being disturbed.\n\
 Please walk quietly."))
 
-export const DIALOG_019 = DEFINE_DIALOG('DIALOG_019', 1, 2, 30, 200, ("\
+export const DIALOG_019 = DEFINE_DIALOG('DIALOG_019', 1, 2, 30, 200, t("\
 Shhh! Please walk\n\
 quietly in the hallway!"))
 
-export const DIALOG_020 = DEFINE_DIALOG('DIALOG_020', 1, 6, 95, 150, ("\
+export const DIALOG_020 = DEFINE_DIALOG('DIALOG_020', 1, 6, 95, 150, t("\
 Dear Mario:\n\
 Please come to the\n\
 castle. I've baked\n\
@@ -272,61 +274,61 @@ a cake for you.\n\
 Yours truly--\n\
 Princess Toadstool"))
 
-export const DIALOG_021 = DEFINE_DIALOG('DIALOG_021', 1, 5, 95, 200, ("\
+export const DIALOG_021 = DEFINE_DIALOG('DIALOG_021', 1, 5, 95, 200, t("\
 Welcome.\n\
 No one's home!\n\
 Now scram--\n\
 and don't come back!\n\
 Gwa ha ha!"))
 
-export const DIALOG_022 = DEFINE_DIALOG('DIALOG_022', 1, 2, 95, 200, ("\
+export const DIALOG_022 = DEFINE_DIALOG('DIALOG_022', 1, 2, 95, 200, t("\
 You need a key to open\n\
 this door."))
 
-export const DIALOG_023 = DEFINE_DIALOG('DIALOG_023', 1, 3, 95, 200, ("\
+export const DIALOG_023 = DEFINE_DIALOG('DIALOG_023', 1, 3, 95, 200, t("\
 This key doesn't fit!\n\
 Maybe it's for the\n\
 basement..."))
 
-export const DIALOG_024 = DEFINE_DIALOG('DIALOG_024', 1, 5, 95, 200, ("\
+export const DIALOG_024 = DEFINE_DIALOG('DIALOG_024', 1, 5, 95, 200, t("\
 You need Star power to\n\
 open this door. Recover a\n\
 Power Star from an enemy\n\
 inside one of the castle's\n\
 paintings."))
 
-export const DIALOG_025 = DEFINE_DIALOG('DIALOG_025', 1, 4, 95, 200, ("\
+export const DIALOG_025 = DEFINE_DIALOG('DIALOG_025', 1, 4, 95, 200, t("\
 It takes the power of\n\
 3 Stars to open this\n\
 door. You need [%] more\n\
 Stars."))
 
-export const DIALOG_026 = DEFINE_DIALOG('DIALOG_026', 1, 4, 95, 200, ("\
+export const DIALOG_026 = DEFINE_DIALOG('DIALOG_026', 1, 4, 95, 200, t("\
 It takes the power of\n\
 8 Stars to open this\n\
 door. You need [%] more\n\
 Stars."))
 
-export const DIALOG_027 = DEFINE_DIALOG('DIALOG_027', 1, 4, 95, 200, ("\
+export const DIALOG_027 = DEFINE_DIALOG('DIALOG_027', 1, 4, 95, 200, t("\
 It takes the power of\n\
 30 Stars to open this\n\
 door. You need [%] more\n\
 Stars."))
 
-export const DIALOG_028 = DEFINE_DIALOG('DIALOG_028', 1, 4, 95, 200, ("\
+export const DIALOG_028 = DEFINE_DIALOG('DIALOG_028', 1, 4, 95, 200, t("\
 It takes the power of\n\
 50 Stars to open this\n\
 door. You need [%] more\n\
 Stars."))
 
-export const DIALOG_029 = DEFINE_DIALOG('DIALOG_029', 1, 5, 95, 200, ("\
+export const DIALOG_029 = DEFINE_DIALOG('DIALOG_029', 1, 5, 95, 200, t("\
 To open the door that\n\
 leads to the 『endless』\n\
 stairs, you need 70\n\
 Stars.\n\
 Bwa ha ha!"))
 
-export const DIALOG_030 = DEFINE_DIALOG('DIALOG_030', 1, 6, 30, 200, ("\
+export const DIALOG_030 = DEFINE_DIALOG('DIALOG_030', 1, 6, 30, 200, t("\
 Hello! The Lakitu Bros.,\n\
 cutting in with a live\n\
 update on Mario's\n\
@@ -351,7 +353,7 @@ buzzer will sound. This is\n\
 the Lakitu Bros.,\n\
 signing off."))
 
-export const DIALOG_031 = DEFINE_DIALOG('DIALOG_031', 1, 5, 30, 200, ("\
+export const DIALOG_031 = DEFINE_DIALOG('DIALOG_031', 1, 5, 30, 200, t("\
 No way! You beat me...\n\
 again!! And I just spent\n\
 my entire savings on\n\
@@ -362,7 +364,7 @@ hand over this Star to\n\
 the winner of the race.\n\
 Congrats, Mario!"))
 
-export const DIALOG_032 = DEFINE_DIALOG('DIALOG_032', 1, 5, 30, 200, ("\
+export const DIALOG_032 = DEFINE_DIALOG('DIALOG_032', 1, 5, 30, 200, t("\
 If you get the Wing Cap,\n\
 you can fly! Put the cap\n\
 on, then do a Triple\n\
@@ -377,7 +379,7 @@ Use the [C] Buttons to look\n\
 around while flying, and\n\
 press [Z] to land."))
 
-export const DIALOG_033 = DEFINE_DIALOG('DIALOG_033', 1, 6, 30, 200, ("\
+export const DIALOG_033 = DEFINE_DIALOG('DIALOG_033', 1, 6, 30, 200, t("\
 Ciao! You've reached\n\
 Princess Toadstool's\n\
 castle via a warp pipe.\n\
@@ -391,7 +393,7 @@ controller to move Mario\n\
 around. Now, head for\n\
 the castle."))
 
-export const DIALOG_034 = DEFINE_DIALOG('DIALOG_034', 1, 6, 30, 200, ("\
+export const DIALOG_034 = DEFINE_DIALOG('DIALOG_034', 1, 6, 30, 200, t("\
 Good afternoon. The\n\
 Lakitu Bros., here,\n\
 reporting live from just\n\
@@ -426,7 +428,7 @@ For now, reporting live,\n\
 this has been the\n\
 Lakitu Bros."))
 
-export const DIALOG_035 = DEFINE_DIALOG('DIALOG_035', 1, 5, 30, 200, ("\
+export const DIALOG_035 = DEFINE_DIALOG('DIALOG_035', 1, 5, 30, 200, t("\
 There are four camera, or\n\
 『[C],』 Buttons. Press [C]^\n\
 to look around using the\n\
@@ -448,7 +450,7 @@ to Lakitu's camera. Press\n\
 afar, using either\n\
 Lakitu's or Mario's view."))
 
-export const DIALOG_036 = DEFINE_DIALOG('DIALOG_036', 1, 5, 30, 200, ("\
+export const DIALOG_036 = DEFINE_DIALOG('DIALOG_036', 1, 5, 30, 200, t("\
 OBSERVATION PLATFORM\n\
 Press [C]^ to take a look\n\
 around. Don't miss\n\
@@ -464,19 +466,19 @@ switch the mode to 『fix』\n\
 the camera in place while\n\
 holding [R]. Give it a try!"))
 
-export const DIALOG_037 = DEFINE_DIALOG('DIALOG_037', 1, 2, 30, 200, ("\
+export const DIALOG_037 = DEFINE_DIALOG('DIALOG_037', 1, 2, 30, 200, t("\
 I win! You lose!\n\
 Ha ha ha ha!\n\
 You're no slouch, but I'm\n\
 a better sledder!\n\
 Better luck next time!"))
 
-export const DIALOG_038 = DEFINE_DIALOG('DIALOG_038', 1, 3, 95, 200, ("\
+export const DIALOG_038 = DEFINE_DIALOG('DIALOG_038', 1, 3, 95, 200, t("\
 Reacting to the Star\n\
 power, the door slowly\n\
 opens."))
 
-export const DIALOG_039 = DEFINE_DIALOG('DIALOG_039', 1, 4, 30, 200, ("\
+export const DIALOG_039 = DEFINE_DIALOG('DIALOG_039', 1, 4, 30, 200, t("\
 No visitors allowed,\n\
 by decree of\n\
 the Big Bob-omb\n\
@@ -498,12 +500,12 @@ the beginning of the\n\
 course.\n\
 //--The Big Bob-omb"))
 
-export const DIALOG_040 = DEFINE_DIALOG('DIALOG_040', 1, 3, 30, 200, ("\
+export const DIALOG_040 = DEFINE_DIALOG('DIALOG_040', 1, 3, 30, 200, t("\
 Warning!\n\
 Cold, Cold Crevasse\n\
 Below!"))
 
-export const DIALOG_041 = DEFINE_DIALOG('DIALOG_041', 1, 3, 30, 200, ("\
+export const DIALOG_041 = DEFINE_DIALOG('DIALOG_041', 1, 3, 30, 200, t("\
 I win! You lose!\n\
 Ha ha ha!\n\
 \n\
@@ -512,7 +514,7 @@ messin' with Koopa the\n\
 Quick.\n\
 Better luck next time!"))
 
-export const DIALOG_042 = DEFINE_DIALOG('DIALOG_042', 1, 4, 30, 200, ("\
+export const DIALOG_042 = DEFINE_DIALOG('DIALOG_042', 1, 4, 30, 200, t("\
 Caution! Narrow Bridge!\n\
 Cross slowly!\n\
 \n\
@@ -530,14 +532,14 @@ the Control Stick. To\n\
 scurry up quickly, press\n\
 the [A] Button."))
 
-export const DIALOG_043 = DEFINE_DIALOG('DIALOG_043', 1, 5, 30, 200, ("\
+export const DIALOG_043 = DEFINE_DIALOG('DIALOG_043', 1, 5, 30, 200, t("\
 If you jump and hold the\n\
 [A] Button, you can hang on\n\
 to some objects overhead.\n\
 It's the same as grabbing\n\
 a flying bird!"))
 
-export const DIALOG_044 = DEFINE_DIALOG('DIALOG_044', 1, 5, 95, 200, ("\
+export const DIALOG_044 = DEFINE_DIALOG('DIALOG_044', 1, 5, 95, 200, t("\
 Whooo's there? Whooo\n\
 woke me up? It's still\n\
 daylight--I should be\n\
@@ -554,7 +556,7 @@ as my wings hold out.\n\
 Watch my shadow, and\n\
 grab on."))
 
-export const DIALOG_045 = DEFINE_DIALOG('DIALOG_045', 1, 6, 95, 200, ("\
+export const DIALOG_045 = DEFINE_DIALOG('DIALOG_045', 1, 6, 95, 200, t("\
 Whew! I'm just about\n\
 flapped out. You should\n\
 lay off the pasta, Mario!\n\
@@ -562,7 +564,7 @@ That's it for now. Press\n\
 [A] to let go. Okay,\n\
 bye byyyyyyeeee!"))
 
-export const DIALOG_046 = DEFINE_DIALOG('DIALOG_046', 1, 5, 30, 200, ("\
+export const DIALOG_046 = DEFINE_DIALOG('DIALOG_046', 1, 5, 30, 200, t("\
 You have to master three\n\
 important jumping\n\
 techniques.\n\
@@ -589,17 +591,17 @@ Practice, practice,\n\
 practice. You don't stand\n\
 a chance without them."))
 
-export const DIALOG_047 = DEFINE_DIALOG('DIALOG_047', 1, 2, 95, 200, ("\
+export const DIALOG_047 = DEFINE_DIALOG('DIALOG_047', 1, 2, 95, 200, t("\
 Hi! I'll prepare the\n\
 cannon for you!"))
 
-export const DIALOG_048 = DEFINE_DIALOG('DIALOG_048', 1, 4, 30, 200, ("\
+export const DIALOG_048 = DEFINE_DIALOG('DIALOG_048', 1, 4, 30, 200, t("\
 Snow Mountain Summit\n\
 Watch for slippery\n\
 conditions! Please enter\n\
 the cottage first."))
 
-export const DIALOG_049 = DEFINE_DIALOG('DIALOG_049', 1, 5, 30, 200, ("\
+export const DIALOG_049 = DEFINE_DIALOG('DIALOG_049', 1, 5, 30, 200, t("\
 Remember that tricky Wall\n\
 Kick jump? It's a\n\
 technique you'll have to\n\
@@ -612,7 +614,7 @@ direction you want to\n\
 bounce to gain momentum.\n\
 Practice makes perfect!"))
 
-export const DIALOG_050 = DEFINE_DIALOG('DIALOG_050', 1, 4, 30, 200, ("\
+export const DIALOG_050 = DEFINE_DIALOG('DIALOG_050', 1, 4, 30, 200, t("\
 Hold [Z] to crouch and\n\
 slide down a slope.\n\
 Or press [Z] while in the\n\
@@ -626,7 +628,7 @@ then jump to do a\n\
 Long Jump! Or crouch and\n\
 walk to...never mind."))
 
-export const DIALOG_051 = DEFINE_DIALOG('DIALOG_051', 1, 6, 30, 200, ("\
+export const DIALOG_051 = DEFINE_DIALOG('DIALOG_051', 1, 6, 30, 200, t("\
 Climbing's easy! When you\n\
 jump at trees, poles or\n\
 pillars, you'll grab them\n\
@@ -643,7 +645,7 @@ Jump off from the\n\
 handstand for a high,\n\
 stylin' dismount."))
 
-export const DIALOG_052 = DEFINE_DIALOG('DIALOG_052', 1, 5, 30, 200, ("\
+export const DIALOG_052 = DEFINE_DIALOG('DIALOG_052', 1, 5, 30, 200, t("\
 Stop and press [Z] to\n\
 crouch, then press [A]\n\
 to do a high, Backward\n\
@@ -655,7 +657,7 @@ sharp U-turn and jump.\n\
 You can catch lots of\n\
 air with both jumps."))
 
-export const DIALOG_053 = DEFINE_DIALOG('DIALOG_053', 1, 5, 30, 200, ("\
+export const DIALOG_053 = DEFINE_DIALOG('DIALOG_053', 1, 5, 30, 200, t("\
 Sometimes, if you pass\n\
 through a coin ring or\n\
 find a secret point in a\n\
@@ -665,14 +667,14 @@ If you trigger five red\n\
 numbers, a secret Star\n\
 will show up."))
 
-export const DIALOG_054 = DEFINE_DIALOG('DIALOG_054', 1, 5, 30, 200, ("\
+export const DIALOG_054 = DEFINE_DIALOG('DIALOG_054', 1, 5, 30, 200, t("\
 Welcome to the snow\n\
 slide! Hop on! To speed\n\
 up, press forward on the\n\
 Control Stick. To slow\n\
 down, pull back."))
 
-export const DIALOG_055 = DEFINE_DIALOG('DIALOG_055', 1, 4, 30, 200, ("\
+export const DIALOG_055 = DEFINE_DIALOG('DIALOG_055', 1, 4, 30, 200, t("\
 Hey-ey, Mario, buddy,\n\
 howzit goin'? Step right\n\
 up. You look like a fast\n\
@@ -686,7 +688,7 @@ Ready...\n\
 \n\
 //Go//// Don't Go"))
 
-export const DIALOG_056 = DEFINE_DIALOG('DIALOG_056', 1, 6, 30, 200, ("\
+export const DIALOG_056 = DEFINE_DIALOG('DIALOG_056', 1, 6, 30, 200, t("\
 You brrrr-oke my record!\n\
 Unbelievable! I knew\n\
 that you were the coolest.\n\
@@ -698,7 +700,7 @@ medal, but here, take this\n\
 Star instead. You've\n\
 earned it!"))
 
-export const DIALOG_057 = DEFINE_DIALOG('DIALOG_057', 1, 4, 30, 200, ("\
+export const DIALOG_057 = DEFINE_DIALOG('DIALOG_057', 1, 4, 30, 200, t("\
 Egad! My baby!! Have you\n\
 seen my baby??? She's\n\
 the most precious baby in\n\
@@ -712,7 +714,7 @@ for herring and ice cubes,\n\
 then I...oohh! I just\n\
 don't know!"))
 
-export const DIALOG_058 = DEFINE_DIALOG('DIALOG_058', 1, 4, 30, 200, ("\
+export const DIALOG_058 = DEFINE_DIALOG('DIALOG_058', 1, 4, 30, 200, t("\
 You found my precious,\n\
 precious baby! Where\n\
 have you been? How can\n\
@@ -722,13 +724,13 @@ Oh, I do have this...\n\
 with my eternal\n\
 gratitude."))
 
-export const DIALOG_059 = DEFINE_DIALOG('DIALOG_059', 1, 4, 30, 200, ("\
+export const DIALOG_059 = DEFINE_DIALOG('DIALOG_059', 1, 4, 30, 200, t("\
 That's not my baby! She\n\
 looks nothing like me!\n\
 Her parents must be\n\
 worried sick!"))
 
-export const DIALOG_060 = DEFINE_DIALOG('DIALOG_060', 1, 4, 30, 200, ("\
+export const DIALOG_060 = DEFINE_DIALOG('DIALOG_060', 1, 4, 30, 200, t("\
 ATTENTION!\n\
 Read Before Diving In!\n\
 \n\
@@ -758,13 +760,13 @@ while on the surface near\n\
 the edge of the water to\n\
 jump out."))
 
-export const DIALOG_061 = DEFINE_DIALOG('DIALOG_061', 1, 4, 30, 200, ("\
+export const DIALOG_061 = DEFINE_DIALOG('DIALOG_061', 1, 4, 30, 200, t("\
 BRRR! Frostbite Danger!\n\
 Do not swim here.\n\
 I'm serious.\n\
 /--The Penguin"))
 
-export const DIALOG_062 = DEFINE_DIALOG('DIALOG_062', 1, 3, 30, 200, ("\
+export const DIALOG_062 = DEFINE_DIALOG('DIALOG_062', 1, 3, 30, 200, t("\
 Hidden inside the green\n\
 block is the amazing\n\
 Metal Cap.\n\
@@ -777,7 +779,7 @@ breathe while wearing it.\n\
 The only problem:\n\
 You can't swim in it."))
 
-export const DIALOG_063 = DEFINE_DIALOG('DIALOG_063', 1, 5, 30, 200, ("\
+export const DIALOG_063 = DEFINE_DIALOG('DIALOG_063', 1, 5, 30, 200, t("\
 The Vanish Cap is inside\n\
 the blue block. Mr. I.\n\
 will be surprised, since\n\
@@ -787,7 +789,7 @@ Even the Big Boo will be\n\
 fooled--and you can walk\n\
 through secret walls, too."))
 
-export const DIALOG_064 = DEFINE_DIALOG('DIALOG_064', 1, 5, 30, 200, ("\
+export const DIALOG_064 = DEFINE_DIALOG('DIALOG_064', 1, 5, 30, 200, t("\
 When you put on the Wing\n\
 Cap that comes from a\n\
 red block, do the Triple\n\
@@ -799,7 +801,7 @@ to fly up, press forward\n\
 to nose down, and press [Z]\n\
 to land."))
 
-export const DIALOG_065 = DEFINE_DIALOG('DIALOG_065', 1, 6, 30, 200, ("\
+export const DIALOG_065 = DEFINE_DIALOG('DIALOG_065', 1, 6, 30, 200, t("\
 Swimming Lessons!\n\
 Tap [A] to do the breast\n\
 stroke. If you time the\n\
@@ -828,7 +830,7 @@ And one last thing: You\n\
 can't open doors that\n\
 are underwater."))
 
-export const DIALOG_066 = DEFINE_DIALOG('DIALOG_066', 1, 5, 30, 200, ("\
+export const DIALOG_066 = DEFINE_DIALOG('DIALOG_066', 1, 5, 30, 200, t("\
 Mario, it's Peach!\n\
 Please be careful! Bowser\n\
 is so wicked! He will try\n\
@@ -854,7 +856,7 @@ again to launch Bowser.\n\
 Good luck, Mario! Our\n\
 fate is in your hands."))
 
-export const DIALOG_067 = DEFINE_DIALOG('DIALOG_067', 1, 5, 30, 200, ("\
+export const DIALOG_067 = DEFINE_DIALOG('DIALOG_067', 1, 5, 30, 200, t("\
 Tough luck, Mario!\n\
 Princess Toadstool isn't\n\
 here...Gwa ha ha!! Go\n\
@@ -865,7 +867,7 @@ swing ME around! A wimp\n\
 like you won't throw me\n\
 out of here! Never! Ha!"))
 
-export const DIALOG_068 = DEFINE_DIALOG('DIALOG_068', 1, 5, 30, 200, ("\
+export const DIALOG_068 = DEFINE_DIALOG('DIALOG_068', 1, 5, 30, 200, t("\
 It's Lethal Lava Land!\n\
 If you catch fire or fall\n\
 into a pool of flames,\n\
@@ -875,7 +877,7 @@ You can still control\n\
 Mario--just try to keep\n\
 calm!"))
 
-export const DIALOG_069 = DEFINE_DIALOG('DIALOG_069', 1, 6, 30, 200, ("\
+export const DIALOG_069 = DEFINE_DIALOG('DIALOG_069', 1, 6, 30, 200, t("\
 Sometimes you'll bump into\n\
 invisible walls at the\n\
 edges of the painting\n\
@@ -883,7 +885,7 @@ worlds. If you hit a wall\n\
 while flying, you'll bounce\n\
 back."))
 
-export const DIALOG_070 = DEFINE_DIALOG('DIALOG_070', 1, 5, 30, 200, ("\
+export const DIALOG_070 = DEFINE_DIALOG('DIALOG_070', 1, 5, 30, 200, t("\
 You can return to the\n\
 castle's main hall at any\n\
 time from the painting\n\
@@ -915,7 +917,7 @@ Stars next. You don't\n\
 have to recover the one\n\
 described by the hint."))
 
-export const DIALOG_071 = DEFINE_DIALOG('DIALOG_071', 1, 3, 30, 200, ("\
+export const DIALOG_071 = DEFINE_DIALOG('DIALOG_071', 1, 3, 30, 200, t("\
 Danger Ahead!\n\
 Beware of the strange\n\
 cloud! Don't inhale!\n\
@@ -925,14 +927,14 @@ air!\n\
 Circle: Shelter\n\
 Arrow: Entrance-Exit"))
 
-export const DIALOG_072 = DEFINE_DIALOG('DIALOG_072', 1, 5, 30, 200, ("\
+export const DIALOG_072 = DEFINE_DIALOG('DIALOG_072', 1, 5, 30, 200, t("\
 High winds ahead!\n\
 Pull your Cap down tight.\n\
 If it blows off, you'll\n\
 have to find it on this\n\
 mountain."))
 
-export const DIALOG_073 = DEFINE_DIALOG('DIALOG_073', 1, 4, 95, 200, ("\
+export const DIALOG_073 = DEFINE_DIALOG('DIALOG_073', 1, 4, 95, 200, t("\
 Aarrgh! Ahoy, matey. I\n\
 have sunken treasure,\n\
 here, I do.\n\
@@ -949,7 +951,7 @@ I'll never tell!\n\
 \n\
 //--The Cap'n"))
 
-export const DIALOG_074 = DEFINE_DIALOG('DIALOG_074', 1, 5, 30, 200, ("\
+export const DIALOG_074 = DEFINE_DIALOG('DIALOG_074', 1, 5, 30, 200, t("\
 You can grab on to the\n\
 edge of a cliff or ledge\n\
 with your fingertips and\n\
@@ -966,7 +968,7 @@ Control Stick or press [A]\n\
 as soon as you grab the\n\
 ledge to climb up quickly."))
 
-export const DIALOG_075 = DEFINE_DIALOG('DIALOG_075', 1, 5, 30, 200, ("\
+export const DIALOG_075 = DEFINE_DIALOG('DIALOG_075', 1, 5, 30, 200, t("\
 Mario!! My castle is in\n\
 great peril. I know that\n\
 Bowser is the cause...and\n\
@@ -998,7 +1000,7 @@ and free us from this\n\
 awful prison!\n\
 Please!"))
 
-export const DIALOG_076 = DEFINE_DIALOG('DIALOG_076', 1, 6, 30, 200, ("\
+export const DIALOG_076 = DEFINE_DIALOG('DIALOG_076', 1, 6, 30, 200, t("\
 Thanks to the power of\n\
 the Stars, life is\n\
 returning to the castle.\n\
@@ -1017,11 +1019,11 @@ it with a high jump into\n\
 the painting. Oh, by the\n\
 way, look what I found!"))
 
-export const DIALOG_077 = DEFINE_DIALOG('DIALOG_077', 1, 2, 150, 200, ("\
+export const DIALOG_077 = DEFINE_DIALOG('DIALOG_077', 1, 2, 150, 200, t("\
 It is decreed that one\n\
 shall pound the pillars."))
 
-export const DIALOG_078 = DEFINE_DIALOG('DIALOG_078', 1, 5, 30, 200, ("\
+export const DIALOG_078 = DEFINE_DIALOG('DIALOG_078', 1, 5, 30, 200, t("\
 Break open the Blue Coin\n\
 Block by Pounding the\n\
 Ground with the [Z] Button.\n\
@@ -1032,7 +1034,7 @@ The coins will disappear\n\
 if you're not quick to\n\
 collect them! Too bad."))
 
-export const DIALOG_079 = DEFINE_DIALOG('DIALOG_079', 1, 4, 30, 200, ("\
+export const DIALOG_079 = DEFINE_DIALOG('DIALOG_079', 1, 4, 30, 200, t("\
 Owwwuu! Let me go!\n\
 Uukee-kee! I was only\n\
 teasing! Can't you take\n\
@@ -1045,10 +1047,10 @@ So, how about it?\n\
 \n\
 //Free him/ Hold on"))
 
-export const DIALOG_080 = DEFINE_DIALOG('DIALOG_080', 1, 1, 30, 200, ("\
+export const DIALOG_080 = DEFINE_DIALOG('DIALOG_080', 1, 1, 30, 200, t("\
 Eeeh hee hee hee!"))
 
-export const DIALOG_081 = DEFINE_DIALOG('DIALOG_081', 1, 4, 30, 200, ("\
+export const DIALOG_081 = DEFINE_DIALOG('DIALOG_081', 1, 4, 30, 200, t("\
 The mystery is of Wet\n\
 or Dry.\n\
 And where does the\n\
@@ -1057,7 +1059,7 @@ The city welcomes visitors\n\
 with the depth they bring\n\
 as they enter."))
 
-export const DIALOG_082 = DEFINE_DIALOG('DIALOG_082', 1, 4, 30, 200, ("\
+export const DIALOG_082 = DEFINE_DIALOG('DIALOG_082', 1, 4, 30, 200, t("\
 Hold on to your hat! If\n\
 you lose it, you'll be\n\
 injured easily.\n\
@@ -1079,7 +1081,7 @@ troops are there, too.\n\
 Oh, here, take this. I've\n\
 been keeping it for you."))
 
-export const DIALOG_083 = DEFINE_DIALOG('DIALOG_083', 1, 6, 30, 200, ("\
+export const DIALOG_083 = DEFINE_DIALOG('DIALOG_083', 1, 6, 30, 200, t("\
 There's something strange\n\
 about that clock. As you\n\
 jump inside, watch the\n\
@@ -1087,7 +1089,7 @@ position of the big hand.\n\
 Oh, look what I found!\n\
 Here, Mario, catch!"))
 
-export const DIALOG_084 = DEFINE_DIALOG('DIALOG_084', 1, 3, 30, 200, ("\
+export const DIALOG_084 = DEFINE_DIALOG('DIALOG_084', 1, 3, 30, 200, t("\
 Yeeoww! Unhand me,\n\
 brute! I'm late, so late,\n\
 I must make haste!\n\
@@ -1101,32 +1103,32 @@ Now let me be! I have a\n\
 date! I cannot be late\n\
 for tea!"))
 
-export const DIALOG_085 = DEFINE_DIALOG('DIALOG_085', 1, 5, 30, 200, ("\
+export const DIALOG_085 = DEFINE_DIALOG('DIALOG_085', 1, 5, 30, 200, t("\
 You don't stand a ghost\n\
 of a chance in this house.\n\
 If you walk out of here,\n\
 you deserve...\n\
 ...a Ghoul Medal..."))
 
-export const DIALOG_086 = DEFINE_DIALOG('DIALOG_086', 1, 3, 30, 200, ("\
+export const DIALOG_086 = DEFINE_DIALOG('DIALOG_086', 1, 3, 30, 200, t("\
 Running around in circles\n\
 makes some bad guys roll\n\
 their eyes."))
 
-export const DIALOG_087 = DEFINE_DIALOG('DIALOG_087', 1, 4, 30, 200, ("\
+export const DIALOG_087 = DEFINE_DIALOG('DIALOG_087', 1, 4, 30, 200, t("\
 Santa Claus isn't the only\n\
 one who can go down a\n\
 chimney! Come on in!\n\
 /--Cabin Proprietor"))
 
-export const DIALOG_088 = DEFINE_DIALOG('DIALOG_088', 1, 5, 30, 200, ("\
+export const DIALOG_088 = DEFINE_DIALOG('DIALOG_088', 1, 5, 30, 200, t("\
 Work Elevator\n\
 For those who get off\n\
 here: Grab the pole to the\n\
 left and slide carefully\n\
 down."))
 
-export const DIALOG_089 = DEFINE_DIALOG('DIALOG_089', 1, 5, 95, 200, ("\
+export const DIALOG_089 = DEFINE_DIALOG('DIALOG_089', 1, 5, 95, 200, t("\
 Both ways fraught with\n\
 danger! Watch your feet!\n\
 Those who can't do the\n\
@@ -1141,7 +1143,7 @@ Red Circle: Elevator 2\n\
 //// Underground Lake\n\
 Arrow: You are here"))
 
-export const DIALOG_090 = DEFINE_DIALOG('DIALOG_090', 1, 6, 30, 200, ("\
+export const DIALOG_090 = DEFINE_DIALOG('DIALOG_090', 1, 6, 30, 200, t("\
 Bwa ha ha ha!\n\
 You've stepped right into\n\
 my trap, just as I knew\n\
@@ -1149,13 +1151,13 @@ you would! I warn you,\n\
 『Friend,』 watch your\n\
 step!"))
 
-export const DIALOG_091 = DEFINE_DIALOG('DIALOG_091', 2, 2, 30, 200, ("\
+export const DIALOG_091 = DEFINE_DIALOG('DIALOG_091', 2, 2, 30, 200, t("\
 Danger!\n\
 Strong Gusts!\n\
 But the wind makes a\n\
 comfy ride."))
 
-export const DIALOG_092 = DEFINE_DIALOG('DIALOG_092', 1, 5, 30, 200, ("\
+export const DIALOG_092 = DEFINE_DIALOG('DIALOG_092', 1, 5, 30, 200, t("\
 Pestering me again, are\n\
 you, Mario? Can't you see\n\
 that I'm having a merry\n\
@@ -1165,7 +1167,7 @@ Now, return those Stars!\n\
 My troops in the walls\n\
 need them! Bwa ha ha!"))
 
-export const DIALOG_093 = DEFINE_DIALOG('DIALOG_093', 1, 5, 30, 200, ("\
+export const DIALOG_093 = DEFINE_DIALOG('DIALOG_093', 1, 5, 30, 200, t("\
 Mario! You again! Well\n\
 that's just fine--I've\n\
 been looking for something\n\
@@ -1180,13 +1182,13 @@ And you'll never see the\n\
 Princess again!\n\
 Bwa ha ha ha!"))
 
-export const DIALOG_094 = DEFINE_DIALOG('DIALOG_094', 1, 4, 30, 200, ("\
+export const DIALOG_094 = DEFINE_DIALOG('DIALOG_094', 1, 4, 30, 200, t("\
 Get a good run up the\n\
 slope! Do you remember\n\
 the Long Jump? Run, press\n\
 [Z], then jump!"))
 
-export const DIALOG_095 = DEFINE_DIALOG('DIALOG_095', 1, 4, 30, 200, ("\
+export const DIALOG_095 = DEFINE_DIALOG('DIALOG_095', 1, 4, 30, 200, t("\
 To read a sign, stand in\n\
 front of it and press [B],\n\
 like you did just now.\n\
@@ -1199,7 +1201,7 @@ Please recover the Stars\n\
 that were stolen by\n\
 Bowser in this course."))
 
-export const DIALOG_096 = DEFINE_DIALOG('DIALOG_096', 1, 4, 30, 200, ("\
+export const DIALOG_096 = DEFINE_DIALOG('DIALOG_096', 1, 4, 30, 200, t("\
 The path is narrow here.\n\
 Easy does it! No one is\n\
 allowed on top of the\n\
@@ -1211,31 +1213,31 @@ sleeping!\n\
 Move slowly,\n\
 tread lightly."))
 
-export const DIALOG_097 = DEFINE_DIALOG('DIALOG_097', 1, 5, 30, 200, ("\
+export const DIALOG_097 = DEFINE_DIALOG('DIALOG_097', 1, 5, 30, 200, t("\
 Don't be a pushover!\n\
 If anyone tries to shove\n\
 you around, push back!\n\
 It's one-on-one, with a\n\
 fiery finish for the loser!"))
 
-export const DIALOG_098 = DEFINE_DIALOG('DIALOG_098', 1, 2, 95, 200, ("\
+export const DIALOG_098 = DEFINE_DIALOG('DIALOG_098', 1, 2, 95, 200, t("\
 Come on in here...\n\
 ...heh, heh, heh..."))
 
 // unused
-export const DIALOG_099 = DEFINE_DIALOG('DIALOG_099', 1, 5, 95, 200, ("\
+export const DIALOG_099 = DEFINE_DIALOG('DIALOG_099', 1, 5, 95, 200, t("\
 Eh he he...\n\
 You're mine, now, hee hee!\n\
 I'll pass right through\n\
 this wall. Can you do\n\
 that? Heh, heh, heh!"))
 
-export const DIALOG_100 = DEFINE_DIALOG('DIALOG_100', 1, 3, 95, 200, ("\
+export const DIALOG_100 = DEFINE_DIALOG('DIALOG_100', 1, 3, 95, 200, t("\
 Ukkiki...Wakkiki...kee kee!\n\
 Ha! I snagged it!\n\
 It's mine! Heeheeheeee!"))
 
-export const DIALOG_101 = DEFINE_DIALOG('DIALOG_101', 1, 3, 95, 200, ("\
+export const DIALOG_101 = DEFINE_DIALOG('DIALOG_101', 1, 3, 95, 200, t("\
 Ackk! Let...go...\n\
 You're...choking...me...\n\
 Cough...I've been framed!\n\
@@ -1246,7 +1248,7 @@ I think it looks better on\n\
 me than it does on you,\n\
 though! Eeeee! Kee keee!"))
 
-export const DIALOG_102 = DEFINE_DIALOG('DIALOG_102', 1, 5, 30, 200, ("\
+export const DIALOG_102 = DEFINE_DIALOG('DIALOG_102', 1, 5, 30, 200, t("\
 Pssst! The Boos are super\n\
 shy. If you look them\n\
 in the eyes, they fade\n\
@@ -1257,20 +1259,20 @@ them when they're fading\n\
 away. Instead, sneak up\n\
 behind them and punch."))
 
-export const DIALOG_103 = DEFINE_DIALOG('DIALOG_103', 1, 4, 95, 200, ("\
+export const DIALOG_103 = DEFINE_DIALOG('DIALOG_103', 1, 4, 95, 200, t("\
 Upon four towers\n\
 one must alight...\n\
 Then at the peak\n\
 shall shine the light..."))
 
-export const DIALOG_104 = DEFINE_DIALOG('DIALOG_104', 1, 5, 30, 200, ("\
+export const DIALOG_104 = DEFINE_DIALOG('DIALOG_104', 1, 5, 30, 200, t("\
 The shadowy star in front\n\
 of you is a 『Star\n\
 Marker.』 When you collect\n\
 all 8 Red Coins, the Star\n\
 will appear here."))
 
-export const DIALOG_105 = DEFINE_DIALOG('DIALOG_105', 1, 3, 95, 200, ("\
+export const DIALOG_105 = DEFINE_DIALOG('DIALOG_105', 1, 3, 95, 200, t("\
 Ready for blastoff! Come\n\
 on, hop into the cannon!\n\
 \n\
@@ -1284,11 +1286,11 @@ If you're handy, you can\n\
 grab on to trees or poles\n\
 to land."))
 
-export const DIALOG_106 = DEFINE_DIALOG('DIALOG_106', 1, 2, 95, 200, ("\
+export const DIALOG_106 = DEFINE_DIALOG('DIALOG_106', 1, 2, 95, 200, t("\
 Ready for blastoff! Come\n\
 on, hop into the cannon!"))
 
-export const DIALOG_107 = DEFINE_DIALOG('DIALOG_107', 1, 3, 95, 200, ("\
+export const DIALOG_107 = DEFINE_DIALOG('DIALOG_107', 1, 3, 95, 200, t("\
 Ghosts...\n\
 ...don't...\n\
 ...DIE!\n\
@@ -1296,14 +1298,14 @@ Heh, heh, heh!\n\
 Can you get out of here...\n\
 ...alive?"))
 
-export const DIALOG_108 = DEFINE_DIALOG('DIALOG_108', 1, 2, 95, 200, ("\
+export const DIALOG_108 = DEFINE_DIALOG('DIALOG_108', 1, 2, 95, 200, t("\
 Boooooo-m! Here comes\n\
 the master of mischief,\n\
 the tower of terror,\n\
 the Big Boo!\n\
 Ka ha ha ha..."))
 
-export const DIALOG_109 = DEFINE_DIALOG('DIALOG_109', 1, 4, 95, 200, ("\
+export const DIALOG_109 = DEFINE_DIALOG('DIALOG_109', 1, 4, 95, 200, t("\
 Ooooo Nooooo!\n\
 Talk about out-of-body\n\
 experiences--my body\n\
@@ -1315,20 +1317,20 @@ body!\n\
 Brrr! My face might\n\
 freeze like this!"))
 
-export const DIALOG_110 = DEFINE_DIALOG('DIALOG_110', 1, 5, 95, 200, ("\
+export const DIALOG_110 = DEFINE_DIALOG('DIALOG_110', 1, 5, 95, 200, t("\
 I need a good head on my\n\
 shoulders. Do you know of\n\
 anybody in need of a good\n\
 body? Please! I'll follow\n\
 you if you do!"))
 
-export const DIALOG_111 = DEFINE_DIALOG('DIALOG_111', 1, 4, 95, 200, ("\
+export const DIALOG_111 = DEFINE_DIALOG('DIALOG_111', 1, 4, 95, 200, t("\
 Perfect! What a great\n\
 new body! Here--this is a\n\
 present for you. It's sure\n\
 to warm you up."))
 
-export const DIALOG_112 = DEFINE_DIALOG('DIALOG_112', 1, 4, 30, 200, ("\
+export const DIALOG_112 = DEFINE_DIALOG('DIALOG_112', 1, 4, 30, 200, t("\
 Collect as many coins as\n\
 possible! They'll refill\n\
 your Power Meter.\n\
@@ -1345,7 +1347,7 @@ The faster you run\n\
 through the heart, the\n\
 more power you'll recover."))
 
-export const DIALOG_113 = DEFINE_DIALOG('DIALOG_113', 1, 6, 30, 200, ("\
+export const DIALOG_113 = DEFINE_DIALOG('DIALOG_113', 1, 6, 30, 200, t("\
 There are special Caps in\n\
 the red, green and blue\n\
 blocks. Step on the\n\
@@ -1353,7 +1355,7 @@ switches in the hidden\n\
 courses to activate the\n\
 Cap Blocks."))
 
-export const DIALOG_114 = DEFINE_DIALOG('DIALOG_114', 1, 5, 95, 200, ("\
+export const DIALOG_114 = DEFINE_DIALOG('DIALOG_114', 1, 5, 95, 200, t("\
 It makes me so mad! We\n\
 build your houses, your\n\
 castles. We pave your\n\
@@ -1368,14 +1370,14 @@ Do you have a problem\n\
 with that? Just try to\n\
 pound me, wimp! Ha!"))
 
-export const DIALOG_115 = DEFINE_DIALOG('DIALOG_115', 1, 5, 95, 200, ("\
+export const DIALOG_115 = DEFINE_DIALOG('DIALOG_115', 1, 5, 95, 200, t("\
 No! Crushed again!\n\
 I'm just a stepping stone,\n\
 after all. I won't gravel,\n\
 er, grovel. Here, you win.\n\
 Take this with you!"))
 
-export const DIALOG_116 = DEFINE_DIALOG('DIALOG_116', 1, 5, 95, 200, ("\
+export const DIALOG_116 = DEFINE_DIALOG('DIALOG_116', 1, 5, 95, 200, t("\
 Whaaa....Whaaat?\n\
 Can it be that a\n\
 pipsqueak like you has\n\
@@ -1396,7 +1398,7 @@ again, select this Star\n\
 from the menu. For now,\n\
 farewell."))
 
-export const DIALOG_117 = DEFINE_DIALOG('DIALOG_117', 1, 1, 95, 200, ("\
+export const DIALOG_117 = DEFINE_DIALOG('DIALOG_117', 1, 1, 95, 200, t("\
 Who...walk...here?\n\
 Who...break...seal?\n\
 Wake..ancient..ones?\n\
@@ -1408,7 +1410,7 @@ Now battle...\n\
 ...to...\n\
 ...hand!"))
 
-export const DIALOG_118 = DEFINE_DIALOG('DIALOG_118', 1, 6, 95, 200, ("\
+export const DIALOG_118 = DEFINE_DIALOG('DIALOG_118', 1, 6, 95, 200, t("\
 Grrrrumbbble!\n\
 What...happen?\n\
 We...crushed like pebble.\n\
@@ -1418,7 +1420,7 @@ For today...\n\
 Now, take Star of Power.\n\
 We...sleep...darkness."))
 
-export const DIALOG_119 = DEFINE_DIALOG('DIALOG_119', 1, 6, 30, 200, ("\
+export const DIALOG_119 = DEFINE_DIALOG('DIALOG_119', 1, 6, 30, 200, t("\
 Grrr! I was a bit\n\
 careless. This is not as I\n\
 had planned...but I still\n\
@@ -1432,7 +1434,7 @@ but I'll let you go for\n\
 now. You'll pay for this...\n\
 later!"))
 
-export const DIALOG_120 = DEFINE_DIALOG('DIALOG_120', 1, 4, 30, 200, ("\
+export const DIALOG_120 = DEFINE_DIALOG('DIALOG_120', 1, 4, 30, 200, t("\
 Ooowaah! Can it be that\n\
 I've lost??? The power of\n\
 the Stars has failed me...\n\
@@ -1448,7 +1450,7 @@ tower.\n\
 I'll be waiting!\n\
 Gwa ha ha ha!"))
 
-export const DIALOG_121 = DEFINE_DIALOG('DIALOG_121', 1, 5, 30, 200, ("\
+export const DIALOG_121 = DEFINE_DIALOG('DIALOG_121', 1, 5, 30, 200, t("\
 Nooo! It can't be!\n\
 You've really beaten me,\n\
 Mario?!! I gave those\n\
@@ -1463,18 +1465,18 @@ C'mon troops! Let's watch\n\
 the ending together!\n\
 Bwa ha ha!"))
 
-export const DIALOG_122 = DEFINE_DIALOG('DIALOG_122', 1, 4, 30, 200, ("\
+export const DIALOG_122 = DEFINE_DIALOG('DIALOG_122', 1, 4, 30, 200, t("\
 The Black Hole\n\
 Right: Work Elevator\n\
 /// Cloudy Maze\n\
 Left: Underground Lake"))
 
-export const DIALOG_123 = DEFINE_DIALOG('DIALOG_123', 1, 4, 30, 200, ("\
+export const DIALOG_123 = DEFINE_DIALOG('DIALOG_123', 1, 4, 30, 200, t("\
 Metal Cavern\n\
 Right: To Waterfall\n\
 Left: Metal Cap Switch"))
 
-export const DIALOG_124 = DEFINE_DIALOG('DIALOG_124', 1, 4, 30, 200, ("\
+export const DIALOG_124 = DEFINE_DIALOG('DIALOG_124', 1, 4, 30, 200, t("\
 Work Elevator\n\
 Danger!!\n\
 Read instructions\n\
@@ -1483,17 +1485,17 @@ Elevator continues in the\n\
 direction of the arrow\n\
 activated."))
 
-export const DIALOG_125 = DEFINE_DIALOG('DIALOG_125', 1, 3, 30, 200, ("\
+export const DIALOG_125 = DEFINE_DIALOG('DIALOG_125', 1, 3, 30, 200, t("\
 Hazy Maze-Exit\n\
 Danger! Closed.\n\
 Turn back now."))
 
-export const DIALOG_126 = DEFINE_DIALOG('DIALOG_126', 2, 3, 30, 200, ("\
+export const DIALOG_126 = DEFINE_DIALOG('DIALOG_126', 2, 3, 30, 200, t("\
 Up: Black Hole\n\
 Right: Work Elevator\n\
 /// Hazy Maze"))
 
-export const DIALOG_127 = DEFINE_DIALOG('DIALOG_127', 3, 4, 30, 200, ("\
+export const DIALOG_127 = DEFINE_DIALOG('DIALOG_127', 3, 4, 30, 200, t("\
 Underground Lake\n\
 Right: Metal Cave\n\
 Left: Abandoned Mine\n\
@@ -1503,13 +1505,13 @@ here. Pound on his back to\n\
 make him lower his head.\n\
 Don't become his lunch."))
 
-export const DIALOG_128 = DEFINE_DIALOG('DIALOG_128', 1, 4, 95, 200, ("\
+export const DIALOG_128 = DEFINE_DIALOG('DIALOG_128', 1, 4, 95, 200, t("\
 You must fight with\n\
 honor! It is against the\n\
 royal rules to throw the\n\
 king out of the ring!"))
 
-export const DIALOG_129 = DEFINE_DIALOG('DIALOG_129', 1, 5, 30, 200, ("\
+export const DIALOG_129 = DEFINE_DIALOG('DIALOG_129', 1, 5, 30, 200, t("\
 Welcome to the Vanish\n\
 Cap Switch Course! All of\n\
 the blue blocks you find\n\
@@ -1521,7 +1523,7 @@ you'll be able to elude\n\
 enemies and walk through\n\
 many things. Try it out!"))
 
-export const DIALOG_130 = DEFINE_DIALOG('DIALOG_130', 1, 5, 30, 200, ("\
+export const DIALOG_130 = DEFINE_DIALOG('DIALOG_130', 1, 5, 30, 200, t("\
 Welcome to the Metal Cap\n\
 Switch Course! Once you\n\
 step on the Cap Switch,\n\
@@ -1532,7 +1534,7 @@ into metal with the Metal\n\
 Cap, you can walk\n\
 underwater! Try it!"))
 
-export const DIALOG_131 = DEFINE_DIALOG('DIALOG_131', 1, 5, 30, 200, ("\
+export const DIALOG_131 = DEFINE_DIALOG('DIALOG_131', 1, 5, 30, 200, t("\
 Welcome to the Wing Cap\n\
 Course! Step on the red\n\
 switch at the top of the\n\
@@ -1554,7 +1556,7 @@ forward to nose down,\n\
 just as you would when\n\
 flying an airplane."))
 
-export const DIALOG_132 = DEFINE_DIALOG('DIALOG_132', 1, 4, 30, 200, ("\
+export const DIALOG_132 = DEFINE_DIALOG('DIALOG_132', 1, 4, 30, 200, t("\
 Whoa, Mario, pal, you\n\
 aren't trying to cheat,\n\
 are you? Shortcuts aren't\n\
@@ -1564,7 +1566,7 @@ know better. You're\n\
 disqualified! Next time,\n\
 play fair!"))
 
-export const DIALOG_133 = DEFINE_DIALOG('DIALOG_133', 1, 6, 30, 200, ("\
+export const DIALOG_133 = DEFINE_DIALOG('DIALOG_133', 1, 6, 30, 200, t("\
 Am I glad to see you! The\n\
 Princess...and I...and,\n\
 well, everybody...we're all\n\
@@ -1595,7 +1597,7 @@ able to open the door\n\
 with the big star. The\n\
 Princess must be inside!"))
 
-export const DIALOG_134 = DEFINE_DIALOG('DIALOG_134', 1, 5, 30, 200, ("\
+export const DIALOG_134 = DEFINE_DIALOG('DIALOG_134', 1, 5, 30, 200, t("\
 The names of the Stars\n\
 are also hints for\n\
 finding them. They are\n\
@@ -1612,7 +1614,7 @@ another course.\n\
 We're all waiting for\n\
 your help!"))
 
-export const DIALOG_135 = DEFINE_DIALOG('DIALOG_135', 1, 5, 30, 200, ("\
+export const DIALOG_135 = DEFINE_DIALOG('DIALOG_135', 1, 5, 30, 200, t("\
 It was Bowser who stole\n\
 the Stars. I saw him with\n\
 my own eyes!\n\
@@ -1634,7 +1636,7 @@ already defeated, select\n\
 the Stars you recovered\n\
 from them."))
 
-export const DIALOG_136 = DEFINE_DIALOG('DIALOG_136', 1, 6, 30, 200, ("\
+export const DIALOG_136 = DEFINE_DIALOG('DIALOG_136', 1, 6, 30, 200, t("\
 Wow! You've already\n\
 recovered that many\n\
 Stars? Way to go, Mario!\n\
@@ -1665,7 +1667,7 @@ minimize damage if you\n\
 Pound the Ground as you\n\
 land."))
 
-export const DIALOG_137 = DEFINE_DIALOG('DIALOG_137', 1, 6, 30, 200, ("\
+export const DIALOG_137 = DEFINE_DIALOG('DIALOG_137', 1, 6, 30, 200, t("\
 Thanks, Mario! The castle\n\
 is recovering its energy\n\
 as you retrieve Power\n\
@@ -1678,12 +1680,12 @@ Stars appear when you\n\
 collect 100 coins in each\n\
 of the 15 courses!"))
 
-export const DIALOG_138 = DEFINE_DIALOG('DIALOG_138', 1, 3, 30, 200, ("\
+export const DIALOG_138 = DEFINE_DIALOG('DIALOG_138', 1, 3, 30, 200, t("\
 Down: Underground Lake\n\
 Left: Black Hole\n\
 Right: Hazy Maze (Closed)"))
 
-export const DIALOG_139 = DEFINE_DIALOG('DIALOG_139', 1, 6, 30, 200, ("\
+export const DIALOG_139 = DEFINE_DIALOG('DIALOG_139', 1, 6, 30, 200, t("\
 Above: Automatic Elevator\n\
 Elevator begins\n\
 automatically and follows\n\
@@ -1691,7 +1693,7 @@ pre-set course.\n\
 It disappears\n\
 automatically, too."))
 
-export const DIALOG_140 = DEFINE_DIALOG('DIALOG_140', 1, 6, 30, 200, ("\
+export const DIALOG_140 = DEFINE_DIALOG('DIALOG_140', 1, 6, 30, 200, t("\
 Elevator Area\n\
 Right: Hazy Maze\n\
 /// Entrance\n\
@@ -1699,7 +1701,7 @@ Left: Black Hole\n\
 ///Elevator 1\n\
 Arrow: You are here"))
 
-export const DIALOG_141 = DEFINE_DIALOG('DIALOG_141', 1, 5, 150, 200, ("\
+export const DIALOG_141 = DEFINE_DIALOG('DIALOG_141', 1, 5, 150, 200, t("\
 You've recovered one of\n\
 the stolen Power Stars!\n\
 Now you can open some of\n\
@@ -1716,7 +1718,7 @@ can't give up. Save us,\n\
 Mario! Keep searching for\n\
 Stars!"))
 
-export const DIALOG_142 = DEFINE_DIALOG('DIALOG_142', 1, 5, 150, 200, ("\
+export const DIALOG_142 = DEFINE_DIALOG('DIALOG_142', 1, 5, 150, 200, t("\
 You've recovered three\n\
 Power Stars! Now you can\n\
 open any door with a 3\n\
@@ -1728,7 +1730,7 @@ please. The enemies ahead\n\
 are even meaner, so be\n\
 careful!"))
 
-export const DIALOG_143 = DEFINE_DIALOG('DIALOG_143', 1, 6, 150, 200, ("\
+export const DIALOG_143 = DEFINE_DIALOG('DIALOG_143', 1, 6, 150, 200, t("\
 You've recovered eight of\n\
 the Power Stars! Now you\n\
 can open the door with\n\
@@ -1736,7 +1738,7 @@ the big Star! But Bowser\n\
 is just ahead...can you\n\
 hear the Princess calling?"))
 
-export const DIALOG_144 = DEFINE_DIALOG('DIALOG_144', 1, 6, 150, 200, ("\
+export const DIALOG_144 = DEFINE_DIALOG('DIALOG_144', 1, 6, 150, 200, t("\
 You've recovered 30\n\
 Power Stars! Now you can\n\
 open the door with the\n\
@@ -1755,7 +1757,7 @@ and into the underground.\n\
 Have you finally\n\
 cornered him?"))
 
-export const DIALOG_145 = DEFINE_DIALOG('DIALOG_145', 1, 6, 150, 200, ("\
+export const DIALOG_145 = DEFINE_DIALOG('DIALOG_145', 1, 6, 150, 200, t("\
 You've recovered 50\n\
 Power Stars! Now you can\n\
 open the Star Door on the\n\
@@ -1771,7 +1773,7 @@ helpful.\n\
 Hurry along, now. The\n\
 third floor is just ahead."))
 
-export const DIALOG_146 = DEFINE_DIALOG('DIALOG_146', 1, 6, 150, 200, ("\
+export const DIALOG_146 = DEFINE_DIALOG('DIALOG_146', 1, 6, 150, 200, t("\
 You've found 70 Power\n\
 Stars! The mystery of the\n\
 endless stairs is solved,\n\
@@ -1779,7 +1781,7 @@ thanks to you--and is\n\
 Bowser ever upset! Now,\n\
 on to the final bout!"))
 
-export const DIALOG_147 = DEFINE_DIALOG('DIALOG_147', 1, 5, 30, 200, ("\
+export const DIALOG_147 = DEFINE_DIALOG('DIALOG_147', 1, 5, 30, 200, t("\
 Are you using the Cap\n\
 Blocks? You really should,\n\
 you know.\n\
@@ -1801,7 +1803,7 @@ Cap, green for the Metal\n\
 Cap, blue for the Vanish\n\
 Cap."))
 
-export const DIALOG_148 = DEFINE_DIALOG('DIALOG_148', 1, 6, 30, 200, ("\
+export const DIALOG_148 = DEFINE_DIALOG('DIALOG_148', 1, 6, 30, 200, t("\
 Snowman Mountain ahead.\n\
 Keep out! And don't try\n\
 the Triple Jump over the\n\
@@ -1815,7 +1817,7 @@ you won't recover\n\
 automatically.\n\
 //--The Snowman"))
 
-export const DIALOG_149 = DEFINE_DIALOG('DIALOG_149', 1, 3, 30, 200, ("\
+export const DIALOG_149 = DEFINE_DIALOG('DIALOG_149', 1, 3, 30, 200, t("\
 Welcome to\n\
 Princess Toadstool's\n\
 secret slide!\n\
@@ -1828,7 +1830,7 @@ pull back to slow down.\n\
 If you slide really\n\
 fast, you'll win the Star!"))
 
-export const DIALOG_150 = DEFINE_DIALOG('DIALOG_150', 1, 5, 30, 200, ("\
+export const DIALOG_150 = DEFINE_DIALOG('DIALOG_150', 1, 5, 30, 200, t("\
 Waaaa! You've flooded my\n\
 house! Wh-why?? Look at\n\
 this mess! What am I\n\
@@ -1845,7 +1847,7 @@ this Star...It's so shiny,\n\
 but it makes me feel...\n\
 strange..."))
 
-export const DIALOG_151 = DEFINE_DIALOG('DIALOG_151', 1, 4, 30, 200, ("\
+export const DIALOG_151 = DEFINE_DIALOG('DIALOG_151', 1, 4, 30, 200, t("\
 I can't take this\n\
 anymore! First you get\n\
 me all wet, then you\n\
@@ -1854,7 +1856,7 @@ Now I'm really, really,\n\
 REALLY mad!\n\
 Waaaaaaaaaaaaaaaaa!!!"))
 
-export const DIALOG_152 = DEFINE_DIALOG('DIALOG_152', 1, 3, 30, 200, ("\
+export const DIALOG_152 = DEFINE_DIALOG('DIALOG_152', 1, 3, 30, 200, t("\
 Owwch! Uncle! Uncle!\n\
 Okay, I give. Take this\n\
 Star!\n\
@@ -1868,7 +1870,7 @@ They make me feel...\n\
 ...peaceful. Please, come\n\
 back and visit anytime."))
 
-export const DIALOG_153 = DEFINE_DIALOG('DIALOG_153', 1, 4, 30, 200, ("\
+export const DIALOG_153 = DEFINE_DIALOG('DIALOG_153', 1, 4, 30, 200, t("\
 Hey! Who's there?\n\
 What's climbing on me?\n\
 Is it an ice ant?\n\
@@ -1877,7 +1879,7 @@ Whatever it is, it's\n\
 bugging me! I think I'll\n\
 blow it away!"))
 
-export const DIALOG_154 = DEFINE_DIALOG('DIALOG_154', 1, 5, 30, 200, ("\
+export const DIALOG_154 = DEFINE_DIALOG('DIALOG_154', 1, 5, 30, 200, t("\
 Hold on to your hat! If\n\
 you lose it, you'll be\n\
 easily injured. If you\n\
@@ -1893,7 +1895,7 @@ are secret worlds in the\n\
 walls as well as in the\n\
 paintings, right?"))
 
-export const DIALOG_155 = DEFINE_DIALOG('DIALOG_155', 1, 6, 30, 200, ("\
+export const DIALOG_155 = DEFINE_DIALOG('DIALOG_155', 1, 6, 30, 200, t("\
 Thanks to the power of\n\
 the Stars, life is\n\
 returning to the castle.\n\
@@ -1911,14 +1913,14 @@ water town, you can flood\n\
 it with a high jump into\n\
 the painting."))
 
-export const DIALOG_156 = DEFINE_DIALOG('DIALOG_156', 1, 5, 30, 200, ("\
+export const DIALOG_156 = DEFINE_DIALOG('DIALOG_156', 1, 5, 30, 200, t("\
 The world inside the\n\
 clock is so strange!\n\
 When you jump inside,\n\
 watch the position of\n\
 the big hand!"))
 
-export const DIALOG_157 = DEFINE_DIALOG('DIALOG_157', 1, 5, 30, 200, ("\
+export const DIALOG_157 = DEFINE_DIALOG('DIALOG_157', 1, 5, 30, 200, t("\
 Watch out! Don't let\n\
 yourself be swallowed by\n\
 quicksand.\n\
@@ -1932,7 +1934,7 @@ smothered.\n\
 The dark areas are\n\
 bottomless pits."))
 
-export const DIALOG_158 = DEFINE_DIALOG('DIALOG_158', 1, 6, 30, 200, ("\
+export const DIALOG_158 = DEFINE_DIALOG('DIALOG_158', 1, 6, 30, 200, t("\
 1. If you jump repeatedly\n\
 and time it right, you'll\n\
 jump higher and higher.\n\
@@ -1945,7 +1947,7 @@ hit the wall. You can\n\
 bounce to a higher level\n\
 using this Wall Kick."))
 
-export const DIALOG_159 = DEFINE_DIALOG('DIALOG_159', 1, 6, 30, 200, ("\
+export const DIALOG_159 = DEFINE_DIALOG('DIALOG_159', 1, 6, 30, 200, t("\
 3. If you stop, press [Z]\n\
 to crouch, then jump, you\n\
 can perform a Backward\n\
@@ -1953,13 +1955,13 @@ Somersault. To do a Long\n\
 Jump, run fast, press [Z],\n\
 then jump."))
 
-export const DIALOG_160 = DEFINE_DIALOG('DIALOG_160', 1, 4, 30, 200, ("\
+export const DIALOG_160 = DEFINE_DIALOG('DIALOG_160', 1, 4, 30, 200, t("\
 Press [B] while running\n\
 fast to do a Body Slide\n\
 attack. To stand while\n\
 sliding, press [A] or [B]."))
 
-export const DIALOG_161 = DEFINE_DIALOG('DIALOG_161', 1, 4, 30, 200, ("\
+export const DIALOG_161 = DEFINE_DIALOG('DIALOG_161', 1, 4, 30, 200, t("\
 Mario!!!\n\
 It that really you???\n\
 It has been so long since\n\
@@ -1988,7 +1990,7 @@ Enjoy!!!』\n\
 \n\
 The Super Mario 64 Team"))
 
-export const DIALOG_162 = DEFINE_DIALOG('DIALOG_162', 1, 4, 30, 200, ("\
+export const DIALOG_162 = DEFINE_DIALOG('DIALOG_162', 1, 4, 30, 200, t("\
 No, no, no! Not you\n\
 again! I'm in a great\n\
 hurry, can't you see?\n\
@@ -2002,7 +2004,7 @@ a rush. That's it, that's\n\
 all. Now, I must be off.\n\
 Owww! Let me go!"))
 
-export const DIALOG_163 = DEFINE_DIALOG('DIALOG_163', 1, 5, 30, 200, ("\
+export const DIALOG_163 = DEFINE_DIALOG('DIALOG_163', 1, 5, 30, 200, t("\
 Noooo! You've really\n\
 beaten me this time,\n\
 Mario! I can't stand\n\
@@ -2029,7 +2031,7 @@ that Control Stick\n\
 smokin'!\n\
 Buwaa ha ha!"))
 
-export const DIALOG_164 = DEFINE_DIALOG('DIALOG_164', 1, 4, 30, 200, ("\
+export const DIALOG_164 = DEFINE_DIALOG('DIALOG_164', 1, 4, 30, 200, t("\
 Mario! What's up, pal?\n\
 I haven't been on the\n\
 slide lately, so I'm out\n\
@@ -2043,20 +2045,20 @@ Ready...set...\n\
 \n\
 //Go//// Don't Go"))
 
-export const DIALOG_165 = DEFINE_DIALOG('DIALOG_165', 1, 5, 30, 200, ("\
+export const DIALOG_165 = DEFINE_DIALOG('DIALOG_165', 1, 5, 30, 200, t("\
 I take no responsibility\n\
 whatsoever for those who\n\
 get dizzy and pass out\n\
 from running around\n\
 this post."))
 
-export const DIALOG_166 = DEFINE_DIALOG('DIALOG_166', 1, 4, 30, 200, ("\
+export const DIALOG_166 = DEFINE_DIALOG('DIALOG_166', 1, 4, 30, 200, t("\
 I'll be back soon.\n\
 I'm out training now,\n\
 so come back later.\n\
 //--Koopa the Quick"))
 
-export const DIALOG_167 = DEFINE_DIALOG('DIALOG_167', 1, 4, 30, 200, ("\
+export const DIALOG_167 = DEFINE_DIALOG('DIALOG_167', 1, 4, 30, 200, t("\
 Princess Toadstool's\n\
 castle is just ahead.\n\
 \n\
@@ -2068,14 +2070,14 @@ something.\n\
 Press [B] again to throw\n\
 something you're holding."))
 
-export const DIALOG_168 = DEFINE_DIALOG('DIALOG_168', 1, 5, 30, 200, ("\
+export const DIALOG_168 = DEFINE_DIALOG('DIALOG_168', 1, 5, 30, 200, t("\
 Hey! Knock it off! That's\n\
 the second time you've\n\
 nailed me. Now you're\n\
 asking for it, linguine\n\
 breath!"))
 
-export const DIALOG_169 = DEFINE_DIALOG('DIALOG_169', 1, 4, 30, 200, ("\
+export const DIALOG_169 = DEFINE_DIALOG('DIALOG_169', 1, 4, 30, 200, t("\
 Keep out!\n\
 That means you!\n\
 Arrgghh!\n\

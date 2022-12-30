@@ -325,3 +325,7 @@ export const check_warp_checkpoint = (warpNode) => {
 
     return warpCheckpointActive
 }
+
+export const save_file_exists = (fileIndex) => {
+    return (gSaveBuffer.files[fileIndex][0].flags & SAVE_FLAG_FILE_EXISTS) != 0
+}

@@ -1,10 +1,10 @@
 import * as _Linker from "./Linker"
-import { AreaInstance as Area, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./Area"
-import { COURSE_NONE, COURSE_STAGES_MAX } from "../levels/course_defines"
+import { AreaInstance as Area, MARIO_SPAWN_AIRBORNE, MARIO_SPAWN_AIRBORNE_DEATH, MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_DEATH, MARIO_SPAWN_DOOR_WARP, MARIO_SPAWN_FLYING, MARIO_SPAWN_HARD_AIR_KNOCKBACK, MARIO_SPAWN_INSTANT_ACTIVE, MARIO_SPAWN_LAUNCH_DEATH, MARIO_SPAWN_LAUNCH_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH, MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_SPIN_AIRBORNE, MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_SWIMMING, MARIO_SPAWN_TELEPORT, MARIO_SPAWN_UNKNOWN_02, MARIO_SPAWN_UNKNOWN_03, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./Area"
+import { COURSE_NONE, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
 import * as Mario from "./Mario"
 import { CameraInstance as Camera, CAM_MOVE_PAUSE_SCREEN } from "./Camera"
 import * as CourseTable from "../include/course_table"
-import { disable_warp_checkpoint, gLevelToCourseNumTable } from "./SaveFile"
+import { disable_warp_checkpoint, gLevelToCourseNumTable, save_file_get_star_flags, SAVE_FLAG_HAVE_VANISH_CAP } from "./SaveFile"
 import { s16, sins, coss } from "../utils"
 import { IngameMenuInstance as IngameMenu, MENU_MODE_RENDER_PAUSE_SCREEN } from "./IngameMenu"
 import { fadeout_music } from "./SoundInit"
@@ -89,26 +89,6 @@ export const WARP_OP_DEMO_END      = 0x19
 
 export const WARP_OP_TRIGGERS_LEVEL_SELECT = 0x10
 
-export const MARIO_SPAWN_DOOR_WARP             = 0x01
-export const MARIO_SPAWN_UNKNOWN_02            = 0x02
-export const MARIO_SPAWN_UNKNOWN_03            = 0x03
-export const MARIO_SPAWN_TELEPORT              = 0x04
-export const MARIO_SPAWN_INSTANT_ACTIVE        = 0x10
-export const MARIO_SPAWN_SWIMMING              = 0x11
-export const MARIO_SPAWN_AIRBORNE              = 0x12
-export const MARIO_SPAWN_HARD_AIR_KNOCKBACK    = 0x13
-export const MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE  = 0x14
-export const MARIO_SPAWN_DEATH                 = 0x15
-export const MARIO_SPAWN_SPIN_AIRBORNE         = 0x16
-export const MARIO_SPAWN_FLYING                = 0x17
-export const MARIO_SPAWN_PAINTING_STAR_COLLECT = 0x20
-export const MARIO_SPAWN_PAINTING_DEATH        = 0x21
-export const MARIO_SPAWN_AIRBORNE_STAR_COLLECT = 0x22
-export const MARIO_SPAWN_AIRBORNE_DEATH        = 0x23
-export const MARIO_SPAWN_LAUNCH_STAR_COLLECT   = 0x24
-export const MARIO_SPAWN_LAUNCH_DEATH          = 0x25
-export const MARIO_SPAWN_UNKNOWN_27            = 0x27
-
 
 const PLAY_MODE_NORMAL  =  0
 const PLAY_MODE_PAUSED  =  2
@@ -143,30 +123,6 @@ class HudDisplay {
         this.timer = timer
     }
 }
-
-
-const sProtoWarpBhvSpawnType = [
-    ['bhvDoorWarp',                MARIO_SPAWN_DOOR_WARP],
-    ['bhvStar',                    MARIO_SPAWN_UNKNOWN_02],
-    ['bhvExitPodiumWarp',          MARIO_SPAWN_UNKNOWN_03],
-    ['bhvWarp',                    MARIO_SPAWN_UNKNOWN_03],
-    ['bhvWarpPipe',                MARIO_SPAWN_UNKNOWN_03],
-    ['bhvFadingWarp',              MARIO_SPAWN_TELEPORT],
-    ['bhvInstantActiveWarp',       MARIO_SPAWN_INSTANT_ACTIVE],
-    ['bhvAirborneWarp',            MARIO_SPAWN_AIRBORNE],
-    ['bhvHardAirKnockBackWarp',    MARIO_SPAWN_HARD_AIR_KNOCKBACK],
-    ['bhvSpinAirborneCircleWarp',  MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE],
-    ['bhvDeathWarp',               MARIO_SPAWN_DEATH],
-    ['bhvSpinAirborneWarp',        MARIO_SPAWN_SPIN_AIRBORNE],
-    ['bhvFlyingWarp',              MARIO_SPAWN_FLYING],
-    ['bhvSwimmingWarp',            MARIO_SPAWN_SWIMMING],
-    ['bhvPaintingStarCollectWarp', MARIO_SPAWN_PAINTING_STAR_COLLECT],
-    ['bhvPaintingDeathWarp',       MARIO_SPAWN_PAINTING_DEATH],
-    ['bhvAirborneStarCollectWarp', MARIO_SPAWN_AIRBORNE_STAR_COLLECT],
-    ['bhvAirborneDeathWarp',       MARIO_SPAWN_AIRBORNE_DEATH],
-    ['bhvLaunchStarCollectWarp',   MARIO_SPAWN_LAUNCH_STAR_COLLECT],
-    ['bhvLaunchDeathWarp',         MARIO_SPAWN_LAUNCH_DEATH],
-]
 
 
 class LevelUpdate {
@@ -215,26 +171,6 @@ class LevelUpdate {
         this.sWarpCheckpointActive = 0
 
         this.sWarpBhvSpawnType = null
-    }
-
-    init_mario_warp_spawn_type() {
-        if (!this.sWarpBhvSpawnType) {
-            this.sWarpBhvSpawnType = []
-            for (let i = 0; i < sProtoWarpBhvSpawnType.length; ++i) {
-                this.sWarpBhvSpawnType[i] = [gLinker.behaviors[sProtoWarpBhvSpawnType[i][0]], sProtoWarpBhvSpawnType[i][1]]
-            }
-        }
-    }
-
-    get_mario_spawn_type(o) {
-        this.init_mario_warp_spawn_type()
-
-        for (let i = 0; i < this.sWarpBhvSpawnType.length; ++i) {
-            if (this.sWarpBhvSpawnType[i][0] == o.behavior) {
-                return this.sWarpBhvSpawnType[i][1]
-            }
-        }
-        return false
     }
 
     lvl_init_from_save_file(arg0, levelNum) {
@@ -331,7 +267,7 @@ class LevelUpdate {
                     Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                 } else if (true) { // !gDebugLevelSelect) {
                     if (this.gMarioState.action != ACT_UNINITIALIZED) {
-                        if (true) { // save_file_exists(gCurrSaveFileNum - 1)) {
+                        if (save_file_exists(gCurrSaveFileNum - 1)) {
                             Mario.set_mario_action(this.gMarioState, ACT_IDLE, 0)
                         } else {
                             Mario.set_mario_action(this.gMarioState, ACT_INTRO_CUTSCENE, 0)
@@ -417,41 +353,6 @@ class LevelUpdate {
 
         this.warp_special(level)
     }
-
-// export const stub_level_update_1 = () => {
-// }
-
-// export const load_level_init_text = (arg) => {
-//     let /*s32*/ gotAchievement
-//     let /*u32*/ dialogID = Area.gCurrentArea.dialog[arg]
-
-//     switch (dialogID) {
-//         case DIALOG_129:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP
-//             break
-
-//         case DIALOG_130:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP
-//             break
-
-//         case DIALOG_131:
-//             gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP
-//             break
-
-//         case 255:
-//             gotAchievement = 1
-//             break
-
-//         default:
-//             gotAchievement = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)
-//             break
-//     }
-
-//     if (!gotAchievement) {
-//         level_set_transition(-1, null)
-//         create_dialog_box(dialogID)
-//     }
-// }
 
     init_door_warp(spawnInfo, arg1) {
         if (arg1 & 0x00000002) {
@@ -1206,7 +1107,37 @@ class LevelUpdate {
         this.sCurrPlayMode = playMode
     }
 
-    load_level_init_text(arg) {}
+    load_level_init_text(arg) {
+        let gotAchievement
+        let dialogID = Area.gCurrentArea.dialog[arg]
+
+        switch (dialogID) {
+            case DIALOG_129:
+                gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP
+                break
+
+            case DIALOG_130:
+                gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP
+                break
+                
+            case DIALOG_131:
+                gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP
+                break
+
+            case DIALOG_NONE:
+                gotAchievement = true
+                break
+
+            default:
+                gotAchievement = save_file_get_star_flags(Area.gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(Area.gCurrCourseNum))
+                break
+        }
+
+        if (!gotAchievement) {
+            this.level_set_transition(-1, null)
+            this.create_dialog_box(dialogID)
+        }
+    }
 
     update_hud_values() {
         if (this.gCurrCreditsEntry == null) {

@@ -12,7 +12,7 @@ import {
     ACTIVE_PARTICLE_DUST, ACTIVE_PARTICLE_V_STAR, ACTIVE_PARTICLE_H_STAR, ACTIVE_PARTICLE_SPARKLES, ACTIVE_PARTICLE_BUBBLE,
     ACTIVE_PARTICLE_WATER_SPLASH, ACTIVE_PARTICLE_IDLE_WATER_WAVE, ACTIVE_PARTICLE_PLUNGE_BUBBLE, ACTIVE_PARTICLE_WAVE_TRAIL,
     ACTIVE_PARTICLE_FIRE, ACTIVE_PARTICLE_SHALLOW_WATER_WAVE, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_LEAF,
-    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE
+    ACTIVE_PARTICLE_SNOW, ACTIVE_PARTICLE_BREATH, ACTIVE_PARTICLE_DIRT, ACTIVE_PARTICLE_MIST_CIRCLE, ACTIVE_PARTICLE_TRIANGLE, oInteractType, ACTIVE_FLAG_UNIMPORTANT, ACTIVE_FLAG_INITIATED_TIME_STOP
 } from "../include/object_constants"
 import { detect_object_collisions } from "./ObjectCollisions"
 import { uint32, uint16 } from "../utils"
@@ -26,6 +26,7 @@ import {
     PARTICLE_SHALLOW_WATER_SPLASH, PARTICLE_LEAF, PARTICLE_SNOW, PARTICLE_BREATH, PARTICLE_DIRT, PARTICLE_MIST_CIRCLE, PARTICLE_TRIANGLE
 } from "../include/mario_constants"
 import { spawn_object_at_origin, obj_copy_pos_and_angle } from "./ObjectHelpers"
+import { INTERACT_DOOR, INTERACT_WARP_DOOR } from "./Interaction"
 
 export const gDebugInfo = new Array(16).fill(0).map(() => new Array(8).fill(0))
 
@@ -92,8 +93,6 @@ class ObjectListProcessor {
             })
         }
 
-        // this.OBJECT_POOL_CAPACITY = 240
-
         this.OBJ_LIST_PLAYER       = OBJ_LIST_PLAYER
         this.OBJ_LIST_UNUSED_1     = OBJ_LIST_UNUSED_1
         this.OBJ_LIST_DESTRUCTIVE  = OBJ_LIST_DESTRUCTIVE
@@ -151,117 +150,10 @@ class ObjectListProcessor {
         })
     }
 
-    update_objects() {
-        this.gObjectCounter = 0  /// probaly not used and not needed
-
-        gLinker.SurfaceLoad.clear_dynamic_surfaces()
-        this.update_terrain_objects()
-
-        gLinker.PlatformDisplacement.apply_mario_platform_displacement()
-
-        detect_object_collisions()
-        this.update_non_terrain_objects()
-
-        this.unload_deactivated_objects()
-
-        gLinker.PlatformDisplacement.update_mario_platform()
-    }
-
-    update_terrain_objects() {
-        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SPAWNER])
-        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SURFACE])
-    }
-
-    update_non_terrain_objects() {
-        this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
-            this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
-        })
-    }
-
-    update_objects_in_list(objList) {
-
-        const firstObj = objList.next
-        return this.update_objects_starting_at(objList, firstObj)
-    }
-
-    update_objects_starting_at(objList, firstObj) {
-        let count = 0
-        while (objList != firstObj) {
-            this.gCurrentObject = firstObj
-            this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
-            gLinker.BehaviorCommands.cur_obj_update()
-            firstObj = firstObj.next
-            count++
-        }
-        return count
-    }
-
-    unload_deactivated_objects_in_list(objList) {
-        let obj = objList.next
-
-        while (objList != obj) {
-            this.gCurrentObject = obj
-            obj = obj.next
-
-            if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
-                /// Prevent object from respawning after exiting and re-entering the area
-                if (!(this.gCurrentObject.rawData[oFlags] & OBJ_FLAG_PERSISTENT_RESPAWN)) {
-                    this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
-                }
-
-                gLinker.Spawn.unload_object(this.gCurrentObject)
-            }
-
-        }
-
-        return false
-    }
-
-    unload_deactivated_objects() {
-        this.sObjectListUpdateOrder.forEach(listIndex => {
-            this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
-        })
-    }
-
-    set_object_respawn_info_bits(obj, bits) {
-        switch (obj.respawnInfoType) {
-            case RESPAWN_INFO_TYPE_32:
-                let info32 = uint32(obj.respawnInfo)
-                info32 |= bits << 8
-                obj.respawnInfo = info32
-                break
-            case RESPAWN_INFO_TYPE_16:
-                let info16 = uint16(obj.respawnInfo)
-                info16 |= bits << 8
-                obj.respawnInfo = info16
-                break
-        }
-    }
-
-    spawn_particle(activeParticleFlag, model, behavior) {
-        if (!(this.gCurrentObject.rawData[oActiveParticleFlags] & activeParticleFlag)) {
-            this.gCurrentObject.rawData[oActiveParticleFlags] |= activeParticleFlag
-            let particle
-            particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
-            obj_copy_pos_and_angle(particle, this.gCurrentObject)
-        }
-    }
-
-    bhv_mario_update() {
-        const particleFlags = Mario.execute_mario_action()
-        this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
-        this.copy_mario_state_to_object()
-
-        if (this.sParticleTypes == undefined) {
-            this.sParticleTypesInit()
-        }
-        this.sParticleTypes.forEach(particleType => {
-            if (particleFlags & particleType.particleFlag) {
-                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
-            }
-        })
-    }
-
+    /**
+     * Copy position, velocity, and angle variables from MarioState to the Mario
+     * object.
+     */
     copy_mario_state_to_object() {
         const gMarioState = gLinker.LevelUpdate.gMarioState
         this.gCurrentObject.rawData[oPosX] = gMarioState.pos[0]
@@ -284,6 +176,154 @@ class ObjectListProcessor {
         this.gCurrentObject.rawData[oAngleVelYaw]   = gMarioState.angleVel[1]
         this.gCurrentObject.rawData[oAngleVelRoll]  = gMarioState.angleVel[2]
     }
+    
+    /**
+     * Spawn a particle at gCurrentObject's location.
+     */
+    spawn_particle(activeParticleFlag, model, behavior) {
+        if (!(this.gCurrentObject.rawData[oActiveParticleFlags] & activeParticleFlag)) {
+            this.gCurrentObject.rawData[oActiveParticleFlags] |= activeParticleFlag
+            let particle
+            particle = spawn_object_at_origin(this.gCurrentObject, model, behavior)
+            obj_copy_pos_and_angle(particle, this.gCurrentObject)
+        }
+    }
+
+    /**
+     * Mario's primary behavior update function.
+     */
+    bhv_mario_update() {
+        const particleFlags = Mario.execute_mario_action()
+        this.gCurrentObject.rawData[oMarioParticleFlags] = particleFlags
+        this.copy_mario_state_to_object()
+
+        if (this.sParticleTypes == undefined) {
+            this.sParticleTypesInit()
+        }
+        this.sParticleTypes.forEach(particleType => {
+            if (particleFlags & particleType.particleFlag) {
+                this.spawn_particle(particleType.activeParticleFlag, particleType.model, particleType.behavior)
+            }
+        })
+    }
+
+    /**
+     * Update every object that occurs after firstObj in the given object list,
+     * including firstObj itself. Return the number of objects that were updated.
+     */
+    update_objects_starting_at(objList, firstObj) {
+        let count = 0
+        while (objList != firstObj) {
+            this.gCurrentObject = firstObj
+            this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            gLinker.BehaviorCommands.cur_obj_update()
+            firstObj = firstObj.next
+            count++
+        }
+        return count
+    }
+
+    /**
+     * Update objects in objList starting with firstObj while time stop is active.
+     * This means that only certain select objects will be updated, such as Mario,
+     * doors, unimportant objects, and the object that initiated time stop.
+     * The exact set of objects that are updated depends on which flags are set
+     * in gTimeStopState.
+     * Return the total number of objects in the list (including those that weren't
+     * updated)
+     */
+    update_objects_during_time_stop(objList, firstObj) {
+        let count = 0
+        let unfrozen;
+
+        while (objList != firstObj) {
+            this.gCurrentObject = firstObj
+            unfrozen = false
+            
+            // Selectively unfreeze certain objects
+            if (!(this.gTimeStopState & TIME_STOP_ALL_OBJECTS)) {
+                if (this.gCurrentObject == this.gMarioObject && !(this.gTimeStopState & TIME_STOP_MARIO_AND_DOORS))
+                    unfrozen = true
+                
+                if (this.gCurrentObject.rawData[oInteractType] & (INTERACT_DOOR | INTERACT_WARP_DOOR) && !(this.gTimeStopState & TIME_STOP_MARIO_AND_DOORS))
+                    unfrozen = true
+
+                if (this.gCurrentObject.activeFalgs & (ACTIVE_FLAG_UNIMPORTANT | ACTIVE_FLAG_INITIATED_TIME_STOP))
+                    unfrozen = true
+            }
+
+            // Only update if unfrozen
+            if (unfrozen) {
+                this.gCurrentObject.gfx.flags |= GraphNode.GRAPH_RENDER_HAS_ANIMATION
+                gLinker.BehaviorCommands.cur_obj_update()
+            } else 
+                this.gCurrentObject.gfx.flags &= ~GraphNode.GRAPH_RENDER_HAS_ANIMATION
+            
+            firstObj = firstObj.next
+            count++
+        }
+
+        return count
+    }
+
+    /**
+     * Update every object in the given list. Return the total number of objects in
+     * the list.
+     */
+    update_objects_in_list(objList) {
+        const firstObj = objList.next
+
+        if (!(this.gTimeStopState & TIME_STOP_ACTIVE))
+            return this.update_objects_starting_at(objList, firstObj)
+        else 
+            return this.update_objects_during_time_stop(objList, firstObj)
+    }
+
+    /**
+     * Unload any objects in the list that have been deactivated.
+     */
+    unload_deactivated_objects_in_list(objList) {
+        let obj = objList.next
+
+        while (objList != obj) {
+            this.gCurrentObject = obj
+            obj = obj.next
+
+            if ((this.gCurrentObject.activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
+                /// Prevent object from respawning after exiting and re-entering the area
+                if (!(this.gCurrentObject.rawData[oFlags] & OBJ_FLAG_PERSISTENT_RESPAWN)) {
+                    this.set_object_respawn_info_bits(this.gCurrentObject, RESPAWN_INFO_DONT_RESPAWN)
+                }
+
+                gLinker.Spawn.unload_object(this.gCurrentObject)
+            }
+
+        }
+
+        return false
+    }
+
+    /**
+     * OR the object's respawn info with bits << 8. If bits = 0xFF, this prevents
+     * the object from respawning after leaving and re-entering the area.
+     * For macro objects, respawnInfo points to the 16 bit entry in the macro object
+     * list. For other objects, it points to the 32 bit behaviorArg in the
+     * SpawnInfo.
+     */
+    set_object_respawn_info_bits(obj, bits) {
+        switch (obj.respawnInfoType) {
+            case RESPAWN_INFO_TYPE_32:
+                let info32 = uint32(obj.respawnInfo)
+                info32 |= bits << 8
+                obj.respawnInfo = info32
+                break
+            case RESPAWN_INFO_TYPE_16:
+                let info16 = uint16(obj.respawnInfo)
+                info16 |= bits << 8
+                obj.respawnInfo = info16
+                break
+        }
+    }
 
     /**
      * Unload all objects whose activeAreaIndex is areaIndex.
@@ -301,6 +341,9 @@ class ObjectListProcessor {
         }
     }
 
+    /**
+     * Spawn objects given a list of SpawnInfos. Called when loading an area.
+     */
     spawn_objects_from_info(spawnInfo) {
         this.gTimeStopState = 0
 
@@ -354,6 +397,9 @@ class ObjectListProcessor {
         }
     }
 
+    /**
+     * Clear objects, dynamic surfaces, and some miscellaneous level data used by objects.
+     */
     clear_objects() {
         let i
 
@@ -370,6 +416,66 @@ class ObjectListProcessor {
 
         gLinker.Spawn.clear_object_lists()
         gLinker.SurfaceLoad.clear_dynamic_surfaces()
+    }
+
+    /**
+     * Update spawner and surface objects.
+     */
+    update_terrain_objects() {
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SPAWNER])
+        this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[this.OBJ_LIST_SURFACE])
+    }
+
+    /**
+     * Update all other object lists besides spawner and surface objects, using
+     * the order specified by sObjectListUpdateOrder.
+     */
+    update_non_terrain_objects() {
+        this.sObjectListUpdateOrder.slice(2).forEach(listIndex => {
+            this.gObjectCounter += this.update_objects_in_list(this.gObjectLists[listIndex])
+        })
+    }
+
+    /**
+     * Unload deactivated objects in any object list.
+     */
+    unload_deactivated_objects() {
+        this.sObjectListUpdateOrder.forEach(listIndex => {
+            this.unload_deactivated_objects_in_list(this.gObjectLists[listIndex])
+        })
+    }
+
+    /**
+     * Update all objects. This includes script execution, object collision detection,
+     * and object surface management.
+     */
+    update_objects() {
+
+        this.gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR
+
+        this.gNumRoomedObjectsInMarioRoom = 0
+        this.gNumRoomedObjectsNotInMarioRoom = 0
+        this.gCheckingSurfaceCollisionsForCamera = false
+
+        gLinker.SurfaceLoad.clear_dynamic_surfaces()
+        this.update_terrain_objects()
+
+        gLinker.PlatformDisplacement.apply_mario_platform_displacement()
+
+        detect_object_collisions()
+        this.update_non_terrain_objects()
+
+        this.unload_deactivated_objects()
+
+        gLinker.PlatformDisplacement.update_mario_platform()
+
+        // If time stop was enabled this frame, activate it now so that it will
+        // take effect next frame
+        if (this.gTimeStopState & TIME_STOP_ENABLED) {
+            this.gTimeStopState |= TIME_STOP_ACTIVE
+        } else {
+            this.gTimeStopState &= ~TIME_STOP_ACTIVE
+        }
     }
 }
 

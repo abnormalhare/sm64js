@@ -6,13 +6,15 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../include/config"
 import { COURSE_MAX, COURSE_MIN, COURSE_NONE } from "../include/course_table"
 import * as Gbi from "../include/gbi"
 import { GFX_DIMENSIONS_FROM_LEFT_EDGE, GFX_DIMENSIONS_FROM_RIGHT_EDGE } from "../include/gfx_dimensions"
-import { SOUND_MENU_CHANGE_SELECT, SOUND_MENU_MESSAGE_APPEAR, SOUND_MENU_PAUSE } from "../include/sounds"
+import { SOUND_MENU_CHANGE_SELECT, SOUND_MENU_MESSAGE_APPEAR, SOUND_MENU_PAUSE, SOUND_MENU_PAUSE_2 } from "../include/sounds"
 import { main_hud_cmp, TEXT_CAMERA_ANGLE_R, TEXT_COIN_X, TEXT_CONTINUE, TEXT_COURSE, TEXT_EXIT_COURSE, TEXT_FILE_MARIO_EXCLAMATION, TEXT_FILE_MARIO_QUESTION, TEXT_FOR_MARIO, TEXT_LETS_HAVE_CAKE, TEXT_LISTEN_EVERYBODY, TEXT_MY_SCORE, TEXT_PAUSE, TEXT_POWER_STARS_RESTORED, TEXT_SOMETHING_SPECIAL, TEXT_STAR_X, TEXT_THANKS_TO_YOU, TEXT_THANK_YOU_MARIO, TEXT_UNFILLED_STAR, unm, unt } from "../include/text_strings"
+import { castle_grounds_seg7_dl_0700EA58 } from "../levels/castle_grounds/areas/1/12/model.inc"
+import { castle_grounds_seg7_us_dl_0700F2E8 } from "../levels/castle_grounds/areas/1/13/model.inc"
 import { COURSE_BONUS_STAGES, COURSE_NUM_TO_INDEX, COURSE_STAGES_MAX } from "../levels/course_defines"
 import { menu_hud_lut } from "../levels/menu/leveldata"
 import { seg2_act_name_table, seg2_course_name_table } from "../text/us/courses"
 import { DIALOG_020, DIALOG_NONE, seg2_dialog_table } from "../text/us/dialogs"
-import { AreaInstance as Area, MENU_OPT_CAMERA_ANGLE_R, MENU_OPT_DEFAULT, MENU_OPT_NONE } from "./Area"
+import { AreaInstance as Area, MENU_OPT_CAMERA_ANGLE_R, MENU_OPT_DEFAULT, MENU_OPT_EXIT_COURSE, MENU_OPT_NONE } from "./Area"
 import { CameraInstance as Camera } from "./Camera"
 import { GameInstance as Game } from "./Game"
 import { LevelUpdateInstance as LevelUpdate } from "./LevelUpdate"
@@ -87,6 +89,11 @@ export const TXT_HISCORE_Y  = 36
 export const TXT_CONGRATS_X = 70
 
 export const PAUSE_X = 123
+
+export const PEACH_MESSAGE_TIMER = 250
+
+export const STR_X = 38
+export const STR_Y = 142
 
 export const X_VAL1 = -7.0
 export const Y_VAL1 = 5.0
@@ -307,10 +314,10 @@ class IngameMenu {
                     this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * 2, 0.0, 0.0)
                     break
                 case String.fromCharCode(DIALOG_CHAR_MULTI_THE):
-                    this.render_multi_text_string(STRING_THE)
+                    this.render_multi_text_string(this.MultiStringIDs.STRING_THE)
                     break
                 case String.fromCharCode(DIALOG_CHAR_MULTI_YOU):
-                    this.render_multi_text_string(STRING_YOU)
+                    this.render_multi_text_string(this.MultiStringIDs.STRING_YOU)
                     break
                 case String.fromCharCode(DIALOG_CHAR_SPACE):
                     this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.CHAR_WIDTH_SPACE, 0.0, 0.0)
@@ -342,8 +349,6 @@ class IngameMenu {
         let curY = y
         let xStride;
 
-        console.log(str, unm(str))
-
         hudLUT == HUD_LUT_JPMENU ? xStride = 16 : xStride = 12
         while (str[strPos] != "\xFF") {
             this.CHAR_WIDTH_DEFAULT = this.gDialogCharWidths[str[strPos]]
@@ -357,7 +362,7 @@ class IngameMenu {
                     if (hudLUT == HUD_LUT_JPMENU)
                         Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT1[str[strPos]])
                     if (hudLUT == HUD_LUT_GLOBAL)
-                        Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT2[str[strPos]])
+                        Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT2[str[strPos].charCodeAt(0)])
                     
                     Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_load_tex_block)
                     Gbi.gSPTextureRectangle(Game.gDisplayList, curX << 2, curY << 2, (curX + 16) << 2, (curY + 16) << 2, Gbi.G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10)
@@ -482,14 +487,6 @@ class IngameMenu {
         }
 
         this.gDialogLineNum = doneCourseIndex
-    }
-
-    print_hud_pause_colorful_str() {
-        let textPause = TEXT_PAUSE
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin)
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
-        this.print_hud_lut_string(HUD_LUT_GLOBAL, PAUSE_X, 81, textPause)
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end)
     }
 
     shade_screen() {
@@ -631,108 +628,6 @@ class IngameMenu {
         Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
     }
 
-    render_pause_castle_main_strings(x, y) {
-        let courseNameTbl = seg2_course_name_table
-        let textCoin = TEXT_COIN_X
-        let prevCourseIndex = this.gDialogLineNum
-        let strVal = Array(8)
-
-        const wrapper = { index: this.gDialogLineNum }
-        this.handle_menu_scrolling(
-            MENU_SCROLL_VERTICAL, wrapper, COURSE_NUM_TO_INDEX(COURSE_MIN) - 1,
-            COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1
-        )
-        
-        if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1)
-            this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN) // Exceeded max, set to min
-        if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1)
-            this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) // Exceeded min, set to max
-        
-        if (this.gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
-            while (save_file_get_course_star_count(Area.gCurrSaveFileNum - 1, this.gDialogLineNum) == 0) {
-                if (this.gDialogLineNum >= prevCourseIndex) this.gDialogLineNum++
-                else this.gDialogLineNum--
-
-                if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1 ||
-                    this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) - 1) {
-                    this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)
-                    break
-                }
-            }
-        }
-
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin)
-        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
-
-        let courseName;
-        if (this.gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
-            courseName = courseNameTbl[this.gDialogLineNum]
-            this.render_pause_castle_course_stars(x, y, Area.gCurrSaveFileNum - 1, this.gDialogLineNum)
-            this.print_generic_string(x + 34, y - 5, textCoin)
-            this.int_to_str(save_file_get_course_coin_score(Area.gCurrSaveFileNum - 1, this.gDialogLineNum), strVal)
-            this.print_generic_string(x + 54, y - 5, strVal)
-        } else {
-            let textStarX = TEXT_STAR_X
-            courseName = courseNameTbl[COURSE_MAX]
-            this.print_generic_string(x + 40, y - 13, textStarX)
-            this.int_to_str(save_file_get_total_star_count(Area.gCurrSaveFileNum - 1, COURSE_BONUS_STAGES - 1, COURSE_MAX - 1), strVal)
-            this.print_generic_string(x + 60, y - 13, strVal)
-        }
-        //this.print_generic_string(x - 9, y + 30, courseName)
-
-        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end)
-    }
-
-    render_pause_courses_and_castle() {
-        let index;
-        const gMarioStates = [ gLinker.LevelUpdate.gMarioStates ]
-
-        switch (this.gDialogBoxState) {
-            case DIALOG_STATE_OPENING:
-                this.gDialogLineNum = MENU_OPT_DEFAULT
-                this.gDialogTextAlpha = 0
-                LevelUpdate.level_set_transition(-1, null)
-                play_sound(SOUND_MENU_PAUSE, gGlobalSoundSource)
-
-                if (Area.gCurrCourseNum >= COURSE_MIN && Area.gCurrCourseNum <= COURSE_MAX) {
-                    this.change_dialog_camera_angle()
-                    this.gDialogBoxState = DIALOG_STATE_VERTICAL
-                } else {
-                    this.highlight_last_course_complete_stars()
-                    this.gDialogBoxState = DIALOG_STATE_HORIZONTAL
-                }
-                break
-
-            case DIALOG_STATE_VERTICAL:
-                this.shade_screen();
-                this.render_pause_my_score_coins();
-                this.render_pause_red_coins()
-
-                const wrapper = { index: this.gDialogLineNum }
-                if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) 
-                    this.render_pause_course_options(99, 93, wrapper, 15)
-                break;
-            
-            case DIALOG_STATE_HORIZONTAL:
-                this.shade_screen()
-                this.print_hud_pause_colorful_str()
-                this.render_pause_castle_menu_box(160, 143)
-                this.render_pause_castle_main_strings(104, 60)
-                /*if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart) {
-                    level_set_transition(0, null)
-                    play_sound(SOUND_MENU_PAUSE, gGlobalSoundSource)
-                    this.gMenuMode = MENU_MODE_NONE
-                    this.gDialogBoxState = DIALOG_STATE_OPENING
-                    return MENU_OPT_DEFAULT
-                }*/
-                break
-        }
-
-        if (this.gDialogTextAlpha < 250) this.gDialogTextAlpha == 25
-
-        return MENU_OPT_NONE
-    }
-
     render_dialog_box_type(dialog, linesPerBox) {
         this.create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog.leftOffset, dialog.width, 0)
 
@@ -860,6 +755,46 @@ class IngameMenu {
         this.gCutsceneMsgTimer++
     }
 
+    print_peach_letter_message() {
+        let dialog = this.gDialogID
+        let str = dialog.str
+        
+        this.create_dl_translation_matrix(MENU_MTX_PUSH, 97.0, 118.0, 0)
+
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gCutsceneMsgFade)
+        Gbi.gSPDisplayList(Game.gDisplayList, castle_grounds_seg7_dl_0700EA58)
+        Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin)
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 20, 20, 20, this.gCutsceneMsgFade)
+
+        // this.print_generic_string(STR_X, STR_Y, str)
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, 255)
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end)
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 200, 80, 120, this.gCutsceneMsgFade)
+        Gbi.gSPDisplayList(Game.gDisplayList, castle_grounds_seg7_us_dl_0700F2E8)
+
+        // at the start/end of message, reset the fade.
+        if (this.gCutsceneMsgTimer == 0) this.gCutsceneMsgFade = 0
+
+        // we're less than 20 increments, so increase the fade.
+        if (this.gCutsceneMsgTimer < 20) this.gCutsceneMsgFade += 10
+
+        // we're after PEACH_MESSAGE_TIMER increments, so decrease the fade.
+        if (this.gCutsceneMsgTimer > PEACH_MESSAGE_TIMER) this.gCutsceneMsgFade -= 10
+
+        // 20 increments after the start of the decrease, we're
+        // back where we are, so reset everything at the end.
+        if (this.gCutsceneMsgTimer > PEACH_MESSAGE_TIMER + 20) {
+            this.gCutsceneMsgIndex = -1
+            this.gCutsceneMsgFade = 0 //! uselessly reset since the next execution will just set it to 0 again.
+            this.gDialogID = DIALOG_NONE
+            this.gCutsceneMsgTimer = 0
+            return // return to avoid incrementing the timer
+        }
+
+        this.gCutsceneMsgTimer++
+    }
+
     set_menu_mode(mode) {
         if (this.gMenuMode == MENU_MODE_NONE) this.gMenuMode = mode
     }
@@ -919,6 +854,132 @@ class IngameMenu {
             this.gDialogID = dialog
             this.gDialogBoxType = DIALOG_TYPE_ZOOM
         }
+    }
+
+    print_hud_pause_colorful_str() {
+        let textPause = TEXT_PAUSE
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin)
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
+        this.print_hud_lut_string(HUD_LUT_GLOBAL, PAUSE_X, 81, textPause)
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end)
+    }
+
+    render_pause_castle_main_strings(x, y) {
+        let courseNameTbl = seg2_course_name_table
+        let textCoin = TEXT_COIN_X
+        let prevCourseIndex = this.gDialogLineNum
+        let strVal = Array(8)
+
+        const wrapper = { index: this.gDialogLineNum }
+        this.handle_menu_scrolling(
+            MENU_SCROLL_VERTICAL, wrapper, COURSE_NUM_TO_INDEX(COURSE_MIN) - 1,
+            COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1
+        )
+        
+        if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1)
+            this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN) // Exceeded max, set to min
+        if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1)
+            this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) // Exceeded min, set to max
+        
+        if (this.gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
+            while (save_file_get_course_star_count(Area.gCurrSaveFileNum - 1, this.gDialogLineNum) == 0) {
+                if (this.gDialogLineNum >= prevCourseIndex) this.gDialogLineNum++
+                else this.gDialogLineNum--
+
+                if (this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1 ||
+                    this.gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) - 1) {
+                    this.gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)
+                    break
+                }
+            }
+        }
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_begin)
+        Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gDialogTextAlpha)
+
+        let courseName;
+        if (this.gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
+            courseName = courseNameTbl[this.gDialogLineNum]
+            this.render_pause_castle_course_stars(x, y, Area.gCurrSaveFileNum - 1, this.gDialogLineNum)
+            this.print_generic_string(x + 34, y - 5, textCoin)
+            this.int_to_str(save_file_get_course_coin_score(Area.gCurrSaveFileNum - 1, this.gDialogLineNum), strVal)
+            this.print_generic_string(x + 54, y - 5, strVal)
+        } else {
+            let textStarX = TEXT_STAR_X
+            courseName = courseNameTbl[COURSE_MAX]
+            this.print_generic_string(x + 40, y - 13, textStarX)
+            this.int_to_str(save_file_get_total_star_count(Area.gCurrSaveFileNum - 1, COURSE_BONUS_STAGES - 1, COURSE_MAX - 1), strVal)
+            this.print_generic_string(x + 60, y - 13, strVal)
+        }
+        // this.print_generic_string(x - 9, y + 30, courseName)
+
+        Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end)
+    }
+
+    render_pause_courses_and_castle() {
+        let index;
+        const gMarioStates = [ gLinker.LevelUpdate.gMarioStates ]
+
+        switch (this.gDialogBoxState) {
+            case DIALOG_STATE_OPENING:
+                this.gDialogLineNum = MENU_OPT_DEFAULT
+                this.gDialogTextAlpha = 0
+                LevelUpdate.level_set_transition(-1, null)
+                play_sound(SOUND_MENU_PAUSE, gGlobalSoundSource)
+
+                if (Area.gCurrCourseNum >= COURSE_MIN && Area.gCurrCourseNum <= COURSE_MAX) {
+                    this.change_dialog_camera_angle()
+                    this.gDialogBoxState = DIALOG_STATE_VERTICAL
+                } else {
+                    this.highlight_last_course_complete_stars()
+                    this.gDialogBoxState = DIALOG_STATE_HORIZONTAL
+                }
+                break
+
+            case DIALOG_STATE_VERTICAL:
+                this.shade_screen();
+                this.render_pause_my_score_coins();
+                this.render_pause_red_coins()
+
+                const wrapper = { index: this.gDialogLineNum }
+                if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) 
+                    this.render_pause_course_options(99, 93, wrapper, 15)
+                this.gDialogLineNum = wrapper.index
+
+                if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart) {
+                    LevelUpdate.level_set_transition(0, null)
+                    play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource)
+                    this.gDialogBoxState = DIALOG_STATE_OPENING
+                    this.gMenuMode = MENU_MODE_NONE
+
+                    if (this.gDialogLineNum == MENU_OPT_EXIT_COURSE) {
+                        index = this.gDialogLineNum
+                    } else {
+                        index = MENU_OPT_DEFAULT
+                    }
+
+                    return index
+                }
+                break;
+            
+            case DIALOG_STATE_HORIZONTAL:
+                this.shade_screen()
+                this.print_hud_pause_colorful_str()
+                this.render_pause_castle_menu_box(160, 143)
+                this.render_pause_castle_main_strings(104, 60)
+                if (window.playerInput.buttonPressedA || window.playerInput.buttonPressedStart) {
+                    LevelUpdate.level_set_transition(0, null)
+                    play_sound(SOUND_MENU_PAUSE, gGlobalSoundSource)
+                    this.gMenuMode = MENU_MODE_NONE
+                    this.gDialogBoxState = DIALOG_STATE_OPENING
+                    return MENU_OPT_DEFAULT
+                }
+                break
+        }
+
+        if (this.gDialogTextAlpha < 250) this.gDialogTextAlpha == 25
+
+        return MENU_OPT_NONE
     }
 
     render_menus_and_dialogs() {

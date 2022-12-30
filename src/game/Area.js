@@ -9,8 +9,12 @@ import { render_screen_transition } from "./ScreenTransition"
 import { HudInstance as Hud } from "./Hud"
 import { PrintInstance as Print } from "./Print"
 import { SCREEN_WIDTH } from "../include/config"
-import { oBehParams, ACTIVE_FLAG_DEACTIVATED } from "../include/object_constants"
+import { oBehParams, ACTIVE_FLAG_DEACTIVATED, oActiveParticleFlags } from "../include/object_constants"
 import { IngameMenuInstance as IngameMenu } from "./IngameMenu"
+import { stop_sounds_in_continuous_banks } from "../audio/external"
+import { SCREEN_HEIGHT } from "./Skybox"
+import { GFX_DIMENSIONS_FULL_RADIUS } from "../include/gfx_dimensions"
+import { print_displaying_credits_entry } from "./MarioActionsCutscene"
 
 export const WARP_TRANSITION_FADE_FROM_COLOR   = 0x00
 export const WARP_TRANSITION_FADE_INTO_COLOR   = 0x01
@@ -46,6 +50,26 @@ export const MENU_OPT_SAVE_AND_CONTINUE = MENU_OPT_1
 export const MENU_OPT_SAVE_AND_QUIT = MENU_OPT_2
 export const MENU_OPT_CONTINUE_DONT_SAVE = MENU_OPT_3
 
+export const MARIO_SPAWN_DOOR_WARP             = 0x01
+export const MARIO_SPAWN_UNKNOWN_02            = 0x02
+export const MARIO_SPAWN_UNKNOWN_03            = 0x03
+export const MARIO_SPAWN_TELEPORT              = 0x04
+export const MARIO_SPAWN_INSTANT_ACTIVE        = 0x10
+export const MARIO_SPAWN_SWIMMING              = 0x11
+export const MARIO_SPAWN_AIRBORNE              = 0x12
+export const MARIO_SPAWN_HARD_AIR_KNOCKBACK    = 0x13
+export const MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE  = 0x14
+export const MARIO_SPAWN_DEATH                 = 0x15
+export const MARIO_SPAWN_SPIN_AIRBORNE         = 0x16
+export const MARIO_SPAWN_FLYING                = 0x17
+export const MARIO_SPAWN_PAINTING_STAR_COLLECT = 0x20
+export const MARIO_SPAWN_PAINTING_DEATH        = 0x21
+export const MARIO_SPAWN_AIRBORNE_STAR_COLLECT = 0x22
+export const MARIO_SPAWN_AIRBORNE_DEATH        = 0x23
+export const MARIO_SPAWN_LAUNCH_STAR_COLLECT   = 0x24
+export const MARIO_SPAWN_LAUNCH_DEATH          = 0x25
+export const MARIO_SPAWN_UNKNOWN_27            = 0x27
+
 class Area {
     constructor() {
         this.gCurrentArea = null
@@ -80,6 +104,22 @@ class Area {
         this.gWarpTransGreen = 0
         this.gWarpTransBlue = 0
 
+        this.sWarpBhvSpawnTable = [
+            gLinker.behaviors.bhvDoorWarp,                gLinker.behaviors.bhvStar,                   gLinker.behaviors.bhvExitPodiumWarp,          gLinker.behaviors.bhvWarp,
+            gLinker.behaviors.bhvWarpPipe,                gLinker.behaviors.bhvFadingWarp,             gLinker.behaviors.bhvInstantActiveWarp,       gLinker.behaviors.bhvAirborneWarp,
+            gLinker.behaviors.bhvHardAirKnockBackWarp,    gLinker.behaviors.bhvSpinAirborneCircleWarp, gLinker.behaviors.bhvDeathWarp,               gLinker.behaviors.bhvSpinAirborneWarp,
+            gLinker.behaviors.bhvFlyingWarp,              gLinker.behaviors.bhvSwimmingWarp,           gLinker.behaviors.bhvPaintingStarCollectWarp, gLinker.behaviors.bhvPaintingDeathWarp,
+            gLinker.behaviors.bhvAirborneStarCollectWarp, gLinker.behaviors.bhvAirborneDeathWarp,      gLinker.behaviors.bhvLaunchStarCollectWarp,   gLinker.behaviors.bhvLaunchDeathWarp,
+        ]
+
+        this.sSpawnTypeFromWarpBhv = [
+            MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_UNKNOWN_02,           MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_UNKNOWN_03,
+            MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
+            MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
+            MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
+            MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
+        ]
+
         this.MENU_OPT_NONE = 0
         this.MENU_OPT_1 = 1
         this.MENU_OPT_2 = 2
@@ -92,8 +132,55 @@ class Area {
 
     }
 
+    override_viewport_and_clip(a, b, c, d, e) {
+        let sp6 = ((c >> 3) << 11) | ((d >> 3) << 6) | ((e >> 3) << 1) | 1
+
+        this.gFBSetColor = (sp6 << 16) | sp6
+        this.D_8032CE74 = a
+        this.D_8032CE78 = b
+    }
+
+    set_warp_transition_rgb(red, green, blue) {
+        const warpTransitionRGBA16 = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1 
+
+        this.gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16
+        this.gWarpTransRed = red
+        this.gWarpTransGreen = green
+        this.gWarpTransBlue = blue
+    }
+
+    print_intro_text() {
+        if ((window.gGlobalTimer & 0x1F) < 20) {
+            var noController = false; // gControllerBits == 0
+
+            if (noController) {
+                Print.print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
+            } else {
+                Print.print_text_centered(60, 38, "PRESS");
+                Print.print_text_centered(60, 20, "START");
+            }
+        }
+    }
+
+    get_mario_spawn_type(o) {
+        const behavior = o.behavior
+
+        for (let i = 0; i < 20; i++) {
+            if (this.sWarpBhvSpawnTable[i] == o.behavior) {
+                return this.sSpawnTypeFromWarpBhv
+            }
+        }
+        return false
+    }
+
     area_get_warp_node(id) {
-        return this.gCurrentArea.warpNodes[id]
+        let node;
+        for (node = this.gCurrentArea.warpNodes; node != null; node = node.next) {
+            if (node.id == id) {
+                break
+            }
+        }
+        return node
     }
 
     area_get_warp_node_from_params(o) {
@@ -105,13 +192,42 @@ class Area {
         for (const node of gLinker.GeoLayout.gObjParentGraphNode.children) {
             let object = node.object
 
-            if (object.activeFlags != ACTIVE_FLAG_DEACTIVATED && gLinker.LevelUpdate.get_mario_spawn_type(object) != 0) {
+            if (object.activeFlags != ACTIVE_FLAG_DEACTIVATED && this.get_mario_spawn_type(object) != 0) {
                 let warp_node = this.area_get_warp_node_from_params(object)
                 if (warp_node) {
                     warp_node.object = object
                 }
             }
         }
+    }
+
+    clear_areas() {
+        this.gCurrentArea = null
+        this.gWarpTransition.isActive = 0
+        this.gWarpTransition.pauseRendering = 0
+        this.gMarioSpawnInfo.areaIndex = -1
+
+        this.gAreas.forEach((areaData, i) => {
+            Object.assign(areaData, {
+                index: i,
+                flags: 0,
+                terrainType: 0,
+                geometryLayoutData: null,
+                terrainData: null,
+                surfaceRooms: null,
+                macroObjects: null,
+                warpNodes: [],
+                paintingWarpNodes: [],
+                instantWarps: [],
+                objectSpawnInfos: null,
+                camera: null,
+                unused28: null,
+                whirlpools: [ null, null ],
+                dialog: [null, null],
+                musicParam: 0,
+                musicParam2: 0
+            })
+        })
     }
 
     clear_area_graph_nodes() {
@@ -159,14 +275,12 @@ class Area {
     }
 
     load_mario_area() {
+        stop_sounds_in_continuous_banks()
         this.load_area(this.gMarioSpawnInfo.areaIndex)
 
         if (this.gCurrentArea.index == this.gMarioSpawnInfo.areaIndex) {
             this.gCurrentArea.flags |= 0x01
             gLinker.ObjectListProcessor.spawn_objects_from_info(this.gMarioSpawnInfo)
-/*            const marioCloneSpawnInfo = this.gMarioSpawnInfo
-            marioCloneSpawnInfo.startPos[0] -= 500
-            gLinker.ObjectListProcessor.spawn_objects_from_info(marioCloneSpawnInfo)*/
         }
     }
 
@@ -181,30 +295,31 @@ class Area {
         }
     }
 
+    change_area(index) {
+        const gMarioObject = gLinker.ObjectListProcessor.gMarioObject
+        let areaFlags = this.gCurrentArea.flags
+
+        if (this.gCurrentArea.index != index) {
+            this.unload_area()
+            this.load_area(index)
+
+            this.gCurrentArea.flags = areaFlags
+            gMarioObject.rawData[oActiveParticleFlags] = 0
+        }
+
+        if (areaFlags & 0x01) {
+            gMarioObject.gfx.areaIndex = index
+            this.gMarioSpawnInfo.areaIndex = index
+        }
+    }
+
     area_update_objects() {
         gLinker.GeoRenderer.gAreaUpdateCounter++
         gLinker.ObjectListProcessor.update_objects(0)
     }
 
-    override_viewport_and_clip(a, b, c, d, e) {
-        let sp6 = ((c >> 3) << 11) | ((d >> 3) << 6) | ((e >> 3) << 1) | 1
-
-        this.gFBSetColor = (sp6 << 16) | sp6
-        this.D_8032CE74 = a
-        this.D_8032CE78 = b
-    }
-
-    set_warp_transition_rgb(red, green, blue) {
-        const warpTransitionRGBA16 = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1 
-
-        this.gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16
-        this.gWarpTransRed = red
-        this.gWarpTransGreen = green
-        this.gWarpTransBlue = blue
-    }
-
     play_transition(transType, time, red, green, blue) {
-        this.gWarpTransition.isActive = 1
+        this.gWarpTransition.isActive = true
         this.gWarpTransition.type = transType
         this.gWarpTransition.time = time
         this.gWarpTransition.pauseRendering = false
@@ -220,7 +335,7 @@ class Area {
             this.gWarpTransition.data.red = red
             this.gWarpTransition.data.green = green
             this.gWarpTransition.data.blue = blue
-        } else {
+        } else { // if transition is textured
             this.gWarpTransition.data.red = red
             this.gWarpTransition.data.green = green
             this.gWarpTransition.data.blue = blue
@@ -229,60 +344,35 @@ class Area {
             // If you really wanted to, you could place the start at one corner and the end at
             // the opposite corner. This will make the transition image look like it is moving
             // across the screen.
-            this.gWarpTransition.data.startTexX = canvas.width / 2 / 2
-            this.gWarpTransition.data.startTexY = canvas.height / 2 / 2
-            this.gWarpTransition.data.endTexX = canvas.width / 2 / 2
-            this.gWarpTransition.data.endTexY = canvas.height / 2 / 2
+            this.gWarpTransition.data.startTexX = SCREEN_WIDTH / 2
+            this.gWarpTransition.data.startTexY = SCREEN_HEIGHT / 2
+            this.gWarpTransition.data.endTexX = SCREEN_WIDTH / 2
+            this.gWarpTransition.data.endTexY = SCREEN_HEIGHT / 2
 
             this.gWarpTransition.data.texTimer = 0
 
-            if (transType & 1) { // fading in
-                this.gWarpTransition.data.startTexRadius = canvas.width / 2
+            if (transType & 1) { // Is the image fading in?
+                this.gWarpTransition.data.startTexRadius = GFX_DIMENSIONS_FULL_RADIUS
                 if (transType >= 0x0F) {
                     this.gWarpTransition.data.endTexRadius = 16
                 } else {
                     this.gWarpTransition.data.endTexRadius = 0
                 }
-            } else { // fading out
+            } else { // The image is fading out. (Reverses start & end circles)
                 if (transType >= 0x0E) {
                     this.gWarpTransition.data.startTexRadius = 16
                 } else {
                     this.gWarpTransition.data.startTexRadius = 0
                 }
-                this.gWarpTransition.data.endTexRadius = canvas.width / 2
+                this.gWarpTransition.data.endTexRadius = GFX_DIMENSIONS_FULL_RADIUS
             }
         }
     }
 
-    clear_areas() {
-        this.gCurrentArea = null
-        this.gWarpTransition.isActive = 0
-        this.gWarpTransition.pauseRendering = 0
-        this.gMarioSpawnInfo.areaIndex = -1
-
-        this.gAreas.forEach((areaData, i) => {
-            Object.assign(areaData, {
-                index: i,
-                flags: 0,
-                terrainType: 0,
-                geometryLayoutData: null,
-                terrainData: null,
-                surfaceRooms: null,
-                macroObjects: null,
-                warpNodes: [],
-                paintingWarpNodes: [],
-                instantWarps: [],
-                objectSpawnInfos: null,
-                camera: null,
-                unused28: null,
-                whirlpools: [ null, null ],
-                dialog: [null, null],
-                musicParam: 0,
-                musicParam2: 0
-            })
-        })
+    play_transition_after_delay(transType, time, red, green, blue, delay) {
+        this.gWarpTransDelay = delay // Number of frames to delay playing the transition.
+        this.play_transition(transType, time, red, green, blue)
     }
-
 
     render_game() {
         if (this.gCurrentArea && !this.gWarpTransition.pauseRendering) {
@@ -292,7 +382,7 @@ class Area {
             Hud.render_hud()
             Print.render_text_labels()
             IngameMenu.do_cutscene_handler();
-            // print_displaying_credits_entry();
+            print_displaying_credits_entry();
 
             this.gMenuOptSelectIndex = IngameMenu.render_menus_and_dialogs();
 
@@ -300,9 +390,9 @@ class Area {
                 this.gSaveOptSelectIndex = this.gPauseScreenMode;
             }
 
-            // if (D_8032CE78 != NULL) {
+            if (this.D_8032CE78 != null) {
             //     make_viewport_clip_rect(D_8032CE78);
-            // } else
+            } // else
             //     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
             //                   SCREEN_HEIGHT - BORDER_HEIGHT);
             if (this.gWarpTransition.isActive) {
@@ -332,19 +422,6 @@ class Area {
 
         this.D_8032CE74 = null
         this.D_8032CE78 = null
-    }
-
-    print_intro_text() {
-        if ((window.gGlobalTimer & 0x1F) < 20) {
-            var noController = false; // gControllerBits == 0
-
-            if (noController) {
-                Print.print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
-            } else {
-                Print.print_text_centered(60, 38, "PRESS");
-                Print.print_text_centered(60, 20, "START");
-            }
-        }
     }
         
 

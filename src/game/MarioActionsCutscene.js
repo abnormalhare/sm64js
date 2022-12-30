@@ -39,7 +39,7 @@ import {
 } from "../engine/math_util"
 
 import {
-    enable_time_stop, disable_time_stop, spawn_object
+    enable_time_stop, disable_time_stop, spawn_object, spawn_object_abs_with_rot, obj_mark_for_deletion
 } from "./ObjectHelpers"
 
 import {
@@ -148,6 +148,7 @@ import {
 import { MARIO_EYES_DEAD, MARIO_HAND_PEACE_SIGN, MARIO_HAND_OPEN, MARIO_EYES_HALF_CLOSED } from "../include/mario_geo_switch_case_ids"
 
 import {
+    MODEL_CASTLE_GROUNDS_WARP_PIPE,
     MODEL_STAR
 } from "../include/model_ids"
 
@@ -173,7 +174,7 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT, SOUND_MENU_EXIT_PIPE, SOUND_ACTION_HIT_3, SOUND_MENU_ENTER_PIPE
 } from "../include/sounds"
 
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2 } from "../levels/level_defines_constants"
@@ -181,7 +182,7 @@ import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
 import { play_sound } from "../audio/external"
 
-import { CameraInstance as Camera } from "./Camera"
+import { CameraInstance as Camera, CAM_EVENT_START_INTRO } from "./Camera"
 import { play_mario_heavy_landing_sound } from "./Mario"
 
 let sIntroWarpPipeObj = null
@@ -204,12 +205,12 @@ export const MARIO_DIALOG_STATUS_START = 1
 export const MARIO_DIALOG_STATUS_SPEAK = 2
 
 // static Vp sEndCutsceneVp = { { { 640, 480, 511, 0 }, { 640, 480, 511, 0 } } }
-// static struct CreditsEntry *sDispCreditsEntry = null
+let sDispCreditsEntry = null
 
 // // related to peach gfx?
-// static s8 D_8032CBE4 = 0
-// static s8 D_8032CBE8 = 0
-// static s8 D_8032CBEC[7] = { 2, 3, 2, 1, 2, 3, 2 }
+let D_8032CBE4 = 0
+let D_8032CBE8 = 0
+let D_8032CBEC = [ 2, 3, 2, 1, 2, 3, 2 ]
 
 // static let /*u8*/ sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 }
 
@@ -271,69 +272,47 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 //  * as a counter, and increase the Y value by either the constant 16 (JP only) or
 //  * by the value of lineHeight.
 //  */
-// export const print_displaying_credits_entry = () => {
-//     char **currStrPtr
-//     char *titleStr
-//     let /*s16*/ numLines
-//     let /*s16*/ strY
-// #ifndef VERSION_JP
-//     let /*s16*/ lineHeight
-// #endif
+export const print_displaying_credits_entry = () => {
+    let currStrPtr
+    let titleStr
+    let /*s16*/ numLines
+    let /*s16*/ strY
+    let /*s16*/ lineHeight
 
-//     if (sDispCreditsEntry != null) {
-//         currStrPtr = (char **) sDispCreditsEntry.unk0C
-//         titleStr = *currStrPtr++
-//         numLines = *titleStr++ - '0'
+    if (sDispCreditsEntry != null) {
+        currStrPtr = sDispCreditsEntry.unk0C
+        titleStr = currStrPtr++
+        numLines = titleStr++ - 48
 
-//         strY = (sDispCreditsEntry.unk02 & 0x20 ? 28 : 172) + (numLines == 1) * 16
-// #ifndef VERSION_JP
-//         lineHeight = 16
-// #endif
+        strY = (sDispCreditsEntry.unk02 & 0x20 ? 28 : 172) + (numLines == 1) * 16
+        lineHeight = 16
 
-//         dl_rgba16_begin_cutscene_msg_fade()
-//         print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY, titleStr)
+        dl_rgba16_begin_cutscene_msg_fade()
+        print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY, titleStr)
 
-// #ifndef VERSION_JP
-//         switch (numLines) {
-//             case 4:
-//                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++)
-//                 numLines = 2
-//                 lineHeight = 24
-//                 break
-//             case 5:
-//                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++)
-//                 numLines = 3
-//                 break
-// #ifdef VERSION_EU
-//             case 6:
-//                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++)
-//                 numLines = 3
-//                 break
-//             case 7:
-//                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++)
-//                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++)
-//                 numLines = 3
-//                 break
-// #endif
-//         }
-// #endif
+        switch (numLines) {
+            case 4:
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, currStrPtr++)
+                numLines = 2
+                lineHeight = 24
+                break
+            case 5:
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, currStrPtr++)
+                numLines = 3
+                break
+        }
 
-//         while (numLines-- > 0) {
-//             print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr)
+        while (numLines-- > 0) {
+            print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(currStrPtr), strY, currStrPtr)
 
-// #ifdef VERSION_JP
-//             strY += 16
-// #else
-//             strY += lineHeight
-// #endif
+            strY += lineHeight
+            currStrPtr++
+        }
 
-//             currStrPtr++
-//         }
-
-//         dl_rgba16_stop_cutscene_msg_fade()
-//         sDispCreditsEntry = null
-//     }
-// }
+        dl_rgba16_stop_cutscene_msg_fade()
+        sDispCreditsEntry = null
+    }
+}
 
 // export const bhv_end_peach_loop = () => {
 //     cur_obj_init_animation_with_sound(sEndPeachAnimation)
@@ -357,26 +336,26 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 //     }
 // }
 
-// // Geo switch case function for controlling Peach's eye state.
-// export const geo_switch_peach_eyes = (run, node, a2) => {
-//     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node
-//     let /*s16*/ timer
+// Geo switch case function for controlling Peach's eye state.
+export const geo_switch_peach_eyes = (run, node, a2) => {
+    let switchCase =  node
+    let /*s16*/ timer
 
-//     if (run == 1) {
-//         if (D_8032CBE4 == 0) {
-//             timer = (gAreaUpdateCounter + 0x20) >> 1 & 0x1F
-//             if (timer < 7) {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
-//             } else {
-//                 switchCase.selectedCase = D_8032CBE8 * 4 + 1
-//             }
-//         } else {
-//             switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
-//         }
-//     }
+    if (run == 1) {
+        if (D_8032CBE4 == 0) {
+            timer = (gLinker.GeoRenderer.gAreaUpdateCounter + 0x20) >> 1 & 0x1F
+            if (timer < 7) {
+                switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer]
+            } else {
+                switchCase.selectedCase = D_8032CBE8 * 4 + 1
+            }
+        } else {
+            switchCase.selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1
+        }
+    }
 
-//     return false
-// }
+    return false
+}
 
 // // unused
 // const stub_is_textbox_active = (a0) => {
@@ -623,12 +602,11 @@ export const act_reading_automatic_dialog = (m) => {
           // set Mario dialog
         if (m.actionState == 9) {
             actionArg = m.actionArg
-            IngameMenu.create_dialog_box()
-            // if (GET_HIGH_U16_OF_32(actionArg) == 0) {
-            //     create_dialog_box(GET_LOW_U16_OF_32(actionArg))
-            // } else {
-            //     create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg))
-            // }
+            if (Math.round(actionArg >> 16) == 0) {
+                IngameMenu.create_dialog_box(Math.round(actionArg >> 16))
+            } else {
+                IngameMenu.create_dialog_box_with_var(Math.round(actionArg >> 16), Math.round(actionArg >> 16))
+            }
         }
           // wait until dialog is done
         else if (m.actionState == 10) {
@@ -1769,9 +1747,6 @@ const stuck_in_ground_handler = (m, animation, unstuckFrame, target2, target3, e
     if (animFrame == -1) {
         play_sound_and_spawn_particles(m, SOUND_ACTION_TERRAIN_STUCK_IN_GROUND, 1)
     } else if (animFrame == unstuckFrame) {
-// #ifdef VERSION_SH
-//         queue_rumble_data(5, 80)
-// #endif
         play_sound_and_spawn_particles(m, SOUND_ACTION_UNSTUCK_FROM_GROUND, 1)
     } else if (animFrame == target2 || animFrame == target3) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
@@ -1809,115 +1784,96 @@ const advance_cutscene_step = (m) => {
 }
 
 const intro_cutscene_hide_hud_and_mario = (m) => {
-    gHudDisplay.flags = HUD_DISPLAY_NONE
+    LevelUpdate.gHudDisplay.flags = LevelUpdate.HUD_DISPLAY_NONE
     m.statusForCamera.cameraEvent = CAM_EVENT_START_INTRO
     m.marioObj.gfx.flags &= ~GRAPH_RENDER_ACTIVE
     advance_cutscene_step(m)
 }
 
-// #ifdef VERSION_EU
-//     #define TIMER_SPAWN_PIPE 47
-// #else
-//     #define TIMER_SPAWN_PIPE 37
-// #endif
+export const TIMER_SPAWN_PIPE = 37
 
-// const intro_cutscene_peach_lakitu_scene = (m) => {
-//     if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
-//         if (m.actionTimer++ == TIMER_SPAWN_PIPE) {
-//             sIntroWarpPipeObj =
-//                 spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
-//                                           bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
-//             advance_cutscene_step(m)
-//         }
-//     }
-// }
-// #undef TIMER_SPAWN_PIPE
+const intro_cutscene_peach_lakitu_scene = (m) => {
+    const gCurrentObject = gLinker.ObjectListProcessor.gCurrentObject
+    if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
+        if (m.actionTimer++ == TIMER_SPAWN_PIPE) {
+            sIntroWarpPipeObj =
+                spawn_object_abs_with_rot(gCurrentObject, MODEL_CASTLE_GROUNDS_WARP_PIPE,
+                                          gLinker.behaviors.bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
+            advance_cutscene_step(m)
+        }
+    }
+}
 
-// #ifdef VERSION_EU
-//     #define TIMER_RAISE_PIPE 28
-// #else
-//     #define TIMER_RAISE_PIPE 38
-// #endif
+export const TIMER_RAISE_PIPE = 38
 
-// const intro_cutscene_raise_pipe = (m) => {
-//     sIntroWarpPipeObj.rawData[oPosY] = camera_approach_f32_symmetric(sIntroWarpPipeObj.rawData[oPosY], 260.0, 10.0)
+const intro_cutscene_raise_pipe = (m) => {
+    sIntroWarpPipeObj.rawData[oPosY] = Camera.camera_approach_f32_symmetric(sIntroWarpPipeObj.rawData[oPosY], 260.0, 10.0)
 
-//     if (m.actionTimer == 0) {
-//         play_sound(SOUND_MENU_EXIT_PIPE, sIntroWarpPipeObj.gfx.cameraToObject)
-//     }
+    if (m.actionTimer == 0) {
+        play_sound(SOUND_MENU_EXIT_PIPE, sIntroWarpPipeObj.gfx.cameraToObject)
+    }
 
-//     if (m.actionTimer++ == TIMER_RAISE_PIPE) {
-//         m.vel[1] = 60.0
-//         advance_cutscene_step(m)
-//     }
-// }
-// #undef TIMER_RAISE_PIPE
+    if (m.actionTimer++ == TIMER_RAISE_PIPE) {
+        m.vel[1] = 60.0
+        advance_cutscene_step(m)
+    }
+}
 
-// const intro_cutscene_jump_out_of_pipe = (m) => {
-//     if (m.actionTimer == 25) {
-//         gHudDisplay.flags = HUD_DISPLAY_DEFAULT
-//     }
+const intro_cutscene_jump_out_of_pipe = (m) => {
+    if (m.actionTimer == 25) {
+        LevelUpdate.gHudDisplay.flags = LevelUpdate.HUD_DISPLAY_DEFAULT
+    }
 
-//     if (m.actionTimer++ >= 118) {
-//         m.marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
+    if (m.actionTimer++ >= 118) {
+        m.marioObj.gfx.flags |= GRAPH_RENDER_ACTIVE
 
-// #ifdef VERSION_EU
-//           // For some reason these calls were swapped.
-//         play_sound_if_no_flag(m, SOUND_ACTION_HIT_3, MARIO_ACTION_SOUND_PLAYED)
-//         play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
-// #else
-//         play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
-//     #ifndef VERSION_JP
-//         play_sound_if_no_flag(m, SOUND_ACTION_HIT_3, MARIO_ACTION_SOUND_PLAYED)
-//     #endif
-// #endif
+        play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED)
+        play_sound_if_no_flag(m, SOUND_ACTION_HIT_3, MARIO_ACTION_SOUND_PLAYED)
 
-//         set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP)
-//         mario_set_forward_vel(m, 10.0)
-//         if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
-//             sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE)
-//             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
-// #ifndef VERSION_JP
-//             play_sound(SOUND_MARIO_HAHA, m.marioObj.gfx.cameraToObject)
-// #endif
-//             advance_cutscene_step(m)
-//         }
-//     }
-// }
+        set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP)
+        mario_set_forward_vel(m, 10.0)
+        if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
+            // sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE)
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING)
+            play_sound(SOUND_MARIO_HAHA, m.marioObj.gfx.cameraToObject)
+            advance_cutscene_step(m)
+        }
+    }
+}
 
-// const intro_cutscene_land_outside_pipe = (m) => {
-//     set_mario_animation(m, MARIO_ANIM_LAND_FROM_SINGLE_JUMP)
+const intro_cutscene_land_outside_pipe = (m) => {
+    set_mario_animation(m, MARIO_ANIM_LAND_FROM_SINGLE_JUMP)
 
-//     if (is_anim_at_end(m)) {
-//         advance_cutscene_step(m)
-//     }
+    if (is_anim_at_end(m)) {
+        advance_cutscene_step(m)
+    }
 
-//     stop_and_set_height_to_floor(m)
-// }
+    stop_and_set_height_to_floor(m)
+}
 
-// const intro_cutscene_lower_pipe = (m) => {
-//     if (m.actionTimer++ == 0) {
-//         play_sound(SOUND_MENU_ENTER_PIPE, sIntroWarpPipeObj.gfx.cameraToObject)
-//         set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
-//     }
+const intro_cutscene_lower_pipe = (m) => {
+    if (m.actionTimer++ == 0) {
+        play_sound(SOUND_MENU_ENTER_PIPE, sIntroWarpPipeObj.gfx.cameraToObject)
+        set_mario_animation(m, MARIO_ANIM_FIRST_PERSON)
+    }
 
-//     sIntroWarpPipeObj.rawData[oPosY] -= 5.0
-//     if (sIntroWarpPipeObj.rawData[oPosY] <= 50.0) {
-//         obj_mark_for_deletion(sIntroWarpPipeObj)
-//         advance_cutscene_step(m)
-//     }
+    sIntroWarpPipeObj.rawData[oPosY] -= 5.0
+    if (sIntroWarpPipeObj.rawData[oPosY] <= 50.0) {
+        obj_mark_for_deletion(sIntroWarpPipeObj)
+        advance_cutscene_step(m)
+    }
 
-//     stop_and_set_height_to_floor(m)
-// }
+    stop_and_set_height_to_floor(m)
+}
 
-// const intro_cutscene_set_mario_to_idle = (m) => {
-//     if (gCamera.cutscene == 0) {
-//         gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE
-//         set_mario_action(m, ACT_IDLE, 0)
-//     }
+const intro_cutscene_set_mario_to_idle = (m) => {
+    if (Camera.gCamera.cutscene == 0) {
+        Camera.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE
+        set_mario_action(m, ACT_IDLE, 0)
+    }
 
-//     stop_and_set_height_to_floor(m)
-// }
+    stop_and_set_height_to_floor(m)
+}
 
 const INTRO_CUTSCENE_HIDE_HUD_AND_MARIO = 0
 const INTRO_CUTSCENE_PEACH_LAKITU_SCENE = 1
@@ -1925,7 +1881,7 @@ const INTRO_CUTSCENE_RAISE_PIPE = 2
 const INTRO_CUTSCENE_JUMP_OUT_OF_PIPE = 3
 const INTRO_CUTSCENE_LAND_OUTSIDE_PIPE = 4
 const INTRO_CUTSCENE_LOWER_PIPE = 5
-const INTRO_CUTSCENE_SET_MARIO_TO_IDL = 6
+const INTRO_CUTSCENE_SET_MARIO_TO_IDLE = 6
 
 const act_intro_cutscene = (m) => {
     switch (m.actionArg) {

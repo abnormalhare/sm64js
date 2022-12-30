@@ -11,6 +11,7 @@ import { is_point_within_radius_of_mario, object_step, obj_check_floor_death, OB
 import { obj_set_hitbox } from "../ObjBehaviors2"
 import { cur_obj_become_intangible, cur_obj_init_animation, obj_turn_toward_object, spawn_mist_particles, spawn_object, spawn_object_abs_with_rot } from "../ObjectHelpers"
 import { cur_obj_play_sound_2 } from "../SpawnSound"
+import { spawn_default_star } from "./spawn_star.inc"
 
 const sSmallBullyHitbox = {
     interactType:      INTERACT_BULLY,
@@ -239,9 +240,9 @@ const bully_act_level_death = () => {
             spawn_mist_particles()
 
             if (o.rawData[oBullySubtype] == BULLY_STYPE_CHILL) {
-                //spawn_default_star(130.0, 1600.0, -4335.0)
+                spawn_default_star(130.0, 1600.0, -4335.0)
             } else {
-                //spawn_default_star(0, 950.0f, -6800.0f)
+                spawn_default_star(0, 950.0, -6800.0)
                 spawn_object_abs_with_rot(o, MODEL_NONE, bhvLllTumblingBridge, 0, 154, -5631, 0, 0, 0)
             }
         }

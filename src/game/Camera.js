@@ -20,7 +20,7 @@ import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_P
 import { sins, s16, int16, coss, random_float } from "../utils"
 import { HudInstance as Hud } from "./Hud"
 import { DIALOG_RESPONSE_NONE, CAM_SELECTION_MARIO, CAM_SELECTION_FIXED } from "./IngameMenu"
-import { DIALOG_001, DIALOG_020, DIALOG_NONE } from "../text/us/dialogs"
+import { DIALOG_001, DIALOG_020, DIALOG_033, DIALOG_NONE } from "../text/us/dialogs"
 import { gLastCompletedStarNum } from "./SaveFile"
 import { COURSE_MAX, COURSE_NONE } from "../levels/course_defines"
 import { level_defines } from "../levels/level_defines_constants"
@@ -30,7 +30,7 @@ import {
     seq_player_lower_volume, SEQ_PLAYER_LEVEL, seq_player_unlower_volume,
     play_sound, gGlobalSoundSource
 } from "../audio/external"
-import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN } from "../include/sounds"
+import { SOUND_MENU_CAMERA_ZOOM_OUT, SOUND_MENU_CAMERA_ZOOM_IN, SOUND_PEACH_DEAR_MARIO } from "../include/sounds"
 import { ACT_BUTT_STUCK_IN_GROUND } from "./Mario"
 import { ACT_HEAD_STUCK_IN_GROUND } from "./Mario"
 import { ACT_FEET_STUCK_IN_GROUND } from "./Mario"
@@ -826,6 +826,14 @@ class Camera {
             { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
             { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
         ]
+        
+        this.sCutsceneIntroPeach = [
+            { shot: this.cutscene_intro_peach_letter.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_intro_peach_reset_fov.bind(this), duration: 35 },
+            { shot: this.cutscene_intro_peach_fly_to_pipe.bind(this), duration: 820 },
+            { shot: this.cutscene_intro_peach_mario_appears.bind(this), duration: 270 },
+            { shot: this.cutscene_intro_peach_dialog.bind(this), duration: CUTSCENE_LOOP }
+        ]
 
         this.sCutsceneUnlockKeyDoor = [
             { shot: this.cutscene_unlock_key_door.bind(this), duration: 200 },
@@ -877,7 +885,7 @@ class Camera {
             // [ CUTSCENE_DEATH_EXIT, sCutsceneDeathExit ],
             [ CUTSCENE_EXIT_PAINTING_SUCC, this.sCutsceneExitPaintingSuccess ],
             // [ CUTSCENE_UNUSED_EXIT, sCutsceneUnusedExit ],
-            // [ CUTSCENE_INTRO_PEACH, sCutsceneIntroPeach ],
+            [ CUTSCENE_INTRO_PEACH, this.sCutsceneIntroPeach ],
             // [ CUTSCENE_ENTER_BOWSER_ARENA, sCutsceneEnterBowserArena ],
             // [ CUTSCENE_DANCE_ROTATE, sCutsceneDanceDefaultRotate ],
             // [ CUTSCENE_DANCE_DEFAULT, sCutsceneDanceDefaultRotate ],
@@ -923,6 +931,83 @@ class Camera {
         this.sDanceCutsceneIndexTable = [ 0x44, 0x44, 0x44, 0x04 ]
         this.sDanceCutsceneTable = [CUTSCENE_DANCE_FLY_AWAY, CUTSCENE_DANCE_ROTATE, CUTSCENE_DANCE_CLOSEUP, CUTSCENE_KEY_DANCE, CUTSCENE_DANCE_DEFAULT,
                                     false,                   false,                 false,                  false,              true,]
+
+        this.gIntroLakituStartToPipeFocus = [
+            {index: 0,  speed: 32, point: [58, -250, 346]},       {index: 1,  speed: 50, point: [ -159, -382, 224 ] }, {index: 2, speed: 37,  point: [ 0, -277, 237 ] },
+            {index: 3,  speed: 15, point: [ 1, -44, 245 ] },      {index: 4,  speed: 35, point: [ 0, -89, 228 ] },     {index: 5, speed: 15,  point: [ 28, 3, 259 ] },
+            {index: 6,  speed: 25, point: [ -38, -201, 371 ] },   {index: 7,  speed: 20, point: [ -642, 118, 652 ] },  {index: 8, speed: 25,  point: [ 103, -90, 861 ] },
+            {index: 9,  speed: 25, point: [ 294, 145, 579 ] },    {index: 10, speed: 30, point: [ 220, -42, 500 ] },   {index: 11, speed: 20, point: [ 10, -134, 200 ] },
+            {index: 12, speed: 20, point: [ -143, -145, 351 ] },  {index: 13, speed: 14, point: [ -256, -65, 528 ] },  {index: 14, speed: 20, point: [ -251, -52, 459 ] },
+            {index: 15, speed: 25, point: [ -382, 520, 395 ] },   {index: 16, speed: 25, point: [ -341, 240, 653 ] },  {index: 17, speed: 5,  point: [ -262, 700, 143 ] },
+            {index: 18, speed: 15, point: [ -760, 32, 27 ] },     {index: 19, speed: 20, point: [ -756, -6, -26 ] },   {index: 20, speed: 20, point: [ -613, 5, 424 ] },
+            {index: 21, speed: 20, point: [ -22, -100, 312 ] },   {index: 22, speed: 25, point: [ 212, 80, 61 ] },     {index: 23, speed: 20, point: [ 230, -28, 230 ] },
+            {index: 24, speed: 35, point: [ -83, -51, 303 ] },    {index: 25, speed: 17, point: [ 126, 90, 640 ] },    {index: 26, speed: 9,  point: [ 158, 95, 763 ] },
+            {index: 27, speed: 8,  point: [ 113, -25, 1033 ] },   {index: 28, speed: 20, point: [ 57, -53, 1291 ] },   {index: 29, speed: 15, point: [ 73, -34, 1350 ] },
+            {index: 30, speed: 7,  point: [ 0, 96, 1400 ] },      {index: 31, speed: 8,  point: [ -59, 269, 1450 ] },  {index: 32, speed: 15, point: [ 57, 1705, 1500 ] },
+            {index: 0,  speed: 15, point: [ -227, 511, 1550 ] },  {index: -1, speed: 15, point: [ -227, 511, 1600 ] }
+        ]
+
+        this.gIntroLakituStartToPipeOffsetFromCamera = [
+            {index: 0,  speed: 0,  point: [-46, 87, -15]},   {index: 1,  speed: 0, point: [-38, 91, -11] }, {index: 2,  speed: 0, point: [-31, 93, -13] },
+            {index: 3,  speed: 0,  point: [-50, 84, -16] },  {index: 4,  speed: 0, point: [-52, 83, -17] }, {index: 5,  speed: 0, point: [-10, 99, 3] },
+            {index: 6,  speed: 0,  point: [-54, 83, -10] },  {index: 7,  speed: 0, point: [-31, 85, -40] }, {index: 8,  speed: 0, point: [-34, 91, 19] },
+            {index: 9,  speed: 0,  point: [-9, 95, 28] },    {index: 10, speed: 0, point: [17, 72, 66] },   {index: 11, speed: 0, point: [88, -7, 45] },
+            {index: 12, speed: 0,  point: [96, -6, -26] },   {index: 13, speed: 0, point: [56, -1, -82] },  {index: 14, speed: 0, point: [40, 65, -63] },
+            {index: 15, speed: 0,  point: [-26, -3, -96] },  {index: 16, speed: 0, point: [92, 82, 19] },   {index: 17, speed: 0, point: [92, 32, 19] },
+            {index: 18, speed: 0,  point: [92, 32, 19] },    {index: 19, speed: 0, point: [92, 102, 19] },  {index: 20, speed: 0, point: [-69, 59, -70] },
+            {index: 21, speed: 0,  point: [-77, 109, -61] }, {index: 22, speed: 0, point: [-87, 59, -46] }, {index: 23, speed: 0, point: [-99, -3, 11] },
+            {index: 24, speed: 0,  point: [-99, -11, 5] },   {index: 25, speed: 0, point: [-97, -6, 19] },  {index: 26, speed: 0, point: [-97, 22, -7] },
+            {index: 27, speed: 0,  point: [-98, -11, -13] }, {index: 28, speed: 0, point: [-97, -11, 19] }, {index: 29, speed: 0, point: [-91, -11, 38] },
+            {index: 30, speed: 0,  point: [-76, -11, 63] },  {index: 31, speed: 0, point: [-13, 33, 93] },  {index: 32, speed: 0, point: [51, -11, 84] },
+            {index: 33, speed: 0,  point: [51, -11, 84] },   {index: -1, speed: 0, point: [51, -11, 84] }
+        ]
+
+        this.sIntroStartToPipePosition = [
+            {index: 0,  speed: 0,  point: [2122, 8762, 9114]},   {index: 0,  speed: 0, point: [2122, 8762, 9114] },  {index: 1,  speed: 0, point: [2122, 7916, 9114] },
+            {index: 1,  speed: 0,  point: [2122, 7916, 9114] },  {index: 2,  speed: 0, point: [957, 5166, 8613] },   {index: 3,  speed: 0, point: [589, 4338, 7727] },
+            {index: 4,  speed: 0,  point: [690, 3366, 6267] },   {index: 5,  speed: 0, point: [-1600, 2151, 4955] }, {index: 6,  speed: 0, point: [-1557, 232, 1283] },
+            {index: 7,  speed: 0,  point: [-6962, -295, 2729] }, {index: 8,  speed: 0, point: [-6979, 131, 3246] },  {index: 9,  speed: 0, point: [-6360, -283, 4044] },
+            {index: 0,  speed: 0,  point: [-5695, -334, 5264] }, {index: 1,  speed: 0, point: [-5568, -319, 7933] }, {index: 2,  speed: 0, point: [-3848, -200, 6278] },
+            {index: 3,  speed: 0,  point: [-965, -263, 6092] },  {index: 4,  speed: 0, point: [1607, 2465, 6329] },  {index: 5,  speed: 0, point: [2824, 180, 3548] },
+            {index: 6,  speed: 0,  point: [1236, 136, 945] },    {index: 0,  speed: 0, point: [448, 136, 564] },     {index: 0,  speed: 0, point: [448, 136, 564] },
+            {index: 0,  speed: 0,  point: [448, 136, 564] },     {index: -1, speed: 0, point: [448, 136, 564] }
+        ]
+
+        this.sIntroStartToPipeFocus = [
+            {index: 0,  speed: 50,  point: [1753, 29800, 8999] }, {index: 0, speed: 50,  point: [1753, 29800, 8999] },
+            {index: 1,  speed: 50,  point: [1753, 8580, 8999] },  {index: 1, speed: 100, point: [1753, 8580, 8999] },
+            {index: 2,  speed: 50,  point: [520, 5400, 8674] },   {index: 3, speed: 50,  point: [122, 4437, 7875] },
+            {index: 4,  speed: 50,  point: [316, 3333, 6538] },   {index: 5, speed: 36,  point: [-1526, 2189, 5448] },
+            {index: 6,  speed: 50,  point: [-1517, 452, 1731] },  {index: 7, speed: 50,  point: [-6659, -181, 3109] },
+            {index: 8,  speed: 17,  point: [-6649, 183, 3618] },  {index: 9, speed: 20,  point: [-6009, -214, 4395] },
+            {index: 0,  speed: 50,  point: [-5258, -175, 5449] }, {index: 1, speed: 36,  point: [-5158, -266, 7651] },
+            {index: 2,  speed: 26,  point: [-3351, -192, 6222] }, {index: 3, speed: 25,  point: [-483, -137, 6060] },
+            {index: 4,  speed: 100, point: [1833, 2211, 5962] },  {index: 5, speed: 26,  point: [3022, 207, 3090] },
+            {index: 6,  speed: 20,  point: [1250, 197, 449] },    {index: 7, speed: 50,  point: [248, 191, 227] },
+            {index: 7,  speed: 0,   point: [48, 191, 227] },      {index: 7, speed: 0,   point: [48, 191, 227] },
+            {index: -1, speed: 0,   point: [48, 191, 227] }
+        ]
+
+        /**
+         * Describes the spline the camera follows, starting when the camera jumps to Lakitu and ending after
+         * Mario jumps out of the pipe when the first dialog opens.  This table specifically updates the
+         * camera's position.
+         */
+        this.sIntroPipeToDialogPosition = [
+            {index: 0,  speed: 0,  point: [-785, 625, 4527]},   {index: 1,  speed: 0, point: [-785, 625, 4527] },  {index: 2,  speed: 0, point: [-1286, 644, 4376] },
+            {index: 3,  speed: 0,  point: [-1286, 623, 4387] }, {index: 4,  speed: 0, point: [-1286, 388, 3963] }, {index: 5,  speed: 0, point: [-1286, 358, 4093] },
+            {index: 6,  speed: 0,  point: [-1386, 354, 4159] }, {index: 7,  speed: 0, point: [-1477, 306, 4223] }, {index: 8,  speed: 0, point: [-1540, 299, 4378] },
+            {index: 9,  speed: 0,  point: [-1473, 316, 4574] }, {index: 0, speed: 0, point: [-1328, 485, 5017] },  {index: 0,  speed: 0, point: [-1328, 485, 5017] },
+            {index: 0,  speed: 0,  point: [-1328, 485, 5017] }, {index: -1, speed: 0, point: [-1328, 485, 5017] },
+        ]
+
+        this.sIntroPipeToDialogFocus = [
+            {index: 0,  speed: 20,  point: [-1248, 450, 4596]},  {index: 1,  speed: 59, point: [-1258, 485, 4606] }, {index: 2,  speed: 59, point: [-1379, 344, 4769] },
+            {index: 3,  speed: 20,  point: [-1335, 366, 4815] }, {index: 4,  speed: 23, point: [-1315, 370, 4450] }, {index: 5,  speed: 40, point: [-1322, 333, 4591] },
+            {index: 6,  speed: 25,  point: [-1185, 329, 4616] }, {index: 7,  speed: 21, point: [-1059, 380, 4487] }, {index: 8,  speed: 14, point: [-1086, 421, 4206] },
+            {index: 9,  speed: 21,  point: [-1321, 346, 4098] }, {index: 0,  speed: 0, point: [-1328, 385, 4354] },  {index: 0,  speed: 0,  point: [-1328, 385, 4354] },
+            {index: 0,  speed: 0,  point: [-1328, 385, 4354] },  {index: -1, speed: 0, point: [-1328, 385, 4354] },
+        ]
     }
 
     /**
@@ -3939,16 +4024,16 @@ class Camera {
         }
         this.evaluate_cubic_spline(u, p, controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3])
 
-        if (spline[ptrWrapper.splineSegment + 1].speed != 0) {
+        if (spline[ptrWrapper.splineSegment + 1].speed != 0)
             firstSpeed = 1.0 / spline[ptrWrapper.splineSegment + 1].speed
-        }
-        if (spline[ptrWrapper.splineSegment + 2].speed != 0) {
+        
+        if (spline[ptrWrapper.splineSegment + 2].speed != 0)
             secondSpeed = 1.0 / spline[ptrWrapper.splineSegment + 1].speed
-        }
+
         let progressChange = (secondSpeed - firstSpeed) * ptrWrapper.progress + firstSpeed
 
         ptrWrapper.progress += progressChange
-        if (1 <= ptrWrapper.progress) {
+        if (ptrWrapper.progress >= 1) {
             ptrWrapper.splineSegment++
             if (spline[ptrWrapper.splineSegment + 3].index == -1) {
                 ptrWrapper.splineSegment = 0
@@ -6159,7 +6244,7 @@ class Camera {
 
     cam_bbh_elevator(c) {
         if (c.mode == CAMERA_MODE_FIXED) {
-            let wrapper = c.mode
+            let wrapper = {mode: c.mode}
             this.set_camera_mode_close_cam(wrapper)
             c.mode = wrapper.mode
             c.pos[1] = -405.0
@@ -6786,12 +6871,147 @@ class Camera {
         this.cutscene_intro_peach_play_message_music()
     }
 
-    /**
-     * Raise the volume (not in JP) and start the flying music.
-     */
     cutscene_intro_peach_start_flying_music(c) {
-        seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60)
-        this.cutscene_intro_peach_play_lakitu_flying_music()
+        seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60)
+        // this.cutscene_intro_peach_play_flying_music()
+    }
+
+    intro_peach_move_camera_start_to_pipe(c, positionSpline, focusSpline) {
+        let offset = [0, 0, 0]
+        const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+
+        /**
+         * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
+         * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
+         * further along the spline than c->pos.
+         */
+        let posReturn = this.move_point_along_spline(c.pos, positionSpline, wrapper)
+        let focusReturn = this.move_point_along_spline(c.focus, focusSpline, wrapper)
+        this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress
+
+        // The two splines used by this function are reflected in the horizontal plane for some reason,
+        // so they are rotated every frame. Why do this, Nintendo?
+        this.rotate_in_xz(c.focus, c.focus, DEGREES(-180))
+        this.rotate_in_xz(c.pos, c.pos, DEGREES(-180))
+
+        vec3f_set(offset, -1328.0, 26.0, 4664.0)
+        MathUtil.vec3f_add(c.focus, offset)
+        MathUtil.vec3f_add(c.pos, offset)
+
+        return focusReturn
+    }
+
+    peach_letter_text(c) { IngameMenu.create_dialog_box(DIALOG_020) }
+
+    play_sound_peach_reading_letter(c) { play_sound(SOUND_PEACH_DEAR_MARIO, gGlobalSoundSource) }
+
+    cutscene_intro_peach_start_to_pipe_spline(c) {
+        if (this.intro_peach_move_camera_start_to_pipe(c, this.sIntroStartToPipePosition, this.sIntroStartToPipePosition) != 0) {
+            this.gCmaeraMovementFlags &= ~CAM_MOVE_C_UP_MODE
+            this.gCutsceneTimer = CUTSCENE_LOOP
+        }
+    }
+
+    cutscene_intro_peach_dialog(c) {
+        if (IngameMenu.get_dialog_id() == DIALOG_NONE) {
+            vec3f_copy(this.gLakituState.goalPos, c.pos)
+            vec3f_copy(this.gLakituState.goalFocus, c.focus)
+            sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT | CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+            this.gCutsceneTimer = CUTSCENE_STOP
+            c.cutscene = 0
+        }
+    }
+
+    cutscene_intro_peach_follow_pipe_spline(c) {
+        const wrapper = {splineSegment: this.sCutsceneSplineSegment, progress: this.sCutsceneSplineSegmentProgress}
+        this.move_point_along_spline(c.pos, this.sIntroPipeToDialogPosition, wrapper)
+        this.move_point_along_spline(c.focus, this.sIntroPipeToDialogFocus, wrapper)
+        this.sCutsceneSplineSegment = wrapper.splineSegment; this.sCutsceneSplineSegmentProgress = wrapper.progress
+    }
+
+    cutscene_intro_peach_clear_cutscene_status(c) { this.gPlayerCameraState.cameraEvent = 0 }
+
+    cutscene_intro_peach_zoom_fov(c) {
+        this.sFOVState.fov = 8.0
+        this.set_fov_function(CAM_FOV_ZOOM_30)
+    }
+    
+    cutscene_intro_peach_reset_spline(c) {
+        this.sCutsceneSplineSegment = 0
+        this.sCutsceneSplineSegmentProgress = 0.1
+        //! @bug since this event is only called for one frame, this handheld shake is turned off on the
+        //! next frame.
+        this.set_handheld_shake(HAND_CAM_SHAKE_HIGH)
+    }
+
+    cutscene_intro_peach_handheld_shake_off(c) { this.set_handheld_shake(HAND_CAM_SHAKE_OFF) }
+
+    intro_pipe_exit_text(c) { IngameMenu.create_dialog_box(DIALOG_033) }
+
+    play_sound_intro_turn_on_hud(c) { this.play_sound_rbutton_changed() }
+
+    cutscene_intro_peach_fly_to_pipe(c) {
+        this.play_sound_intro_turn_on_hud = this.play_sound_intro_turn_on_hud.bind(this)
+        this.cutscene_intro_peach_start_flying_music = this.cutscene_intro_peach_start_flying_music.bind(this)
+        this.cutscene_intro_peach_clear_cutscene_status = this.cutscene_intro_peach_clear_cutscene_status.bind(this)
+
+        this.cutscene_event(this.play_sound_intro_turn_on_hud, c, 818, 818)
+        this.cutscene_spawn_obj(6, 1)
+        this.cutscene_event(this.cutscene_intro_peach_start_flying_music, c, 0, -1)
+        this.cutscene_event(this.cutscene_intro_peach_clear_cutscene_status, c, 0, 717)
+        this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
+        this.sCutsceneVars[1].point[1] = 400.0
+    }
+
+    cutscene_intro_peach_mario_appears(c) {
+        this.gPlayerCameraState.cameraEvent = 0
+
+        this.cutscene_intro_peach_reset_spline = this.cutscene_intro_peach_reset_spline.bind(this)
+        this.cutscene_intro_peach_follow_pipe_spline = this.cutscene_intro_peach_follow_pipe_spline.bind(this)
+        this.cutscene_intro_peach_handheld_shake_off = this.cutscene_intro_peach_handheld_shake_off.bind(this)
+        this.intro_pipe_exit_text = this.intro_pipe_exit_text.bind(this)
+
+        this.cutscene_event(this.cutscene_intro_peach_reset_spline, c, 0, 0)
+        this.cutscene_event(this.cutscene_intro_peach_follow_pipe_spline, c, 0, -1)
+        this.cutscene_event(this.cutscene_intro_peach_handheld_shake_off, c, 70, 70)
+        this.cutscene_event(this.intro_pipe_exit_text, c, 250, 250)
+
+        const wrapper = {current: this.sCutsceneVars[1].point[1]}
+        this.approach_f32_asymptotic_bool(wrapper, 80.0 + this.sMarioGeometry.currFloorHeight + (this.gPlayerCameraState.pos[1] - this.sMarioGeometry.currFloorHeight) * 1.1, 0.4)
+
+        // Make the camera look up as Mario jumps out of the pipe
+        if (c.focus[1] < this.sCutsceneVars[1].point[1]) c.focus[1] = this.sCutsceneVars[1].point[1]
+
+        this.sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE
+    }
+
+    cutscene_intro_peach_reset_fov(c) {
+        this.set_fov_function(CAM_FOV_DEFAULT)
+    }
+
+    /**
+     * Peach reads the letter to Mario.
+     */
+    cutscene_intro_peach_letter(c) {
+        this.cutscene_spawn_obj(5, 0)
+
+        this.cutscene_intro_peach_zoom_fov = this.cutscene_intro_peach_zoom_fov.bind(this)
+        this.cutscene_intro_peach_start_letter_music = this.cutscene_intro_peach_start_letter_music.bind(this)
+        this.cutscene_intro_peach_start_to_pipe_spline = this.cutscene_intro_peach_start_to_pipe_spline.bind(this)
+        this.peach_letter_text = this.peach_letter_text.bind(this)
+        this.play_sound_peach_reading_letter = this.play_sound_peach_reading_letter.bind(this)
+
+        this.cutscene_event(this.cutscene_intro_peach_zoom_fov, c, 0, 0)
+        this.cutscene_event(this.cutscene_intro_peach_start_letter_music, c, 65, 65)
+        this.cutscene_event(this.cutscene_intro_peach_start_to_pipe_spline, c, 0, 0)
+        this.cutscene_event(this.peach_letter_text, c, 65, 65)
+        this.cutscene_event(this.play_sound_peach_reading_letter, c, 83, 83)
+
+        if (this.gCutsceneTimer > 120 && IngameMenu.get_dialog_id() == DIALOG_NONE) {
+            this.gCutsceneTimer = CUTSCENE_LOOP
+        }
+
+        this.clamp_pitch(c.pos, c.focus, 0x3B00, -0x3B00)
     }
 
     reset_pan_distance(c) {
@@ -7758,6 +7978,13 @@ class Camera {
         return false
     }
 
+    cutscene_spawn_obj(obj, frame) {
+        if (frame == this.gCutsceneTimer) {
+            this.gCutsceneObjSpawn = obj
+        }
+        return 0;
+    }
+
     /**
      * Start a preset fov shake that is reduced by the point's distance from the camera.
      * Used in set_camera_shake_from_point
@@ -7826,6 +8053,7 @@ class Camera {
         }
     }
 
+    obj_rotate_towards_point(o, point, pitchOff, yawOff, pitchDiv, yawDiv) {}
 }
 
 export const CameraInstance = new Camera()
