@@ -2804,7 +2804,7 @@ export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offset
 }
 
 export const approach_symmetric = (value, target, increment) => {
-    const dist = s16(target - value)
+    const dist = target - value
 
     if (dist >= 0) {
         if (dist > increment) {
