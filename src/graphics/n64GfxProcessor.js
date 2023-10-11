@@ -1065,7 +1065,7 @@ export class n64GfxProcessor {
 
                 switch (opcode) {
                     case Gbi.G_ENDDL: /// not necessary for JS
-                        prev_op = ["G_ENDDL"]
+                        prev_op = ["G_ENDDL", "N/A"]
                         break
                     case Gbi.G_MOVEMEM:
                         this.sp_movemem(args.type, args.data, args.index)

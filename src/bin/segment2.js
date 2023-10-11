@@ -265,7 +265,7 @@ const vertex_triangle = [
 
 export const dl_draw_triangle = [
     gsSPClearGeometryMode(G_LIGHTING),
-    gsDPSetCombineMode(Gbi.G_CC_FADE, Gbi.G_CC_FADE),
+    gsDPSetCombineMode(Gbi.G_CC_FADEA, Gbi.G_CC_FADEA),
     Gbi.gsDPSetRenderMode(Gbi.G_RM_XLU_SURF, Gbi.G_RM_XLU_SURF2),
     Gbi.gsDPSetTextureFilter(Gbi.G_TF_POINT),
     gsSPVertex(vertex_triangle, 3, 0),

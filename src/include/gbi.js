@@ -810,7 +810,7 @@ export const gSPDisplayList = (displaylist, childDisplayList) => {
     displaylist.push({
         words: {
             w0: G_DL,
-            w1: { childDisplayList, branch: G_DL_PUSH }
+            w1: { childDisplayList: childDisplayList, branch: G_DL_PUSH }
         }
     })
 }
@@ -858,7 +858,7 @@ export const gsSPDisplayList = (childDisplayList) => {
     return {
         words: {
             w0: G_DL,
-            w1: { childDisplayList, branch: G_DL_PUSH }
+            w1: { childDisplayList: childDisplayList, branch: G_DL_PUSH }
         }
     }
 }

@@ -307,44 +307,50 @@ class IngameMenu {
      * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
      */
     print_generic_string(x, y, str) {
-        let strPos = 0
         let lineNum = 1;
         let mark = DIALOG_RESPONSE_NONE
 
         this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0)
 
-        while (str[strPos] != DIALOG_CHAR_TERMINATOR && strPos < str.length) {
-            switch (str[strPos]) {
+        str.forEach(char => {
+            switch (char) {
                 case DIALOG_CHAR_DAKUTEN:
-                    mark = DIALOG_CHAR_DAKUTEN
+                    mark = DIALOG_MARK_DAKUTEN
                     break
+
                 case DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
                     mark = DIALOG_MARK_HANDAKUTEN
                     break
+
                 case DIALOG_CHAR_NEWLINE:
-                    Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW);
+                    Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
                     this.create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * MAX_STRING_WIDTH), 0.0)
                     lineNum++
                     break
+                
                 case DIALOG_CHAR_PERIOD:
                     this.create_dl_translation_matrix(MENU_MTX_PUSH, -2.0, -5.0, 0.0)
                     this.render_generic_char(DIALOG_CHAR_PERIOD_OR_HANDAKUTEN)
                     Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
                     break
+
                 case DIALOG_CHAR_SLASH:
                     this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE] * 2, 0.0, 0.0)
                     break
+                
                 case DIALOG_CHAR_MULTI_THE:
                     this.render_multi_text_string(STRING_THE)
                     break
+
                 case DIALOG_CHAR_MULTI_YOU:
                     this.render_multi_text_string(STRING_YOU)
                     break
+
                 case DIALOG_CHAR_SPACE:
-                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.CHAR_WIDTH_SPACE, 0.0, 0.0)
+                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[DIALOG_CHAR_SPACE], 0.0, 0.0)
                     break
+
                 default:
-                    this.render_generic_char(str[strPos])
                     if (mark != DIALOG_MARK_NONE) {
                         this.create_dl_translation_matrix(MENU_MTX_PUSH, 5.0, 5.0, 0.0)
                         this.render_generic_char(DIALOG_CHAR_MARK_START + mark)
@@ -352,32 +358,32 @@ class IngameMenu {
                         mark = DIALOG_MARK_NONE
                     }
 
-                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.CHAR_WIDTH_DEFAULT, 0.0, 0.0)
+                    this.create_dl_translation_matrix(MENU_MTX_NOPUSH, this.gDialogCharWidths[char], 0.0, 0.0)
                     break
             }
-
-           strPos++
-        }
-
+        })
+        
         Gbi.gSPPopMatrix(Game.gDisplayList, Gbi.G_MTX_MODELVIEW)
     }
     
     print_hud_lut_string(x, y, str) {
-        let strPos = 0;
         let hudLUT1 = main_hud_lut;
         let curX = x;
         let curY = y;
-        let xStride = 12;
 
-        while (str[strPos] != GLOBAL_CHAR_TERMINATOR) {
-            switch (str[strPos]) {
+        str.forEach(char => {
+            switch (char) {
                 case GLOBAL_CHAR_SPACE:
                     curX += 8
                     break
+                
+                case GLOBAL_CHAR_TERMINATOR:
+                    break
+
                 default:
                     Gbi.gDPPipeSync(Game.gDisplayList)
 
-                    Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT1[str[strPos]])
+                    Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, hudLUT1[char])
                     
                     Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_load_tex_block)
                     Gbi.gSPTextureRectangle(Game.gDisplayList, (curX / 2) << 2, (curY / 2) << 2,
@@ -385,11 +391,9 @@ class IngameMenu {
                                                                Gbi.G_TX_RENDERTILE, 0, 0,
                                                                6 << 10, 7 << 8);
 
-                    curX += xStride
+                    curX += 12
             }
-
-            strPos++
-        }
+        })
     }
 
     print_menu_generic_string(x, y, str) {
@@ -1199,7 +1203,7 @@ class IngameMenu {
 
         if (indexWrapper.index != MENU_OPT_CAMERA_ANGLE_R) {
             this.print_generic_string(x + 10, y - 33, TEXT_CAMERA_ANGLE_R);
-            Gbi.gSPDisplayList(dl_ia_text_end);
+            Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
 
             this.create_dl_translation_matrix(MENU_MTX_PUSH, x - 4, y - (indexWrapper.index - 1) * yIndex - 2, 0);
 
@@ -1478,7 +1482,7 @@ class IngameMenu {
     }
 
     render_course_complete_lvl_info_and_hud_str() {
-        let textSymStar = Print.GLYPH_STAR + Print.GLYPH_SPACE;
+        let textSymStar = [ Print.GLYPH_STAR, Print.GLYPH_SPACE, 0x00];
 
         let actNameTbl = seg2_act_name_table;
         let courseNameTbl = seg2_course_name_table;
@@ -1524,9 +1528,9 @@ class IngameMenu {
 
             Gbi.gSPDisplayList(Game.gDisplayList, dl_ia_text_end);
 
-            // this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
-            // this.print_hud_course_complete_coins(118, 111);
-            // this.play_star_fanfare_and_flash_hud(2, 0);
+            this.print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
+            this.print_hud_course_complete_coins(118, 111);
+            this.play_star_fanfare_and_flash_hud(2, 0);
 
             return;
         } else {
@@ -1539,7 +1543,7 @@ class IngameMenu {
         // Print star glyph
         Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_begin);
         Gbi.gDPSetEnvColor(Game.gDisplayList, 255, 255, 255, this.gMenuTextAlpha);
-        // this.print_hud_lut_string(55, 77, textSymStar);
+        this.print_hud_lut_string(55, 77, textSymStar);
         Gbi.gSPDisplayList(Game.gDisplayList, dl_rgba16_text_end);
 
         // Print act name
