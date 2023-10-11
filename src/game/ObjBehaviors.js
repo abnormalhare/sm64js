@@ -8,9 +8,9 @@ import { sins, coss, int32, uint16, int16, random_uint16, random_float } from ".
 import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceCollision"
 import { atan2s, mtxf_align_terrain_normal } from "../engine/math_util"
 import { GRAPH_RENDER_BILLBOARD, GRAPH_RENDER_INVISIBLE } from "../engine/graph_node"
-import { approach_symmetric, spawn_object, spawn_object_abs_with_rot } from "./ObjectHelpers"
+import { approach_symmetric, spawn_object, spawn_object_abs_with_rot, spawn_object_relative } from "./ObjectHelpers"
 import { SURFACE_BURNING, SURFACE_DEATH_PLANE } from "../include/surface_terrains"
-import { MODEL_YELLOW_COIN, MODEL_NONE, MODEL_SMOKE } from "../include/model_ids"
+import { MODEL_YELLOW_COIN, MODEL_NONE, MODEL_SMOKE, MODEL_NUMBER } from "../include/model_ids"
 import { bhvBobombBullyDeathSmoke, bhvMovingYellowCoin, bhvRespawner } from "./BehaviorData"
 import { cur_obj_play_sound_2 } from "./SpawnSound"
 import { SOUND_OBJ_BULLY_EXPLODE_2 } from "../include/sounds"
@@ -407,6 +407,13 @@ export const obj_lava_death = () => {
     }
 
     return false
+}
+
+export const spawn_orange_number = (bhvParam, x, y, z) => {
+    const o = gLinker.ObjectListProcessor.gCurrentObject;
+    if (bhvParam >= 10) return;
+
+    let orangeNumber = spawn_object_relative(bhvParam, x, y, z, o, MODEL_NUMBER, gLinker.behaviors.bhvOrangeNumber)
 }
 
 export const obj_spawn_yellow_coins = (obj, nCoins) => {

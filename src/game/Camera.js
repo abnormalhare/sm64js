@@ -15,7 +15,7 @@ import { SurfaceCollisionInstance as SurfaceCollision } from "../engine/SurfaceC
 import { atan2s, vec3f_set, sqrtf,vec3f_set_dist_and_angle } from "../engine/math_util"
 import * as MathUtil from "../engine/math_util"
 import * as Mario from "./Mario"
-import { oBehParams2ndByte, oHeldState, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
+import { oBehParams2ndByte, oHeldState, oHomeX, oHomeY, oHomeZ, oMoveAnglePitch, oMoveAngleRoll, oMoveAngleYaw, oPosX, oPosY, oPosZ } from "../include/object_constants"
 import { CELL_HEIGHT_LIMIT, FLOOR_LOWER_LIMIT, SURFACE_DEATH_PLANE, SURFACE_IS_PAINTING_WARP, SURFACE_WALL_MISC } from "../include/surface_terrains"
 import { sins, s16, int16, coss } from "../utils"
 import { HudInstance as Hud } from "./Hud"
@@ -1285,6 +1285,11 @@ class Camera {
             { shot: this.cutscene_star_spawn_end.bind(this), duration: 0 },
         ]
 
+        this.sCutsceneRedCoinStarSpawn = [
+            { shot: this.cutscene_red_coin_star.bind(this), duration: CUTSCENE_LOOP },
+            { shot: this.cutscene_red_coin_star_end.bind(this), duration: 15 },
+        ]
+
         this.sCutsceneExitPaintingSuccess = [
             { shot: this.cutscene_exit_painting.bind(this), duration: 180 },
             { shot: this.cutscene_exit_painting_end.bind(this), duration: 0 }
@@ -1359,7 +1364,7 @@ class Camera {
 
         this.cutsceneShots = [
             [ CUTSCENE_STAR_SPAWN, this.sCutsceneStarSpawn ],
-            // [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
+            [ CUTSCENE_RED_COIN_STAR_SPAWN, this.sCutsceneRedCoinStarSpawn ],
             // [ CUTSCENE_ENDING, this.sCutsceneEnding ],
             // [ CUTSCENE_GRAND_STAR, this.sCutsceneGrandStar ],
             [ CUTSCENE_DOOR_WARP, this.sCutsceneDoorWarp ],
@@ -7127,7 +7132,7 @@ class Camera {
                 if (dialogID != DIALOG_NONE) {
                     this.sCutsceneDialogID = dialogID
                 } else {
-                    this.sCutsceneDialogID = DIALOG_001
+                    this.sCutsceneDialogID = DIALOG_001.id
                 }
             } else {
                 response = this.sCutsceneDialogResponse
@@ -7515,6 +7520,84 @@ class Camera {
     }
 
     /**
+     * Start the red coin star spawning cutscene.
+     */
+    cutscene_red_coin_star_start(c) {
+        this.object_pos_to_vec3f(this.sCutsceneVars[1].point, this.gCutsceneFocus);
+        this.store_info_star(c);
+        this.sCutsceneVars[2].point[2] = this.sFOVState.fov;
+    }
+
+    cutscene_red_coin_star_focus_xz(c) {
+        const w = {current: c.focus[0]}
+        this.approach_f32_asymptotic_bool(w, this.gCutsceneFocus.rawData[oPosX], 0.15);
+        c.focus[0] = w.current; w.current = c.focus[2];
+        this.approach_f32_asymptotic_bool(w, this.gCutsceneFocus.rawData[oPosZ], 0.15);
+        c.focus[2] = w.current;
+    }
+
+    cutscene_red_coin_star_focus_y(c) {
+        const w = {current: c.focus[1]}
+        this.approach_f32_asymptotic_bool(w, this.gCutsceneFocus.rawData[oPosY], 0.1);
+        c.focus[1] = w.current;
+    }
+
+    cutscene_red_coin_star_look_up_at_star(c) {
+        c.focus[1] = this.sCutsceneVars[1].point[1] + this.gCutsceneFocus.rawData[oPosY] - this.sCutsceneVars[1].point[1] * 0.8;
+    }
+
+    cutscene_red_coin_star_warp(c) {
+        let posYaw, yaw
+        const o = this.gCutsceneFocus;
+
+        vec3f_set(this.sCutsceneVars[1].point, o.rawData[oHomeX], o.rawData[oHomeY], o.rawData[oHomeZ]);
+        vec3f_get_dist_and_angle(this.sCutsceneVars[1].point, c.pos, {})
+        posYaw = this.calculate_yaw(this.sCutsceneVars[1].point, c.pos);
+        yaw = this.calculate_yaw(this.sCutsceneVars[1].point, this.gPlayerCameraState.pos);
+
+        if (Math.abs(yaw - posYaw + DEGREES(90)) < Math.abs(yaw - posYaw - DEGREES(90))) {
+            yaw += DEGREES(90);
+        } else {
+            yaw -= DEGREES(90);
+        }
+
+        vec3f_set_dist_and_angle(this.sCutsceneVars[1].point, c.pos, 400.0, 0x1000, yaw)
+        this.sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT
+    }
+
+    cutscene_red_coin_star_set_fov(c) {
+        this.sFOVState.fov = 60.0
+    }
+
+    cutscene_red_coin_star(c) {
+        this.sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT
+        this.cutscene_red_coin_star_start = this.cutscene_red_coin_star_start.bind(this)
+        this.cutscene_red_coin_star_warp = this.cutscene_red_coin_star_warp.bind(this)
+        this.cutscene_red_coin_star_focus_xz = this.cutscene_red_coin_star_focus_xz.bind(this)
+        this.cutscene_red_coin_star_focus_y = this.cutscene_red_coin_star_focus_y.bind(this)
+        this.cutscene_red_coin_star_look_up_at_star = this.cutscene_red_coin_star_look_up_at_star.bind(this)
+        this.cutscene_red_coin_star_set_fov = this.cutscene_red_coin_star_set_fov.bind(this)
+
+        this.cutscene_event(this.cutscene_red_coin_star_start, c, 0, 0)
+        this.cutscene_event(this.cutscene_red_coin_star_warp, c, 0, 0)
+        this.cutscene_event(this.cutscene_red_coin_star_focus_xz, c, 0, 0)
+        this.cutscene_event(this.cutscene_red_coin_star_focus_y, c, 0, 0)
+        this.cutscene_event(this.cutscene_red_coin_star_look_up_at_star, c, 0, 0)
+        this.cutscene_event(this.cutscene_red_coin_star_set_fov, c, 0, 0)
+
+        if (this.gObjCutsceneDone) {
+            this.gCutsceneTimer = CUTSCENE_LOOP
+        }
+    }
+
+    cutscene_red_coin_star_end(c) {
+        this.retrieve_info_star(c)
+        this.gCutsceneTimer = CUTSCENE_STOP
+        c.cutscene = 0
+        this.sFOVState.fov = this.sCutsceneVars[2].point[2]
+    }
+
+    /**
      * cvar8 is Mario's position and faceAngle
      *
      * cvar9.point is gCutsceneFocus's position
@@ -7848,7 +7931,7 @@ class Camera {
      * Create a dialog box with the cap switch's text.
      */
     cutscene_cap_switch_press_create_dialog(c) {
-        create_dialog_box_with_response(this.gCutsceneFocus.rawData[oBehParams2ndByte] + DIALOG_010)
+        create_dialog_box_with_response(this.gCutsceneFocus.rawData[oBehParams2ndByte] + DIALOG_010.id)
     }
 
     /**
@@ -7976,7 +8059,7 @@ class Camera {
     }
 
     peach_letter_text(c) {
-        IngameMenu.create_dialog_box(DIALOG_020);
+        IngameMenu.create_dialog_box(DIALOG_020.id);
     }
 
     play_sound_peach_reading_letter(c) {
@@ -7984,7 +8067,6 @@ class Camera {
     }
 
     cutscene_intro_peach_start_to_pipe_spline(c) {
-        console.log(this.gLakituState.pos)
         if (this.intro_peach_move_camera_start_to_pipe(c, sIntroPipeToDialogPosition, sIntroPipeToDialogFocus) != 0) {
             this.gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
             this.gCutsceneTimer = CUTSCENE_LOOP;
@@ -8038,7 +8120,7 @@ class Camera {
      */
     cutscene_intro_peach_handheld_shake_off(c) { this.set_handheld_shake(HAND_CAM_SHAKE_OFF); }
 
-    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033); }
+    intro_pipe_exit_text(c) { create_dialog_box(DIALOG_033.id); }
 
     play_sound_intro_turn_on_hud(c) { this.play_sound_rbutton_changed(); }
 

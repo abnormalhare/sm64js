@@ -1200,5 +1200,11 @@ export const gDPPipeSync = () => {return []}
 export const gDPLoadSync = () => {return []}
 export const gDPTileSync = () => {return []}
 export const gDPSetAlpha = () => {return []}
-export const gSPPerspNormalize = () => {return []}
+export const gSPPerspNormalize = (pkt, s) => {return [{
+        words: {
+            w0: G_MOVEWORD,
+            w1: { data: s, offset: 0, index: G_MW_PERSPNORM }
+        }
+    }]
+}
 export const gsDPSetDepthSource = () => {return []}

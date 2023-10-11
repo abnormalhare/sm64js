@@ -324,3 +324,12 @@ export const check_warp_checkpoint = (warpNode) => {
 
     return warpCheckpointActive
 }
+
+export const save_file_get_total_star_count = (fileIndex, minCourse, maxCourse) => {
+    let i;
+    for (i = 0; minCourse <= maxCourse; minCourse++) {
+        i += save_file_get_course_star_count(fileIndex, minCourse)
+    }
+
+    return save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + i;
+}

@@ -7,7 +7,7 @@ import {
     is_anim_past_end, set_jump_from_landing, set_jumping_action, set_mario_action,
     set_water_plunge_action, update_mario_sound_and_camera, play_sound_if_no_flag,
     mario_set_forward_vel, play_mario_landing_sound_once, set_mario_anim_with_accel, ACT_GROUP_MASK, ACT_GROUP_STATIONARY, ACT_GROUP_MOVING, ACT_FLAG_RIDING_SHELL, ACT_FLAG_INVULNERABLE, MARIO_TELEPORTING,
-    set_anim_to_frame, play_sound_and_spawn_particles
+    set_anim_to_frame, play_sound_and_spawn_particles, MARIO_ANIM_LEGS_STUCK_IN_GROUND, MARIO_ANIM_HEAD_STUCK_IN_GROUND, MARIO_ANIM_BOTTOM_STUCK_IN_GROUND
 } from "./Mario"
 
 import { AreaInstance as Area } from "./Area"
@@ -175,7 +175,7 @@ import {
     SOUND_MARIO_YAH_WAH_HOO, SOUND_MARIO_HOOHOO,
 
     SOUND_ACTION_TERRAIN_BODY_HIT_GROUND, SOUND_ACTION_UNKNOWN43D, SOUND_ACTION_UNKNOWN43E,
-    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT, SOUND_MENU_EXIT_PIPE, SOUND_MENU_ENTER_PIPE
+    SOUND_ACTION_BRUSH_HAIR, SOUND_ACTION_KEY_SWISH, SOUND_ACTION_PAT_BACK, SOUND_ACTION_UNKNOWN45C, SOUND_ACTION_READ_SIGN, SOUND_ACTION_TELEPORT, SOUND_MENU_EXIT_PIPE, SOUND_MENU_ENTER_PIPE, SOUND_ACTION_TERRAIN_STUCK_IN_GROUND, SOUND_ACTION_UNSTUCK_FROM_GROUND
 } from "../include/sounds"
 
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_THI } from "../levels/level_defines_constants"
