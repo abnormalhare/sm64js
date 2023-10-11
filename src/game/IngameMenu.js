@@ -1078,7 +1078,7 @@ class IngameMenu {
     }
 
     change_dialog_camera_angle() {
-        if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
+        if (Camera.cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
             this.gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
         } else {
             this.gDialogCameraAngleIndex = CAM_SELECTION_FIXED;
@@ -1364,7 +1364,7 @@ class IngameMenu {
                 play_sound(SOUND_MENU_PAUSE, Game.gGlobalSoundSource);
 
                 if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
-                    // this.change_dialog_camera_angle();
+                    this.change_dialog_camera_angle();
                     this.gMenuState = MENU_STATE_PAUSE_SCREEN_COURSE;
                 } else {
                     this.highlight_last_course_complete_stars();
@@ -1489,7 +1489,7 @@ class IngameMenu {
         let name;
 
         if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
-            // this.print_hud_course_complete_coins(118, 103);
+            this.print_hud_course_complete_coins(118, 103);
             this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
 
             if (gLastCompletedStarNum == 7)
@@ -1536,8 +1536,8 @@ class IngameMenu {
         } else {
             name = actNameTbl[COURSE_STAGES_MAX * 6];
 
-            // this.print_hud_course_complete_coins(118, 103);
-            // this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+            this.print_hud_course_complete_coins(118, 103);
+            this.play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
         }
 
         // Print star glyph
@@ -1608,7 +1608,7 @@ class IngameMenu {
                     this.gCourseCompleteScreenTimer = 0;
                     this.gCourseCompleteCoins = 0;
                     this.gCourseCompleteCoinsEqual = false;
-                    gHudFlash = 0;
+                    this.gHudFlash = 0;
                     return index;
                 }
                 break;
