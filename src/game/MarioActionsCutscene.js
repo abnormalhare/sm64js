@@ -22,6 +22,8 @@ import {
 } from "./Interaction"
 
 import {
+    DIALOG_RESPONSE_NONE,
+    DIALOG_RESPONSE_YES,
     IngameMenuInstance as IngameMenu, MENU_MODE_NONE, MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN, MENU_OPT_NONE
 } from "./IngameMenu"
 
@@ -44,6 +46,7 @@ import {
 
 import {
     gLastCompletedCourseNum,
+    save_data,
     save_file_set_flags
 } from "./SaveFile"
 
@@ -181,10 +184,11 @@ import {
 import { LEVEL_BOWSER_1, LEVEL_BOWSER_2, LEVEL_THI } from "../levels/level_defines_constants"
 import { COURSE_BITDW, COURSE_BITFS } from "../levels/course_defines"
 
-import { play_sound } from "../audio/external"
+import { SEQUENCE_ARGS, SEQ_PLAYER_ENV, play_music, play_sound } from "../audio/external"
 
 import { CameraInstance as Camera, CAM_EVENT_START_INTRO } from "./Camera"
 import { play_mario_heavy_landing_sound } from "./Mario"
+import { SEQ_EVENT_CUTSCENE_COLLECT_KEY, SEQ_EVENT_CUTSCENE_COLLECT_STAR } from "../include/seq_ids"
 
 let sIntroWarpPipeObj = null
 let sEndPeachObj = null
@@ -213,29 +217,29 @@ export const MARIO_DIALOG_STATUS_SPEAK = 2
 let D_8032CBE8 = 0
 let D_8032CBEC = [ 2, 3, 2, 1, 2, 3, 2 ]
 
-// static let /*u8*/ sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 }
+let sStarsNeededForDialog = [ 1, 3, 8, 30, 50, 70 ]
 
-// /**
-//  * Data for the jumbo star cutscene. It specifies the flight path after triple
-//  * jumping. Each entry is one keyframe.
-//  * The first number is playback speed, 1000 is the maximum and means it lasts
-//  * 1 frame. 20 means that it lasts 1000/20 = 50 frames.
-//  * Speed 0 marks the last keyframe. Since the cubic spline looks 3 keyframes
-//  * ahead, there should be at least 2 more entries afterwards.
-//  * The last three numbers of each entry are x, y and z coordinates of points
-//  * that define the curve.
-//  */
-// static Vec4s sJumboStarKeyframes[27] = {
-//     { 20, 0, 678, -2916 },      { 30, 0, 680, -3500 },      { 40, 1000, 700, -4000 },
-//     { 50, 2500, 750, -3500 },   { 50, 3500, 800, -2000 },   { 50, 4000, 850, 0 },
-//     { 50, 3500, 900, 2000 },    { 50, 2000, 950, 3500 },    { 50, 0, 1000, 4000 },
-//     { 50, -2000, 1050, 3500 },  { 50, -3500, 1100, 2000 },  { 50, -4000, 1150, 0 },
-//     { 50, -3500, 1200, -2000 }, { 50, -2000, 1250, -3500 }, { 50, 0, 1300, -4000 },
-//     { 50, 2000, 1350, -3500 },  { 50, 3500, 1400, -2000 },  { 50, 4000, 1450, 0 },
-//     { 50, 3500, 1500, 2000 },   { 50, 2000, 1600, 3500 },   { 50, 0, 1700, 4000 },
-//     { 50, -2000, 1800, 3500 },  { 50, -3500, 1900, 2000 },  { 30, -4000, 2000, 0 },
-//     { 0, -3500, 2100, -2000 },  { 0, -2000, 2200, -3500 },  { 0, 0, 2300, -4000 },
-// }
+/**
+ * Data for the jumbo star cutscene. It specifies the flight path after triple
+ * jumping. Each entry is one keyframe.
+ * The first number is playback speed, 1000 is the maximum and means it lasts
+ * 1 frame. 20 means that it lasts 1000/20 = 50 frames.
+ * Speed 0 marks the last keyframe. Since the cubic spline looks 3 keyframes
+ * ahead, there should be at least 2 more entries afterwards.
+ * The last three numbers of each entry are x, y and z coordinates of points
+ * that define the curve.
+ */
+const sJumboStarKeyframes = [
+    [ 20, 0, 678, -2916 ],      [ 30, 0, 680, -3500 ],      [ 40, 1000, 700, -4000 ],
+    [ 50, 2500, 750, -3500 ],   [ 50, 3500, 800, -2000 ],   [ 50, 4000, 850, 0 ],
+    [ 50, 3500, 900, 2000 ],    [ 50, 2000, 950, 3500 ],    [ 50, 0, 1000, 4000 ],
+    [ 50, -2000, 1050, 3500 ],  [ 50, -3500, 1100, 2000 ],  [ 50, -4000, 1150, 0 ],
+    [ 50, -3500, 1200, -2000 ], [ 50, -2000, 1250, -3500 ], [ 50, 0, 1300, -4000 ],
+    [ 50, 2000, 1350, -3500 ],  [ 50, 3500, 1400, -2000 ],  [ 50, 4000, 1450, 0 ],
+    [ 50, 3500, 1500, 2000 ],   [ 50, 2000, 1600, 3500 ],   [ 50, 0, 1700, 4000 ],
+    [ 50, -2000, 1800, 3500 ],  [ 50, -3500, 1900, 2000 ],  [ 30, -4000, 2000, 0 ],
+    [ 0, -3500, 2100, -2000 ],  [ 0, -2000, 2200, -3500 ],  [ 0, 0, 2300, -4000 ],
+]
 
 // /**
 //  * get_credits_str_width: Calculate width of a Credits String
@@ -387,76 +391,77 @@ export const geo_switch_peach_eyes = (run, node, a2) => {
 //     }
 // }
 
-// /**
-//  * get_star_collection_dialog: Determine what dialog should show when Mario
-//  * collects a star.
-//  * Determines if Mario has collected enough stars to get a dialog for it, and
-//  * if so, return the dialog ID. Otherwise, return false. A dialog is returned if
-//  * numStars has reached a milestone and prevNumStarsForDialog has not reached it.
-//  */
-// export const get_star_collection_dialog = (m) => {
-//     let /*s32*/ i
-//     let /*s32*/ dialogID = 0
-//     let /*s32*/ numStarsRequired
+/**
+ * get_star_collection_dialog: Determine what dialog should show when Mario
+ * collects a star.
+ * Determines if Mario has collected enough stars to get a dialog for it, and
+ * if so, return the dialog ID. Otherwise, return false. A dialog is returned if
+ * numStars has reached a milestone and prevNumStarsForDialog has not reached it.
+ */
+export const get_star_collection_dialog = (m) => {
+    let /*s32*/ dialogID = 0
 
-// export const ARRAY_COUNT = (i) => {
-//         numStarsRequired = sStarsNeededForDialog[i]
-//         if (m.prevNumStarsForDialog < numStarsRequired && m.numStars >= numStarsRequired) {
-//             dialogID = i + DIALOG_141
-//             break
-//         }
-//     }
+    for (let i = 0; sStarsNeededForDialog.length; i++) {
+        let /*s32*/ numStarsRequired = sStarsNeededForDialog[i]
+        if (m.prevNumStarsForDialog < numStarsRequired && m.numStars >= numStarsRequired) {
+            dialogID = DIALOG_021.id + i
+            break
+        }
+    }
 
-//     m.prevNumStarsForDialog = m.numStars
-//     return dialogID
-// }
+    m.prevNumStarsForDialog = m.numStars
+    return dialogID
+}
 
-// // save menu handler
-// export const handle_save_menu = (m) => {
-//     let /*s32*/ dialogID
-//       // wait for the menu to show up
-//     if (is_anim_past_end(m) && gSaveOptSelectIndex != 0) {
-//           // save and continue / save and quit
-//         if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
-//             save_file_do_save(gCurrSaveFileNum - 1)
+// save menu handler
+export const handle_save_menu = (m) => {
+    let dialogID;
 
-//             if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
-//                 fade_into_special_warp(-2, 0);   // reset game
-//             }
-//         }
+    // wait for the menu to show up
+    if (is_anim_past_end(m) && gSaveOptSelectIndex != MENU_OPT_NONE) {
+        // save and continue / save and quit
+        if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
+            save_data();
 
-//           // not quitting
-//         if (gSaveOptSelectIndex != SAVE_OPT_SAVE_AND_QUIT) {
-//             disable_time_stop()
-//             m.faceAngle[1] += 0x8000
-//               // figure out what dialog to show, if we should
-//             dialogID = get_star_collection_dialog(m)
-//             if (dialogID != 0) {
-//                 play_peachs_jingle()
-//                   // look up for dialog
-//                 set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID)
-//             } else {
-//                 set_mario_action(m, ACT_IDLE, 0)
-//             }
-//         }
-//     }
-// }
+            if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
+                gLinker.LevelUpdate.fade_into_special_warp(-2, 0);   // reset game
+            }
+        }
 
-// /**
-//  * spawn_obj_at_mario_rel_yaw: Spawns object at Mario with relative yaw.
-//  * Spawns object with given behavior and model and copies over Mario's position
-//  * and yaw plus relative yaw.
-//  */
-// export const spawn_obj_at_mario_rel_yaw = (m, model, behavior, relYaw) => {
-//     struct Object *o = spawn_object(m.marioObj, model, behavior)
+        // not quitting
+        if (gSaveOptSelectIndex != SAVE_OPT_SAVE_AND_QUIT) {
+            disable_time_stop();
+            m.faceAngle[1] += 0x8000;
 
-//     o.rawData[oFaceAngleYaw] = m.faceAngle[1] + relYaw
-//     o.rawData[oPosX] = m.pos[0]
-//     o.rawData[oPosY] = m.pos[1]
-//     o.rawData[oPosZ] = m.pos[2]
+            // figure out what dialog to show, if we should
+            dialogID = get_star_collection_dialog(m);
+            if (dialogID != 0) {
+                // play_peachs_jingle();
 
-//     return o
-// }
+                // look up for dialog
+                set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
+            } else {
+                set_mario_action(m, ACT_IDLE, 0);
+            }
+        }
+    }
+}
+
+/**
+ * spawn_obj_at_mario_rel_yaw: Spawns object at Mario with relative yaw.
+ * Spawns object with given behavior and model and copies over Mario's position
+ * and yaw plus relative yaw.
+ */
+export const spawn_obj_at_mario_rel_yaw = (m, model, behavior, relYaw) => {
+    let o = spawn_object(m.marioObj, model, behavior)
+
+    o.rawData[oFaceAngleYaw] = m.faceAngle[1] + relYaw
+    o.rawData[oPosX] = m.pos[0]
+    o.rawData[oPosY] = m.pos[1]
+    o.rawData[oPosZ] = m.pos[2]
+
+    return o
+}
 
 /**
  * cutscene_take_cap_off: Put Mario's cap on.
@@ -493,13 +498,13 @@ export const mario_ready_to_speak = () => {
     const gMarioState = gLinker.LevelUpdate.gMarioState
 
     let /*u32*/ actionGroup = gMarioState.action & ACT_GROUP_MASK
-    let /*s32*/ isReadyToSpeak = 0
+    let /*s32*/ isReadyToSpeak = false
 
     if ((gMarioState.action == ACT_WAITING_FOR_DIALOG || actionGroup == ACT_GROUP_STATIONARY
          || actionGroup == ACT_GROUP_MOVING)
         && (!(gMarioState.action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
             && gMarioState.action != ACT_FIRST_PERSON)) {
-        isReadyToSpeak = 1
+        isReadyToSpeak = true
     }
 
     return isReadyToSpeak
@@ -757,17 +762,17 @@ export const general_star_dance_handler = (m, isInWater) => {
     if (m.actionState == 0) {
         switch (++m.actionTimer) {
             case 1:
-                // spawn_object(m.marioObj, MODEL_STAR, gLinker.behaviors.bhvCelebrationStar)
+                spawn_object(m.marioObj, MODEL_STAR, gLinker.behaviors.bhvCelebrationStar)
                 // disable_background_sound()
-                // if (m.actionArg & 1) {
-                //     play_course_clear()
-                // } else {
-                //     if (Area.gCurrLevelNum == LEVEL_BOWSER_1 || Area.gCurrLevelNum == LEVEL_BOWSER_2) {
-                //         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0)
-                //     } else {
-                //         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0)
-                //     }
-                // }
+                if (m.actionArg & 1) {
+                    // play_course_clear()
+                } else {
+                    if (Area.gCurrLevelNum == LEVEL_BOWSER_1 || Area.gCurrLevelNum == LEVEL_BOWSER_2) {
+                        play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0)
+                    } else {
+                        play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0)
+                    }
+                }
                 break
 
             case 42:
@@ -784,14 +789,12 @@ export const general_star_dance_handler = (m, isInWater) => {
                 }
                 break
         }
-    } else if (m.actionState == 1 /*&& gDialogResponse*/) {
-        // if (gDialogResponse == 1) {
-        //     save_file_do_save(gCurrSaveFileNum - 1)
-        // }
+    } else if (m.actionState == 1 && IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE) {
+        if (IngameMenu.gDialogResponse == DIALOG_RESPONSE_YES) save_data();
         m.actionState = 2
         disable_time_stop()
         // enable_background_sound()
-        dialogID = 0 // get_star_collection_dialog(m)
+        dialogID = get_star_collection_dialog(m)
         if (dialogID != 0) {
             // look up for dialog
             set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID)

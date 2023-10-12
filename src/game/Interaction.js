@@ -95,8 +95,11 @@ import { save_file_get_flags, SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR,
     SAVE_FLAG_CAP_ON_KLEPTO,
     SAVE_FLAG_CAP_ON_UKIKI,
     save_file_collect_star_or_key,
+    save_file_get_total_star_count,
 } from "./SaveFile"
 import { MODEL_NONE } from "../include/model_ids"
+import { AreaInstance as Area } from "./Area"
+import { COURSE_MAX, COURSE_MIN } from "../include/course_table"
 
 
 export const INTERACT_HOOT           /* 0x00000001 */ = (1 << 0)
@@ -324,9 +327,8 @@ const interact_star_or_key = (m, /*interactType,*/ o) => {
         starIndex = (o.oBehParams >> 24) & 0x1F;
         save_file_collect_star_or_key(m.numCoins, starIndex);
 
-        // m.numStars =
-        //     save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-        m.numStars++
+        m.numStars =
+            save_file_get_total_star_count(Area.gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
 
         // if (!noExit) {
         //     drop_queued_background_music();
@@ -486,7 +488,7 @@ export const get_door_save_file_flag = (door) => {
 
 export const interact_door = (m, o) => {
     let /*s16*/ requiredNumStars = o.rawData[oBehParams] >> 24
-    let /*s16*/ numStars = 120  // save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1)
+    let /*s16*/ numStars = save_file_get_total_star_count(Area.gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1)
 
     if (m.action == ACT_WALKING || m.action == ACT_DECELERATING) {
         if (numStars >= requiredNumStars) {
