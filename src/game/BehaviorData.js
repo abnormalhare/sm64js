@@ -127,6 +127,7 @@ import * as _thi_top                  from "./behaviors/thi_top.inc"
 import * as _thwomp                   from "./behaviors/thwomp.inc"
 import * as _tilting_inverted_pyramid from "./behaviors/tilting_inverted_pyramid.inc"
 import * as _tower_door               from "./behaviors/tower_door.inc"
+import * as _tree_particles           from "./behaviors/tree_particles.inc"
 import * as _triplet_butterfly        from "./behaviors/triplet_butterfly.inc"
 import * as _tumbling_bridge          from "./behaviors/tumbling_bridge.inc"
 import * as _warp                     from "./behaviors/warp.inc"
@@ -2408,6 +2409,31 @@ const bhvExclamationBox = [
     END_LOOP(),
 ]
 
+const bhvLeafParticleSpawner = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvLeafParticleSpawner'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE('bhv_snow_leaf_particle_spawn_init'),
+    DELAY(1),
+    DEACTIVATE(),
+];
+
+const bhvTreeSnow = [
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvTreeSnow'),
+    OR_INT(oFlags, (OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tree_snow_or_leaf_loop'),
+    END_LOOP(),
+];
+
+const bhvTreeLeaf = [
+    BEGIN(OBJ_LIST_UNIMPORTANT, 'bhvTreeLeaf'),
+    OR_INT(oFlags, (OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_tree_snow_or_leaf_loop'),
+    END_LOOP(),
+]
+
 const bhvRotatingExclamationMark = [
     BEGIN(OBJ_LIST_DEFAULT, 'bhvRotatingExclamationMark'),
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
@@ -3338,6 +3364,7 @@ gLinker.behaviors.bhvKingBobomb = bhvKingBobomb
 gLinker.behaviors.bhvKoopaShellUnderwater = bhvKoopaShellUnderwater
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
+gLinker.behaviors.bhvLeafParticleSpawner = bhvLeafParticleSpawner
 gLinker.behaviors.bhvLLLTumblingBridge = bhvLLLTumblingBridge
 gLinker.behaviors.bhvMadPiano = bhvMadPiano
 gLinker.behaviors.bhvManyBlueFishSpawner = bhvManyBlueFishSpawner
@@ -3421,6 +3448,8 @@ gLinker.behaviors.bhvTowerDoor = bhvTowerDoor
 gLinker.behaviors.bhvTrackBall = bhvTrackBall
 gLinker.behaviors.bhvTumblingBridge = bhvTumblingBridge
 gLinker.behaviors.bhvTree = bhvTree
+gLinker.behaviors.bhvTreeLeaf = bhvTreeLeaf
+gLinker.behaviors.bhvTreeSnow = bhvTreeSnow
 gLinker.behaviors.bhvTriangleParticleSpawner = bhvTriangleParticleSpawner
 gLinker.behaviors.bhvTripletButterfly = bhvTripletButterfly
 gLinker.behaviors.bhvTtmBowlingBallSpawner = bhvTtmBowlingBallSpawner

@@ -37,7 +37,7 @@ import { ACT_IDLE, ACT_PANTING, ACT_STANDING_AGAINST_WALL, ACT_CROUCHING, ACT_DI
          MARIO_CAP_IN_HAND, ACT_PUTTING_ON_CAP,
 
          drop_and_set_mario_action, resolve_and_return_wall_collisions, sBackwardKnockbackActions,
-         set_forward_vel, set_mario_action, sForwardKnockbackActions,
+         mario_set_forward_vel, set_mario_action, sForwardKnockbackActions,
 
          ACT_SHOCKED, ACT_WATER_SHOCKED, ACT_LAVA_BOOST, ACT_BURNING_JUMP, ACT_BURNING_FALL,
 
@@ -1257,9 +1257,9 @@ const bounce_back_from_attack = (m, interaction) => {
         }
 
         if (m.action & ACT_FLAG_AIR) {
-            set_forward_vel(m, -16.0)
+            mario_set_forward_vel(m, -16.0)
         } else {
-            set_forward_vel(m, -48.0)
+            mario_set_forward_vel(m, -48.0)
         }
 
         Camera.set_camera_shake_from_hit(CAMERA.SHAKE_ATTACK)
@@ -1423,7 +1423,7 @@ const determine_knockback_action = (m) => {
     m.faceAngle[1] = angleToObject
 
     if (terrainIndex == 2) {
-        if (m.forwardVel < 28) set_forward_vel(m, 28)
+        if (m.forwardVel < 28) mario_set_forward_vel(m, 28)
 
         if (m.pos[1] >= m.interactObj.rawData[oPosY]) {
             if (m.vel[1] < 20.0) m.vel[1] = 20.0
@@ -1431,7 +1431,7 @@ const determine_knockback_action = (m) => {
             if (m.vel[1] > 0.0) m.vel[1] = 0.0
         }
     } else {
-        if (m.forwardVel < 16) set_forward_vel(m, 16)
+        if (m.forwardVel < 16) mario_set_forward_vel(m, 16)
     }
 
 
@@ -1515,11 +1515,11 @@ const check_kick_or_punch_wall = (m) => {
                     m.action = ACT_MOVE_PUNCHING;
                 }
 
-                set_forward_vel(m, -48.0);
+                mario_set_forward_vel(m, -48.0);
                 // play_sound(SOUND_ACTION_HIT_2, m.marioObj..gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             } else if (m.action & ACT_FLAG_AIR) {
-                set_forward_vel(m, -16.0);
+                mario_set_forward_vel(m, -16.0);
                 // play_sound(SOUND_ACTION_HIT_2, m.marioObj..gfx.cameraToObject);
                 m.particleFlags |= MarioConstants.PARTICLE_TRIANGLE;
             }

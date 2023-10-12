@@ -223,6 +223,8 @@ export const geo_switch_area = (callerContext, node) => {
     } else {
         node.selectedCase = 0
     }
+
+    return null;
 }
 
 export const obj_update_pos_from_parent_transformation = (a0, a1) => {
@@ -373,6 +375,26 @@ export const approach_s16_symmetric = (value, target, increment) =>{
     } else {
         if (dist < -increment) value = s16(value - increment)
         else value = target
+    }
+
+    return value
+}
+
+export const approach_symmetric = (value, target, increment) => {
+    const dist = target - value
+
+    if (dist >= 0) {
+        if (dist > increment) {
+            value += increment
+        } else {
+            value = target
+        }
+    } else {
+        if (dist < -increment) {
+            value -= increment
+        } else {
+            value = target
+        }
     }
 
     return value
@@ -2801,26 +2823,6 @@ export const cur_obj_spawn_star_at_y_offset = (targetX, targetY, targetZ, offset
     o.rawData[oPosY] += offsetY + gDebugInfo[DebugPage.DEBUG_PAGE_ENEMYINFO][0]
     spawn_default_star(targetX, targetY, targetZ)
     o.rawData[oPosY] = objectPosY
-}
-
-export const approach_symmetric = (value, target, increment) => {
-    const dist = target - value
-
-    if (dist >= 0) {
-        if (dist > increment) {
-            value += increment
-        } else {
-            value = target
-        }
-    } else {
-        if (dist < -increment) {
-            value -= increment
-        } else {
-            value = target
-        }
-    }
-
-    return value
 }
 
 gLinker.bhv_init_room = bhv_init_room
