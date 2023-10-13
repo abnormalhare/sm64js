@@ -24,7 +24,7 @@ import {
 import {
     DIALOG_RESPONSE_NONE,
     DIALOG_RESPONSE_YES,
-    IngameMenuInstance as IngameMenu, MENU_MODE_NONE, MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN, MENU_OPT_NONE
+    IngameMenuInstance as IngameMenu, MENU_MODE_NONE, MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN, MENU_OPT_NONE, MENU_OPT_SAVE_AND_CONTINUE, MENU_OPT_SAVE_AND_QUIT
 } from "./IngameMenu"
 
 import {
@@ -46,7 +46,6 @@ import {
 
 import {
     gLastCompletedCourseNum,
-    save_data,
     save_file_set_flags
 } from "./SaveFile"
 
@@ -418,31 +417,31 @@ export const handle_save_menu = (m) => {
     let dialogID;
 
     // wait for the menu to show up
-    if (is_anim_past_end(m) && gSaveOptSelectIndex != MENU_OPT_NONE) {
+    if (is_anim_past_end(m) && Area.gSaveOptSelectIndex != MENU_OPT_NONE) {
         // save and continue / save and quit
-        if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
-            save_data();
+        if (Area.gSaveOptSelectIndex == MENU_OPT_SAVE_AND_CONTINUE || Area.gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
+            window.saveGame();
 
-            if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
+            if (Area.gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
                 gLinker.LevelUpdate.fade_into_special_warp(-2, 0);   // reset game
             }
         }
 
         // not quitting
-        if (gSaveOptSelectIndex != SAVE_OPT_SAVE_AND_QUIT) {
+        if (Area.gSaveOptSelectIndex != MENU_OPT_SAVE_AND_QUIT) {
             disable_time_stop();
             m.faceAngle[1] += 0x8000;
 
-            // figure out what dialog to show, if we should
-            dialogID = get_star_collection_dialog(m);
-            if (dialogID != 0) {
-                // play_peachs_jingle();
+        //     // figure out what dialog to show, if we should
+        //     dialogID = get_star_collection_dialog(m);
+        //     if (dialogID != 0) {
+        //         // play_peachs_jingle();
 
-                // look up for dialog
-                set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
-            } else {
+        //         // look up for dialog
+        //         set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
+        //     } else {
                 set_mario_action(m, ACT_IDLE, 0);
-            }
+        //     }
         }
     }
 }
@@ -790,7 +789,7 @@ export const general_star_dance_handler = (m, isInWater) => {
                 break
         }
     } else if (m.actionState == 1 && IngameMenu.gDialogResponse != DIALOG_RESPONSE_NONE) {
-        if (IngameMenu.gDialogResponse == DIALOG_RESPONSE_YES) save_data();
+        if (IngameMenu.gDialogResponse == DIALOG_RESPONSE_YES) window.saveGame();
         m.actionState = 2
         disable_time_stop()
         // enable_background_sound()
@@ -1271,7 +1270,7 @@ export const act_exit_land_save_dialog = (m) => {
             animFrame = set_mario_animation(m, MARIO_ANIM_THROW_CATCH_KEY)
             switch (animFrame) {
                 case -1:
-                    // spawn_obj_at_mario_rel_yaw(m, MODEL_BOWSER_KEY_CUTSCENE, bhvBowserKeyCourseExit, -32768)
+                    spawn_obj_at_mario_rel_yaw(m, MODEL_BOWSER_KEY_CUTSCENE, gLinker.behaviors.bhvBowserKeyCourseExit, -32768)
                     //! fall through
                 case 67:
                     play_sound(SOUND_ACTION_KEY_SWISH, m.marioObj.gfx.cameraToObject)
@@ -1283,7 +1282,7 @@ export const act_exit_land_save_dialog = (m) => {
                     play_sound(SOUND_ACTION_UNKNOWN45C, m.marioObj.gfx.cameraToObject)
                     // no break
             }
-            // handle_save_menu(m)
+            handle_save_menu(m)
             break
         // exit without cap
         case 2:
@@ -1295,7 +1294,7 @@ export const act_exit_land_save_dialog = (m) => {
                 m.marioBodyState.eyeState = MARIO_EYES_HALF_CLOSED
             }
 
-            // handle_save_menu(m)
+            handle_save_menu(m)
             break
         // exit with cap
         case 3:
@@ -1312,13 +1311,8 @@ export const act_exit_land_save_dialog = (m) => {
                 case 82:
                     cutscene_put_cap_on(m)
                     break
-                // to prevent a softlock due to lack of handle_save_menu
-                case 99:
-                    set_mario_action(m, ACT_IDLE, 0)
-                    m.faceAngle[1] += 0x8000
-                    break
             }
-            // handle_save_menu(m)
+            handle_save_menu(m)
             break
     }
 

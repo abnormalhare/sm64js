@@ -7187,7 +7187,7 @@ class Camera {
     }
 
     cap_switch_save(dummy) {
-        // save_file_do_save(Area.gCurrSaveFileNum - 1)
+        window.saveGame();
     }
 
     init_spline_point(splineWrapper, index, speed, point) {

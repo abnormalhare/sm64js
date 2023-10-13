@@ -143,7 +143,16 @@ const reset_save_buffer = () => {
     }
 }
 
-export const restore_data = () => {
+window.saveGame = () => {
+    if (gMainMenuDataModified) {
+        IDB.set("save_file", msgpack.encode(gSaveBuffer))
+        gMainMenuDataModified = false;
+    }
+
+    console.log("Saved Game:", gSaveBuffer)
+}
+
+window.loadGame = () => {
     IDB.get("save_file").then((data) => {
         if (data) {
             gSaveBuffer = msgpack.decode(data)
@@ -151,25 +160,8 @@ export const restore_data = () => {
             reset_save_buffer();
         }
     })
-
-    console.log(gSaveBuffer)
-}
-
-export const save_data = () => {
-    if (gMainMenuDataModified) {
-        IDB.set("save_file", msgpack.encode(gSaveBuffer))
-        gMainMenuDataModified = false;
-    }
-}
-
-export const wipe_data = () => {
-    reset_save_buffer();
-    gSaveBuffer.menuData.coinScoreAges[0] = 0x3FFFFFFF;
-    gSaveBuffer.menuData.coinScoreAges[1] = 0x2AAAAAAA;
-    gSaveBuffer.menuData.coinScoreAges[2] = 0x15555555;
-
-    gMainMenuDataModified = true;
-    save_main_menu_data();
+    
+    console.log("Loaded Game:", gSaveBuffer)
 }
 
 export const get_coin_score_age = (fileIndex, courseIndex) => {
@@ -211,9 +203,9 @@ export const touch_high_score_ages = (fileIndex) => {
     }
 }
 
-// restore_save_file_data: use restore_data
+// restore_save_file_data: use loadGame
 
-// save_file_do_save: use save_data
+// save_file_do_save: use saveGame
 
 export const save_file_erase = (fileIndex) => {
     touch_high_score_ages(fileIndex);
@@ -228,7 +220,7 @@ export const save_file_erase = (fileIndex) => {
     }
 
     gSaveFileModified = true;
-    save_data();
+    window.saveGame();
 }
 
 export const save_file_copy = (srcFileIndex, destFileIndex) => {
@@ -236,7 +228,7 @@ export const save_file_copy = (srcFileIndex, destFileIndex) => {
     gSaveBuffer.files[destFileIndex] = deep_copy(gSaveBuffer.files[srcFileIndex])
 
     gSaveFileModified = true;
-    save_data();
+    window.saveGame();
 }
 
 export const save_file_load_all = () => {
@@ -244,7 +236,7 @@ export const save_file_load_all = () => {
     gSaveFileModified = false;
 
     reset_save_buffer();
-    restore_data();
+    window.loadGame();
 }
 
 // save_file_reload: not required
@@ -448,7 +440,7 @@ export const save_file_set_sound_mode = (mode) => {
     gSaveBuffer.menuData.soundMode = mode
 
     gMainMenuDataModified = true
-    save_data()
+    window.saveGame();
 }
 
 export const save_file_get_sound_mode = () => {
