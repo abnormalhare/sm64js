@@ -180,6 +180,8 @@ let gMovetexLastTextureId = 0
 let gMovtexCounter = 1
 let gMovtexCounterPrev = 0
 
+export let gPaintingMarioYEntry = 0.0;
+
 
 const get_quad_collection_from_id = (id) => {
     switch (id) {

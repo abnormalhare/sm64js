@@ -41,6 +41,9 @@
  *          enough.
  */
 
+import { bob_painting } from "../levels/castle_inside/painting.inc"
+import { gPaintingMarioYEntry } from "./MovingTexture"
+
 /// The default painting side length
 export const PAINTING_SIZE = 614.0
 
@@ -174,7 +177,7 @@ const /* Painting * */ sHmcPaintings = [
 ]
 
 const /* Painting * */ sInsideCastlePaintings = [
-    // bob_painting, ccm_painting, wf_painting,  jrb_painting,      lll_painting,
+    bob_painting, // ccm_painting, wf_painting,  jrb_painting,      lll_painting,
     // ssl_painting, hmc_painting, ddd_painting, wdw_painting,      thi_tiny_painting,
     // ttm_painting, ttc_painting, sl_painting,  thi_huge_painting,
     null,
@@ -197,125 +200,121 @@ let gLastPaintingUpdateCounter = 0
 /**
  * Stop paintings in paintingGroup from rippling if their id is different from *idptr.
  */
-// export const stop_other_paintings = (idptr, paintingGroup) => {
-//     let /*s16*/ index
-//     let /*s16*/ id = *idptr
+export const stop_other_paintings = (painting, paintingGroup) => {
+    let index
+    let id = painting.id
 
-//     index = 0
-//     while (paintingGroup[index] != null) {
-//         struct Painting *painting = segmented_to_virtual(paintingGroup[index])
+    index = 0;
+    while (paintingGroup[index] != null) {
+        let painting = paintingGroup[index]
 
-//           // stop all rippling except for the selected painting
-//         if (painting.id != id) {
-//             painting.state = 0
-//         }
-//         index++
-//     }
-// }
+        // stop all rippling except for the selected painting
+        if (painting.id != id) {
+            painting.state = 0
+        }
+        index++
+    }
+}
 
 /**
  * @return Mario's y position inside the painting (bounded).
  */
-// export const painting_mario_y = (painting) => {
-//       //! Unnecessary use of double constants
-//       // Add 50 to make the ripple closer to Mario's center of mass.
-//     let /*f32*/ relY = gPaintingMarioYPos - painting.posY + 50.0
+export const painting_mario_y = (painting) => {
+    //! Unnecessary use of double constants
+    // Add 50 to make the ripple closer to Mario's center of mass.
+    let relY = gPaintingMarioYPos - painting.posY + 50.0
 
-//     if (relY < 0.0) {
-//         relY = 0.0
-//     } else if (relY > painting.size) {
-//         relY = painting.size
-//     }
-//     return relY
-// }
+    if (relY < 0.0) {
+        relY = 0.0
+    } else if (relY > painting.size) {
+        relY = painting.size
+    }
+    return relY
+}
 
 /**
  * @return Mario's z position inside the painting (bounded).
  */
-// export const painting_mario_z = (painting) => {
-//     let /*f32*/ relZ = painting.posZ - gPaintingMarioZPos
+export const painting_mario_z = (painting) => {
+    let relZ = painting.posZ - gPaintingMarioZPos
 
-//     if (relZ < 0.0) {
-//         relZ = 0.0
-//     } else if (relZ > painting.size) {
-//         relZ = painting.size
-//     }
-//     return relZ
-// }
+    if (relZ < 0.0) {
+        relZ = 0.0
+    } else if (relZ > painting.size) {
+        relZ = painting.size
+    }
+    return relZ
+}
 
 /**
  * @return The y origin for the ripple, based on ySource.
  *         For floor paintings, the z-axis is treated as y.
  */
-// export const painting_ripple_y = (painting, ySource) => {
-//     switch (ySource) {
-//         case MARIO_Y:
-//             return painting_mario_y(painting);   // normal wall paintings
-//             break
-//         case MARIO_Z:
-//             return painting_mario_z(painting);   // floor paintings use X and Z
-//             break
-//         case MIDDLE_Y:
-//             return painting.size / 2.0;   // some concentric ripples don't care about Mario
-//             break
-//     }
-// }
+export const painting_ripple_y = (painting, ySource) => {
+    switch (ySource) {
+        case MARIO_Y:
+            return painting_mario_y(painting);   // normal wall paintings
+        case MARIO_Z:
+            return painting_mario_z(painting);   // floor paintings use X and Z
+        case MIDDLE_Y:
+            return painting.size / 2.0;   // some concentric ripples don't care about Mario
+    }
+
+    return 0.0;
+}
 
 /**
  * Return the quarter of the painting that is closest to the floor Mario entered.
  */
-// export const painting_nearest_4th = (painting) => {
-//     let /*f32*/ firstQuarter = painting.size / 4.0;         // 1/4 of the way across the painting
-//     let /*f32*/ secondQuarter = painting.size / 2.0;        // 1/2 of the way across the painting
-//     let /*f32*/ thirdQuarter = painting.size * 3.0 / 4.0;   // 3/4 of the way across the painting
+export const painting_nearest_4th = (painting) => {
+    let firstQuarter = painting.size / 4.0;         // 1/4 of the way across the painting
+    let secondQuarter = painting.size / 2.0;        // 1/2 of the way across the painting
+    let thirdQuarter = painting.size * 3.0 / 4.0;   // 3/4 of the way across the painting
 
-//     if (painting.floorEntered & RIPPLE_LEFT) {
-//         return firstQuarter
-//     } else if (painting.floorEntered & RIPPLE_MIDDLE) {
-//         return secondQuarter
-//     } else if (painting.floorEntered & RIPPLE_RIGHT) {
-//         return thirdQuarter
+    if (painting.floorEntered & RIPPLE_LEFT) {
+        return firstQuarter
+    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+        return secondQuarter
+    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+        return thirdQuarter
 
-//       // Same as ripple floors.
-//     } else if (painting.floorEntered & ENTER_LEFT) {
-//         return firstQuarter
-//     } else if (painting.floorEntered & ENTER_MIDDLE) {
-//         return secondQuarter
-//     } else if (painting.floorEntered & ENTER_RIGHT) {
-//         return thirdQuarter
-//     }
-// }
+      // Same as ripple floors.
+    } else if (painting.floorEntered & ENTER_LEFT) {
+        return firstQuarter
+    } else if (painting.floorEntered & ENTER_MIDDLE) {
+        return secondQuarter
+    } else if (painting.floorEntered & ENTER_RIGHT) {
+        return thirdQuarter
+    }
+}
 
 /**
  * @return Mario's x position inside the painting (bounded).
  */
-// export const painting_mario_x = (painting) => {
-//     let /*f32*/ relX = gPaintingMarioXPos - painting.posX
+export const painting_mario_x = (painting) => {
+    let relX = gPaintingMarioXPos - painting.posX
 
-//     if (relX < 0.0) {
-//         relX = 0.0
-//     } else if (relX > painting.size) {
-//         relX = painting.size
-//     }
-//     return relX
-// }
+    if (relX < 0.0) {
+        relX = 0.0
+    } else if (relX > painting.size) {
+        relX = painting.size
+    }
+    return relX
+}
 
 /**
  * @return The x origin for the ripple, based on xSource.
  */
-// export const painting_ripple_x = (painting, xSource) => {
-//     switch (xSource) {
-//         case NEAREST_4TH:   // normal wall paintings
-//             return painting_nearest_4th(painting)
-//             break
-//         case MARIO_X:   // horizontally placed paintings use X and Z
-//             return painting_mario_x(painting)
-//             break
-//         case MIDDLE_X:   // concentric rippling may not care about Mario
-//             return painting.size / 2.0
-//             break
-//     }
-// }
+export const painting_ripple_x = (painting, xSource) => {
+    switch (xSource) {
+        case NEAREST_4TH:   // normal wall paintings
+            return painting_nearest_4th(painting);
+        case MARIO_X:   // horizontally placed paintings use X and Z
+            return painting_mario_x(painting);
+        case MIDDLE_X:   // concentric rippling may not care about Mario
+            return painting.size / 2.0;
+    }
+}
 
 /**
  * Set the painting's state, causing it to start a passive ripple or a ripple from Mario entering.
@@ -325,151 +324,151 @@ let gLastPaintingUpdateCounter = 0
  * @param xSource,ySource what to use for the x and y origin of the ripple
  * @param resetTimer if 100, set the timer to 0
  */
-// void painting_state(s8 state, struct Painting *painting, struct Painting *paintingGroup[],
-//                     s8 xSource, s8 ySource, s8 resetTimer) {
-//       // make sure no other paintings are rippling
-//     stop_other_paintings(&painting.id, paintingGroup)
+const painting_state = (state, painting, paintingGroup, xSource, ySource, resetTimer) => {
+    // make sure no other paintings are rippling
+    stop_other_paintings(painting, paintingGroup);
 
-//       // use a different set of variables depending on the state
-//     switch (state) {
-//         case PAINTING_RIPPLE:
-//             painting.currRippleMag    = painting.passiveRippleMag
-//             painting.rippleDecay      = painting.passiveRippleDecay
-//             painting.currRippleRate   = painting.passiveRippleRate
-//             painting.dispersionFactor = painting.passiveDispersionFactor
-//             break
+    // use a different set of variables depending on the state
+    switch (state) {
+        case PAINTING_RIPPLE:
+            painting.currRippleMag    = painting.passiveRippleMag
+            painting.rippleDecay      = painting.passiveRippleDecay
+            painting.currRippleRate   = painting.passiveRippleRate
+            painting.dispersionFactor = painting.passiveDispersionFactor
+            break
 
-//         case PAINTING_ENTERED:
-//             painting.currRippleMag    = painting.entryRippleMag
-//             painting.rippleDecay      = painting.entryRippleDecay
-//             painting.currRippleRate   = painting.entryRippleRate
-//             painting.dispersionFactor = painting.entryDispersionFactor
-//             break
-//     }
-//     painting.state = state
-//     painting.rippleX = painting_ripple_x(painting, xSource)
-//     painting.rippleY = painting_ripple_y(painting, ySource)
-//     gPaintingMarioYEntry = gPaintingMarioYPos
+        case PAINTING_ENTERED:
+            painting.currRippleMag    = painting.entryRippleMag
+            painting.rippleDecay      = painting.entryRippleDecay
+            painting.currRippleRate   = painting.entryRippleRate
+            painting.dispersionFactor = painting.entryDispersionFactor
+            break
+    }
 
-//       // Because true or false would be too simple...
-//     if (resetTimer == RESET_TIMER) {
-//         painting.rippleTimer = 0.0
-//     }
-//     gRipplingPainting = painting
-// }
+    painting.state = state
+    painting.rippleX = painting_ripple_x(painting, xSource)
+    painting.rippleY = painting_ripple_y(painting, ySource)
+    gPaintingMarioYEntry = gPaintingMarioYPos
+
+      // Because true or false would be too simple...
+    if (resetTimer == RESET_TIMER) {
+        painting.rippleTimer = 0.0
+    }
+    gRipplingPainting = painting
+}
 
 /**
  * Idle update function for wall paintings that use RIPPLE_TRIGGER_PROXIMITY.
  */
-// export const wall_painting_proximity_idle = (painting, paintingGroup) => {
-//       // Check for Mario triggering a ripple
-//     if (painting.floorEntered & RIPPLE_LEFT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_MIDDLE) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_RIGHT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+export const wall_painting_proximity_idle = (painting, paintingGroup) => {
+      // Check for Mario triggering a ripple
+    if (painting.floorEntered & RIPPLE_LEFT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
 
-//       // Check for Mario entering
-//     } else if (painting.floorEntered & ENTER_LEFT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_MIDDLE) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_RIGHT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     }
-// }
+      // Check for Mario entering
+    } else if (painting.floorEntered & ENTER_LEFT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_MIDDLE) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_RIGHT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    }
+}
 
 /**
  * Rippling update function for wall paintings that use RIPPLE_TRIGGER_PROXIMITY.
  */
-// export const wall_painting_proximity_rippling = (painting, paintingGroup) => {
-//     if (painting.floorEntered & ENTER_LEFT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_MIDDLE) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_RIGHT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     }
-// }
+export const wall_painting_proximity_rippling = (painting, paintingGroup) => {
+    if (painting.floorEntered & ENTER_LEFT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_MIDDLE) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_RIGHT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    }
+}
 
 /**
  * Idle update function for wall paintings that use RIPPLE_TRIGGER_CONTINUOUS.
  */
-// export const wall_painting_continuous_idle = (painting, paintingGroup) => {
-//       // Check for Mario triggering a ripple
-//     if (painting.floorEntered & RIPPLE_LEFT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_MIDDLE) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_RIGHT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+export const wall_painting_continuous_idle = (painting, paintingGroup) => {
+      // Check for Mario triggering a ripple
+    if (painting.floorEntered & RIPPLE_LEFT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
 
-//       // Check for Mario entering
-//     } else if (painting.floorEntered & ENTER_LEFT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_MIDDLE) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & ENTER_RIGHT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
-//     }
-// }
+      // Check for Mario entering
+    } else if (painting.floorEntered & ENTER_LEFT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_MIDDLE) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    } else if (painting.floorEntered & ENTER_RIGHT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, RESET_TIMER)
+    }
+}
 
 /**
  * Rippling update function for wall paintings that use RIPPLE_TRIGGER_CONTINUOUS.
  */
-// export const wall_painting_continuous_rippling = (painting, paintingGroup) => {
-//     if (painting.floorEntered & ENTER_LEFT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
-//     } else if (painting.floorEntered & ENTER_MIDDLE) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
-//     } else if (painting.floorEntered & ENTER_RIGHT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
-//     }
-// }
+export const wall_painting_continuous_rippling = (painting, paintingGroup) => {
+    if (painting.floorEntered & ENTER_LEFT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
+    } else if (painting.floorEntered & ENTER_MIDDLE) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
+    } else if (painting.floorEntered & ENTER_RIGHT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, NEAREST_4TH, MARIO_Y, DONT_RESET)
+    }
+}
 
 /**
  * Idle update function for floor paintings that use RIPPLE_TRIGGER_PROXIMITY.
  *
  * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
  */
-// export const floor_painting_proximity_idle = (painting, paintingGroup) => {
-//       // Check for Mario triggering a ripple
-//     if (painting.floorEntered & RIPPLE_LEFT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_MIDDLE) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_RIGHT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+export const floor_painting_proximity_idle = (painting, paintingGroup) => {
+      // Check for Mario triggering a ripple
+    if (painting.floorEntered & RIPPLE_LEFT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
 
-//       // Only check for Mario entering if he jumped below the surface
-//     } else if (painting.marioWentUnder) {
-//         if (painting.currFloor & ENTER_LEFT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         } else if (painting.currFloor & ENTER_MIDDLE) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         } else if (painting.currFloor & ENTER_RIGHT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         }
-//     }
-// }
+      // Only check for Mario entering if he jumped below the surface
+    } else if (painting.marioWentUnder) {
+        if (painting.currFloor & ENTER_LEFT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        } else if (painting.currFloor & ENTER_MIDDLE) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        } else if (painting.currFloor & ENTER_RIGHT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        }
+    }
+}
 
 /**
  * Rippling update function for floor paintings that use RIPPLE_TRIGGER_PROXIMITY.
  *
  * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
  */
-// export const floor_painting_proximity_rippling = (painting, paintingGroup) => {
-//     if (painting.marioWentUnder) {
-//         if (painting.currFloor & ENTER_LEFT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         } else if (painting.currFloor & ENTER_MIDDLE) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         } else if (painting.currFloor & ENTER_RIGHT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//         }
-//     }
-// }
+export const floor_painting_proximity_rippling = (painting, paintingGroup) => {
+    if (painting.marioWentUnder) {
+        if (painting.currFloor & ENTER_LEFT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        } else if (painting.currFloor & ENTER_MIDDLE) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        } else if (painting.currFloor & ENTER_RIGHT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+        }
+    }
+}
 
 /**
  * Idle update function for floor paintings that use RIPPLE_TRIGGER_CONTINUOUS.
@@ -478,96 +477,96 @@ let gLastPaintingUpdateCounter = 0
  * The floor just inside the doorway is RIPPLE_LEFT, so the painting starts rippling as soon as Mario
  * enters the room.
  */
-// export const floor_painting_continuous_idle = (painting, paintingGroup) => {
-//       // Check for Mario triggering a ripple
-//     if (painting.floorEntered & RIPPLE_LEFT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_MIDDLE) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
-//     } else if (painting.floorEntered & RIPPLE_RIGHT) {
-//         painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+export const floor_painting_continuous_idle = (painting, paintingGroup) => {
+      // Check for Mario triggering a ripple
+    if (painting.floorEntered & RIPPLE_LEFT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_MIDDLE) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
+    } else if (painting.floorEntered & RIPPLE_RIGHT) {
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, RESET_TIMER)
 
-//       // Check for Mario entering
-//     } else if (painting.currFloor & ENTER_LEFT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//     } else if (painting.currFloor & ENTER_MIDDLE) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//     } else if (painting.currFloor & ENTER_RIGHT) {
-//         painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
-//     }
-// }
+      // Check for Mario entering
+    } else if (painting.currFloor & ENTER_LEFT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+    } else if (painting.currFloor & ENTER_MIDDLE) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+    } else if (painting.currFloor & ENTER_RIGHT) {
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, RESET_TIMER)
+    }
+}
 
 /**
  * Rippling update function for floor paintings that use RIPPLE_TRIGGER_CONTINUOUS.
  */
-// export const floor_painting_continuous_rippling = (painting, paintingGroup) => {
-//     if (painting.marioWentUnder) {
-//         if (painting.currFloor & ENTER_LEFT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
-//         } else if (painting.currFloor & ENTER_MIDDLE) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
-//         } else if (painting.currFloor & ENTER_RIGHT) {
-//             painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
-//         }
-//     }
-// }
+export const floor_painting_continuous_rippling = (painting, paintingGroup) => {
+    if (painting.marioWentUnder) {
+        if (painting.currFloor & ENTER_LEFT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
+        } else if (painting.currFloor & ENTER_MIDDLE) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
+        } else if (painting.currFloor & ENTER_RIGHT) {
+            painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Z, DONT_RESET)
+        }
+    }
+}
 
 /**
  * Check for Mario entering one of the special floors associated with the painting.
  */
-// export const painting_update_floors = (painting) => {
-//     let /*s16*/ paintingId = painting.id
-//     s8 rippleLeft = 0
-//     s8 rippleMiddle = 0
-//     s8 rippleRight = 0
-//     s8 enterLeft = 0
-//     s8 enterMiddle = 0
-//     s8 enterRight = 0
+export const painting_update_floors = (painting) => {
+    let paintingId = painting.id;
+    let rippleLeft = 0;
+    let rippleMiddle = 0;
+    let rippleRight = 0;
+    let enterLeft = 0;
+    let enterMiddle = 0;
+    let enterRight = 0;
 
-//     /* The area in front of every painting in the game (except HMC and CotMC, which   *\
-//     |* act a little differently) is made up of 3 special floor triangles with special *|
-//     |* (unique) surface types. This code checks which surface Mario is currently on   *|
-//     \* and sets a bitfield accordingly.                                               */
+    /* The area in front of every painting in the game (except HMC and CotMC, which   *\
+    |* act a little differently) is made up of 3 special floor triangles with special *|
+    |* (unique) surface types. This code checks which surface Mario is currently on   *|
+    \* and sets a bitfield accordingly.                                               */
 
-//       // check if Mario's current floor is one of the special floors
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A6) {
-//         rippleLeft = RIPPLE_LEFT
-//     }
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A7) {
-//         rippleMiddle = RIPPLE_MIDDLE
-//     }
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A8) {
-//         rippleRight = RIPPLE_RIGHT
-//     }
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D3) {
-//         enterLeft = ENTER_LEFT
-//     }
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D4) {
-//         enterMiddle = ENTER_MIDDLE
-//     }
-//     if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D5) {
-//         enterRight = ENTER_RIGHT
-//     }
+      // check if Mario's current floor is one of the special floors
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A6) {
+        rippleLeft = RIPPLE_LEFT
+    }
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A7) {
+        rippleMiddle = RIPPLE_MIDDLE
+    }
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A8) {
+        rippleRight = RIPPLE_RIGHT
+    }
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D3) {
+        enterLeft = ENTER_LEFT
+    }
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D4) {
+        enterMiddle = ENTER_MIDDLE
+    }
+    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D5) {
+        enterRight = ENTER_RIGHT
+    }
 
-//     painting.lastFloor = painting.currFloor
-//       // at most 1 of these will be nonzero;
-//     painting.currFloor = rippleLeft + rippleMiddle + rippleRight + enterLeft + enterMiddle + enterRight
+    painting.lastFloor = painting.currFloor
+    // at most 1 of these will be nonzero;
+    painting.currFloor = rippleLeft + rippleMiddle + rippleRight + enterLeft + enterMiddle + enterRight
 
-//       // floorEntered is true iff currFloor is true and lastFloor is false
-//       // (Mario just entered the floor on this frame)
-//     painting.floorEntered = (painting.lastFloor ^ painting.currFloor) & painting.currFloor
+    // floorEntered is true iff currFloor is true and lastFloor is false
+    // (Mario just entered the floor on this frame)
+    painting.floorEntered = (painting.lastFloor ^ painting.currFloor) & painting.currFloor
 
-//     painting.marioWasUnder = painting.marioIsUnder
-//       // Check if Mario has fallen below the painting (used for floor paintings)
-//     if (gPaintingMarioYPos < painting.posY) {
-//         painting.marioIsUnder = 1
-//     } else {
-//         painting.marioIsUnder = 0
-//     }
+    painting.marioWasUnder = painting.marioIsUnder
+      // Check if Mario has fallen below the painting (used for floor paintings)
+    if (gPaintingMarioYPos < painting.posY) {
+        painting.marioIsUnder = 1
+    } else {
+        painting.marioIsUnder = 0
+    }
 
-//       // Mario "went under" if he was not under last frame, but is under now
-//     painting.marioWentUnder = (painting.marioWasUnder ^ painting.marioIsUnder) & painting.marioIsUnder
-// }
+      // Mario "went under" if he was not under last frame, but is under now
+    painting.marioWentUnder = (painting.marioWasUnder ^ painting.marioIsUnder) & painting.marioIsUnder
+}
 
 /**
  * Update the ripple's timer and magnitude, making it propagate outwards.
@@ -575,37 +574,37 @@ let gLastPaintingUpdateCounter = 0
  * Automatically changes the painting back to IDLE state (or RIPPLE for continuous paintings) if the
  * ripple's magnitude becomes small enough.
  */
-// export const painting_update_ripple_state = (painting) => {
-//     if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
-//         painting.currRippleMag *= painting.rippleDecay
+export const painting_update_ripple_state = (painting) => {
+    if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
+        painting.currRippleMag *= painting.rippleDecay
 
-//           //! After ~6.47 days, paintings with RIPPLE_TRIGGER_CONTINUOUS will increment this to
-//           //! 16777216 (1 << 24), at which point it will freeze (due to floating-point
-//           //! imprecision?) and the painting will stop rippling. This happens to HMC, DDD, and
-//           //! CotMC.
-//         painting.rippleTimer += 1.0
-//     }
-//     if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-//           // if the painting is barely rippling, make it stop rippling
-//         if (painting.currRippleMag <= 1.0) {
-//             painting.state = PAINTING_IDLE
-//             gRipplingPainting = null
-//         }
-//     } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+          //! After ~6.47 days, paintings with RIPPLE_TRIGGER_CONTINUOUS will increment this to
+          //! 16777216 (1 << 24), at which point it will freeze (due to floating-point
+          //! imprecision?) and the painting will stop rippling. This happens to HMC, DDD, and
+          //! CotMC.
+        painting.rippleTimer += 1.0
+    }
+    if (painting.rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
+          // if the painting is barely rippling, make it stop rippling
+        if (painting.currRippleMag <= 1.0) {
+            painting.state = PAINTING_IDLE
+            gRipplingPainting = null
+        }
+    } else if (painting.rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
 
-//           // if the painting is doing the entry ripple but the ripples are as small as those from the
-//           // passive ripple, make it do a passive ripple
-//           // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
-//         if (painting.state == PAINTING_ENTERED && painting.currRippleMag <= painting.passiveRippleMag) {
+          // if the painting is doing the entry ripple but the ripples are as small as those from the
+          // passive ripple, make it do a passive ripple
+          // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
+        if (painting.state == PAINTING_ENTERED && painting.currRippleMag <= painting.passiveRippleMag) {
 
-//             painting.state = PAINTING_RIPPLE
-//             painting.currRippleMag = painting.passiveRippleMag
-//             painting.rippleDecay = painting.passiveRippleDecay
-//             painting.currRippleRate = painting.passiveRippleRate
-//             painting.dispersionFactor = painting.passiveDispersionFactor
-//         }
-//     }
-// }
+            painting.state = PAINTING_RIPPLE
+            painting.currRippleMag = painting.passiveRippleMag
+            painting.rippleDecay = painting.passiveRippleDecay
+            painting.currRippleRate = painting.passiveRippleRate
+            painting.dispersionFactor = painting.passiveDispersionFactor
+        }
+    }
+}
 
 /**
  * @return the ripple function at posX, posY
