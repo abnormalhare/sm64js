@@ -12,8 +12,12 @@ import {
 } from "../../game/Skybox"
 
 import {
-    geo_file_select_strings_and_menu_cursor, geo_act_selector_strings
+    geo_act_selector_strings
 } from "../../menu/star_select"
+
+import {
+    geo_file_select_strings_and_menu_cursor
+} from "../../menu/file_select"
 
 import { dl_menu_mario_save_button_base, dl_menu_save_button_back, 
     dl_menu_save_button_fade_back, dl_menu_mario_new_button_base, 

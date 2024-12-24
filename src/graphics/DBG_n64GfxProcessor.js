@@ -28,6 +28,8 @@ const precomp_shaders = [
     0x03200200
 ]
 
+let debug_indent = -1;
+
 const MAX_BUFFERED = 256
 const MAX_LIGHTS = 2
 const MAX_VERTICES = 64
@@ -1065,6 +1067,8 @@ export class n64GfxProcessor {
     run_dl(commands) {
         let prev_op = []
         let next_op = []
+        let ret = ``
+        debug_indent++;
         try {
             
             for (const command of commands) {
@@ -1075,6 +1079,7 @@ export class n64GfxProcessor {
                 switch (opcode) {
                     case Gbi.G_ENDDL: /// not necessary for JS
                         prev_op = ["G_ENDDL", "<"]
+                        debug_indent--;
                         break
                     case Gbi.G_MOVEMEM:
                         this.sp_movemem(args.type, args.data, args.index)
@@ -1172,22 +1177,32 @@ export class n64GfxProcessor {
                         prev_op = ["G_TEXRECT", `Ulx: ${args.ulx}, Uly: ${args.uly}, Lrx: ${args.lrx}, Lry: ${args.lry}, Tile: ${args.tile}, Uls: ${args.uls}, Ult: ${args.ult}, Dsdx: ${args.dsdx}, Dtdy: ${args.dtdy}, Flip: ${opcode == Gbi.G_TEXRECTFLIP}`]
                         break
                     case Gbi.G_DL:
+                        for (let i = 0; i < debug_indent; i++) {
+                            ret += "  "
+                        }
+                        ret += `G_DL ( Branch: ${args.branch} > )\n`
+                        
                         if (args.branch == Gbi.G_DL_PUSH) {
-                            this.run_dl(args.childDisplayList)
+                            ret += this.run_dl(args.childDisplayList)
                         } else {
-                            this.run_dl(args.childDisplayList)
+                            ret += this.run_dl(args.childDisplayList)
                         }
                         break
                     default:
                         console.log(command)
                         throw "unimplemented gfx opcode: " + opcode
                 }
+                for (let i = 0; i < debug_indent; i++) {
+                    ret += "  "
+                }
+                ret += `${prev_op[0]} ( ${prev_op[1]} )\n`
             }
         } catch (e) {
             console.log(`PREV CMD: ${prev_op[0]}, with args ${prev_op[1]} -> ${next_op[0]} :\n\t`)
             console.dir(next_op[1], {depth: null})
             console.log(e);
         }
+        return ret
     }
 
     flush() {
@@ -1203,7 +1218,8 @@ export class n64GfxProcessor {
         this.sp_reset()
 
         WebGL.start_frame()
-        this.run_dl(commands)
+        debug_indent = -1;
+        console.log(this.run_dl(commands))
         this.flush()
 
     }

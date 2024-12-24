@@ -332,13 +332,14 @@ export const G_RM_AA_ZB_OPA_SURF_SURF2 = 0x552078
 export const G_RM_AA_ZB_OPA_DECAL_DECAL2 = 0x552d58
 export const G_RM_AA_ZB_OPA_DECAL_NOOP2 = 0x442d58
 export const G_RM_AA_ZB_XLU_INTER_INTER2 = 0x5045d8
-export const G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2 = 0x00000000  // FIXME
+export const G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2 = 0x4049f8
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_SURF2 = 0xc8112078
 export const G_RM_FOG_SHADE_A_AA_ZB_TEX_EDGE2 = 0xc8113078
 export const G_RM_FOG_SHADE_A_AA_ZB_OPA_DECAL2 = 0xc8112d58
 export const G_RM_FOG_SHADE_A_AA_ZB_XLU_SURF2 = 0xc81049d8
-export const G_RM_AA_TEX_EDGE_EDGE2 = 0x00000000  // FIXME
-export const G_RM_PASS_OPA_SURF2 = 0x00000000  // FIXME
+export const G_RM_AA_TEX_EDGE_EDGE2 = 0x553048
+export const G_RM_PASS_OPA_SURF2 = 0xc192078
+export const G_RM_TEX_EDGE_EDGE2 = 0xf0a7008
 
 
 // Only used in gsDPSetRenderMode to map to actual values,
@@ -1020,8 +1021,9 @@ const renderModesMap = [
     [G_RM_XLU_SURF, G_RM_XLU_SURF2 ,                G_RM_XLU_SURF_SURF2],
     [G_RM_CUSTOM_AA_ZB_XLU_SURF, G_RM_NOOP2,        G_RM_CUSTOM_AA_ZB_XLU_SURF_NOOP2],
     [G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2,           G_RM_AA_TEX_EDGE_EDGE2],
-    [G_RM_PASS, G_RM_AA_ZB_OPA_SURF2,               G_RM_PASS_OPA_SURF2]
-]
+    [G_RM_PASS, G_RM_AA_ZB_OPA_SURF2,               G_RM_PASS_OPA_SURF2],
+    [G_RM_TEX_EDGE, G_RM_TEX_EDGE2,                 G_RM_TEX_EDGE_EDGE2]
+];
 
 export const gsDPSetRenderMode = (mode, mode2) => {
     if (mode2) {

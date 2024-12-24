@@ -1376,7 +1376,7 @@ import { seq_01_cutscene_collect_star, seq_02_menu_title_screen, seq_03_level_gr
 
 
 const loadDataIntoGame = (data) => {
-
+    
     amp_seg8_texture_08000F18.push(...data["actors/amp/amp_electricity.rgba16.png"])
     amp_seg8_texture_08001318.push(...data["actors/amp/amp_eyes.rgba16.png"])
     amp_seg8_texture_08001B18.push(...data["actors/amp/amp_body.rgba16.png"])
@@ -2719,40 +2719,40 @@ const loadDataIntoGame = (data) => {
     water_0900A800.push(...data["textures/water/jrb_textures.0A800.rgba16.png"])
     water_0900B800.push(...data["textures/water/jrb_textures.0B800.rgba16.png"])
 
-    // seq_01_cutscene_collect_star.push(...data["sound/sequences/us/01_cutscene_collect_star.m64"])
-    // seq_02_menu_title_screen.push(...data["sound/sequences/us/02_menu_title_screen.m64"])
-    // seq_03_level_grass.push(...data["sound/sequences/us/03_level_grass.m64"])
-    // seq_04_level_inside_castle.push(...data["sound/sequences/us/04_level_inside_castle.m64"])
-    // seq_05_level_water.push(...data["sound/sequences/us/05_level_water.m64"])
-    // seq_06_level_hot.push(...data["sound/sequences/us/06_level_hot.m64"])
-    // seq_07_level_boss_koopa.push(...data["sound/sequences/us/07_level_boss_koopa.m64"])
-    // seq_08_level_snow.push(...data["sound/sequences/us/08_level_snow.m64"])
-    // seq_09_level_slide.push(...data["sound/sequences/us/09_level_slide.m64"])
-    // seq_0A_level_spooky.push(...data["sound/sequences/us/0A_level_spooky.m64"])
-    // seq_0B_event_piranha_plant.push(...data["sound/sequences/us/0B_event_piranha_plant.m64"])
-    // seq_0C_level_underground.push(...data["sound/sequences/us/0C_level_underground.m64"])
-    // seq_0D_menu_star_select.push(...data["sound/sequences/us/0D_menu_star_select.m64"])
-    // seq_0E_event_powerup.push(...data["sound/sequences/us/0E_event_powerup.m64"])
-    // seq_0F_event_metal_cap.push(...data["sound/sequences/us/0F_event_metal_cap.m64"])
-    // seq_10_event_koopa_message.push(...data["sound/sequences/us/10_event_koopa_message.m64"])
-    // seq_11_level_koopa_road.push(...data["sound/sequences/us/11_level_koopa_road.m64"])
-    // seq_12_event_high_score.push(...data["sound/sequences/us/12_event_high_score.m64"])
-    // seq_13_event_merry_go_round.push(...data["sound/sequences/us/13_event_merry_go_round.m64"])
-    // seq_14_event_race.push(...data["sound/sequences/us/14_event_race.m64"])
-    // seq_15_cutscene_star_spawn.push(...data["sound/sequences/us/15_cutscene_star_spawn.m64"])
-    // seq_16_event_boss.push(...data["sound/sequences/us/16_event_boss.m64"])
-    // seq_17_cutscene_collect_key.push(...data["sound/sequences/us/17_cutscene_collect_key.m64"])
-    // seq_18_event_endless_stairs.push(...data["sound/sequences/us/18_event_endless_stairs.m64"])
-    // seq_19_level_boss_koopa_final.push(...data["sound/sequences/us/19_level_boss_koopa_final.m64"])
-    // seq_1A_cutscene_credits.push(...data["sound/sequences/us/1A_cutscene_credits.m64"])
-    // seq_1B_event_solve_puzzle.push(...data["sound/sequences/us/1B_event_solve_puzzle.m64"])
-    // seq_1C_event_toad_message.push(...data["sound/sequences/us/1C_event_toad_message.m64"])
-    // seq_1D_event_peach_message.push(...data["sound/sequences/us/1D_event_peach_message.m64"])
-    // seq_1E_cutscene_intro.push(...data["sound/sequences/us/1E_cutscene_intro.m64"])
-    // seq_1F_cutscene_victory.push(...data["sound/sequences/us/1F_cutscene_victory.m64"])
-    // seq_20_cutscene_ending.push(...data["sound/sequences/us/20_cutscene_ending.m64"])
-    // seq_21_menu_file_select.push(...data["sound/sequences/us/21_menu_file_select.m64"])
-    // seq_22_cutscene_lakitu.push(...data["sound/sequences/us/22_cutscene_lakitu.m64"])
+    seq_01_cutscene_collect_star.push(...data["sound/sequences/us/01_cutscene_collect_star.m64"])
+    seq_02_menu_title_screen.push(...data["sound/sequences/us/02_menu_title_screen.m64"])
+    seq_03_level_grass.push(...data["sound/sequences/us/03_level_grass.m64"])
+    seq_04_level_inside_castle.push(...data["sound/sequences/us/04_level_inside_castle.m64"])
+    seq_05_level_water.push(...data["sound/sequences/us/05_level_water.m64"])
+    seq_06_level_hot.push(...data["sound/sequences/us/06_level_hot.m64"])
+    seq_07_level_boss_koopa.push(...data["sound/sequences/us/07_level_boss_koopa.m64"])
+    seq_08_level_snow.push(...data["sound/sequences/us/08_level_snow.m64"])
+    seq_09_level_slide.push(...data["sound/sequences/us/09_level_slide.m64"])
+    seq_0A_level_spooky.push(...data["sound/sequences/us/0A_level_spooky.m64"])
+    seq_0B_event_piranha_plant.push(...data["sound/sequences/us/0B_event_piranha_plant.m64"])
+    seq_0C_level_underground.push(...data["sound/sequences/us/0C_level_underground.m64"])
+    seq_0D_menu_star_select.push(...data["sound/sequences/us/0D_menu_star_select.m64"])
+    seq_0E_event_powerup.push(...data["sound/sequences/us/0E_event_powerup.m64"])
+    seq_0F_event_metal_cap.push(...data["sound/sequences/us/0F_event_metal_cap.m64"])
+    seq_10_event_koopa_message.push(...data["sound/sequences/us/10_event_koopa_message.m64"])
+    seq_11_level_koopa_road.push(...data["sound/sequences/us/11_level_koopa_road.m64"])
+    seq_12_event_high_score.push(...data["sound/sequences/us/12_event_high_score.m64"])
+    seq_13_event_merry_go_round.push(...data["sound/sequences/us/13_event_merry_go_round.m64"])
+    seq_14_event_race.push(...data["sound/sequences/us/14_event_race.m64"])
+    seq_15_cutscene_star_spawn.push(...data["sound/sequences/us/15_cutscene_star_spawn.m64"])
+    seq_16_event_boss.push(...data["sound/sequences/us/16_event_boss.m64"])
+    seq_17_cutscene_collect_key.push(...data["sound/sequences/us/17_cutscene_collect_key.m64"])
+    seq_18_event_endless_stairs.push(...data["sound/sequences/us/18_event_endless_stairs.m64"])
+    seq_19_level_boss_koopa_final.push(...data["sound/sequences/us/19_level_boss_koopa_final.m64"])
+    seq_1A_cutscene_credits.push(...data["sound/sequences/us/1A_cutscene_credits.m64"])
+    seq_1B_event_solve_puzzle.push(...data["sound/sequences/us/1B_event_solve_puzzle.m64"])
+    seq_1C_event_toad_message.push(...data["sound/sequences/us/1C_event_toad_message.m64"])
+    seq_1D_event_peach_message.push(...data["sound/sequences/us/1D_event_peach_message.m64"])
+    seq_1E_cutscene_intro.push(...data["sound/sequences/us/1E_cutscene_intro.m64"])
+    seq_1F_cutscene_victory.push(...data["sound/sequences/us/1F_cutscene_victory.m64"])
+    seq_20_cutscene_ending.push(...data["sound/sequences/us/20_cutscene_ending.m64"])
+    seq_21_menu_file_select.push(...data["sound/sequences/us/21_menu_file_select.m64"])
+    seq_22_cutscene_lakitu.push(...data["sound/sequences/us/22_cutscene_lakitu.m64"])
 
     const skyboxes = [
         [bbh_skybox_texture,         "bbh_skybox_texture"],
@@ -2885,7 +2885,7 @@ const extractAssetsFromRom = (romBufferData) => {
     const assetsBasic = []
     
     Object.entries(assets).forEach(([key, value]) => { 
-        if (key == '@comment' || key == '@sound' || key == 'sound/') {
+        if (key == '@comment') {
             return
         }
 
@@ -2905,17 +2905,17 @@ const extractAssetsFromRom = (romBufferData) => {
                     offset: value[1]['us'][1],
                     skybox: true
                 })
-            // } else if (key.startsWith('sound/') && !key.endsWith('.aiff')) {
-            //     const offset = value[1]['us'][0]
-            //     if (assetsAiff[offset] == undefined) {
-            //         assetsAiff[offset] = []
-            //     }
-
-            //     assetsAiff[offset].push({  /// needs Mio decode
-            //         name: key,
-            //         size: value[0],
-            //         offset: offset
-            //     })
+            } else if (key.startsWith('sound/')) {
+                let offset = value[1]['us'][0]
+                if (offset != "@sound") {
+                    assetsAiff.push({  /// needs Mio decode
+                        name: key,
+                        size: value[0],
+                        offset: offset
+                    })
+                } else {
+                    offset = value[1]['us'][1]
+                }
             }
         } else {
             if (value[3]['us'] == undefined) { /// non-US asset
@@ -2947,9 +2947,9 @@ const extractAssetsFromRom = (romBufferData) => {
         extractedData[asset.name] = Buffer.from(romBufferData.slice(asset.offset, asset.offset + asset.size))
     })
 
-    ////// process basic assets
-    assetsAiff.forEach(([offset, assetSublist]) => {
-        console.log(Buffer.from(romBufferData.slice(offset)));
+    ////// process aiff assets
+    assetsAiff.forEach(asset => {
+        extractedData[asset.name] = Buffer.from(romBufferData.slice(asset.offset, asset.offset + asset.size));
     })
 
     /////// process Mio0 assets
@@ -2977,7 +2977,7 @@ const extractAssetsFromRom = (romBufferData) => {
 
 document.getElementById('romSelect').addEventListener('submit', (e) => {
     e.preventDefault()
-    if (loadedGameAssets) return
+    // if (loadedGameAssets) return
     const romFile = document.getElementById('romFile').files[0]
     const reader = new FileReader()
     reader.readAsArrayBuffer(romFile)

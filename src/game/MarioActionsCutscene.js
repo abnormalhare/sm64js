@@ -1821,7 +1821,7 @@ const intro_cutscene_peach_lakitu_scene = (m) => {
     if (m.statusForCamera.cameraEvent != CAM_EVENT_START_INTRO) {
         if (m.actionTimer == TIMER_SPAWN_PIPE) {
             sIntroWarpPipeObj =
-                spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_CASTLE_GROUNDS_WARP_PIPE,
+                spawn_object_abs_with_rot(gCurrentObject, MODEL_CASTLE_GROUNDS_WARP_PIPE,
                                           gLinker.behaviors.bhvStaticObject, -1328, 60, 4664, 0, 180, 0)
             advance_cutscene_step(m)
         }

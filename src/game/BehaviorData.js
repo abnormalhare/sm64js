@@ -2412,6 +2412,15 @@ const bhvHidden1upInPoleSpawner = [
     END_LOOP(),
 ]
 
+const bhvActSelectorStarType = [
+    BEGIN(OBJ_LIST_DEFAULT, 'bhvActSelectorStarType'),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_act_selector_star_type_loop'),
+    END_LOOP(),
+]
+
 export const bhvMovingYellowCoin = [
     BEGIN(OBJ_LIST_LEVEL, 'bhvMovingYellowCoin'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3335,6 +3344,7 @@ const bhvIntroScene = [
 
 gLinker.behaviors.bhv1Up = bhv1Up
 gLinker.behaviors.bhvActivatedBackAndForthPlatform = bhvActivatedBackAndForthPlatform
+gLinker.behaviors.bhvActSelectorStarType = bhvActSelectorStarType
 gLinker.behaviors.bhvAmbientSounds = bhvAmbientSounds
 gLinker.behaviors.bhvAnotherElavator = bhvAnotherElavator
 gLinker.behaviors.bhvAnimatesOnFloorSwitchPress = bhvAnimatesOnFloorSwitchPress

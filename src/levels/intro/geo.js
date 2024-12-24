@@ -1,5 +1,5 @@
 import { GeoLayoutInstance as GeoLayout } from "../../engine/GeoLayout"
-import { geo_title_screen, geo_fade_transition, geo_intro_backdrop, geo_intro_gameover_backdrop } from "./gfx"
+import { geo_title_screen, geo_fade_transition, geo_intro_backdrop, geo_intro_gameover_backdrop } from "../../menu/intro_geo"
 import { MarioMiscInstance as MarioMisc } from "../../game/MarioMisc"
 import {
     debug_level_select_dl_07000858, debug_level_select_dl_07001100, debug_level_select_dl_07001BA0,

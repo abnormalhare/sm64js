@@ -46,29 +46,30 @@ class CameraHUD {
     }
 };
 
+// PowerMeterAnimation enum
+const POWER_METER_HIDDEN = 0;
+const POWER_METER_EMPHASIZED = 1;
+const POWER_METER_DEEMPHASIZING = 2;
+const POWER_METER_HIDING = 3;
+const POWER_METER_VISIBLE = 4;
+
+// CameraHUDLut enum
+const GLYPH_CAM_CAMERA = 0;
+const GLYPH_CAM_MARIO_HEAD = 1;
+const GLYPH_CAM_LAKITU_HEAD = 2;
+const GLYPH_CAM_FIXED = 3;
+const GLYPH_CAM_ARROW_UP = 4;
+const GLYPH_CAM_ARROW_DOWN = 5;
+
 
 class Hud {
     constructor() {
-        // PowerMeterAnimation enum
-        this.POWER_METER_HIDDEN = 0;
-        this.POWER_METER_EMPHASIZED = 1;
-        this.POWER_METER_DEEMPHASIZING = 2;
-        this.POWER_METER_HIDING = 3;
-        this.POWER_METER_VISIBLE = 4;
-
-        // CameraHUDLut enum
-        this.GLYPH_CAM_CAMERA = 0;
-        this.GLYPH_CAM_MARIO_HEAD = 1;
-        this.GLYPH_CAM_LAKITU_HEAD = 2;
-        this.GLYPH_CAM_FIXED = 3;
-        this.GLYPH_CAM_ARROW_UP = 4;
-        this.GLYPH_CAM_ARROW_DOWN = 5;
 
         // Stores health segmented value defined by numHealthWedges
         // When the HUD is rendered this value is 8, full health.
         this.sPowerMeterStoredHealth = 0;
 
-        this.sPowerMeterHUD = new PowerMeterHUD(this.POWER_METER_HIDDEN, 140, 166, 1.0);
+        this.sPowerMeterHUD = { animation: POWER_METER_HIDDEN, x: 140, y: 166, unused: 1.0 };
 
         // Power Meter timer that keeps counting when it's visible.
         // Gets reset when the health is filled and stops counting
@@ -105,6 +106,7 @@ class Hud {
 
     render_power_meter_health_segment(numHealthWedges) {
         const healthLUT = power_meter_health_segments_lut
+
         Gbi.gDPSetTextureImage(Game.gDisplayList, Gbi.G_IM_FMT_RGBA, Gbi.G_IM_SIZ_16b, 1, healthLUT[numHealthWedges - 1])
         Gbi.gDPLoadBlock(Game.gDisplayList, Gbi.G_TX_LOADTILE, 0, 0, 32 * 32 - 1)
         Gbi.gSP1Triangle(Game.gDisplayList, 0, 1, 2, 0)
@@ -133,7 +135,7 @@ class Hud {
 
         if (!(hudDisplayFlags & LevelUpdate.HUD_DISPLAY_FLAG_EMPHASIZE_POWER)) {
             if (this.sPowerMeterVisibleTimer == 45.0) {
-                this.sPowerMeterHUD.animation = this.POWER_METER_DEEMPHASIZING;
+                this.sPowerMeterHUD.animation = POWER_METER_DEEMPHASIZING;
             }
         } else {
             this.sPowerMeterVisibleTimer = 0;
@@ -143,38 +145,38 @@ class Hud {
     animate_power_meter_deemphasizing() {
         var speed = 5;
 
-        if (this.sPowerMeterHUD.y >= 181) {
+        if (this.sPowerMeterHUD.y > 180) {
             speed = 3;
         }
 
-        if (this.sPowerMeterHUD.y >= 191) {
+        if (this.sPowerMeterHUD.y > 190) {
             speed = 2;
         }
 
-        if (this.sPowerMeterHUD.y >= 196) {
+        if (this.sPowerMeterHUD.y > 195) {
             speed = 1;
         }
 
         this.sPowerMeterHUD.y += speed;
 
-        if (this.sPowerMeterHUD.y >= 201) {
+        if (this.sPowerMeterHUD.y > 200) {
             this.sPowerMeterHUD.y = 200;
-            this.sPowerMeterHUD.animation = this.POWER_METER_VISIBLE;
+            this.sPowerMeterHUD.animation = POWER_METER_VISIBLE;
         }
     }
 
     animate_power_meter_hiding() {
         this.sPowerMeterHUD.y += 20;
-        if (this.sPowerMeterHUD.y >= 301) {
-            this.sPowerMeterHUD.animation = this.POWER_METER_HIDDEN;
+        if (this.sPowerMeterHUD.y > 300) {
+            this.sPowerMeterHUD.animation = POWER_METER_HIDDEN;
             this.sPowerMeterVisibleTimer = 0;
         }
     }
 
     handle_power_meter_actions(numHealthWedges) {
         // Show power meter if health is not full, less than 8
-        if (numHealthWedges < 8 && this.sPowerMeterStoredHealth == 8 && this.sPowerMeterHUD.animation == this.POWER_METER_HIDDEN) {
-            this.sPowerMeterHUD.animation = this.POWER_METER_EMPHASIZED
+        if (numHealthWedges < 8 && this.sPowerMeterStoredHealth == 8 && this.sPowerMeterHUD.animation == POWER_METER_HIDDEN) {
+            this.sPowerMeterHUD.animation = POWER_METER_EMPHASIZED
             this.sPowerMeterHUD.y = 166
         }
 
@@ -185,7 +187,7 @@ class Hud {
 
         // After health is full, hide power meter
         if (numHealthWedges == 8 && this.sPowerMeterVisibleTimer > 45.0) {
-            this.sPowerMeterHUD.animation = this.POWER_METER_HIDING;
+            this.sPowerMeterHUD.animation = POWER_METER_HIDING;
         }
 
         // Update to match health value
@@ -193,8 +195,8 @@ class Hud {
 
         // If Mario is swimming, keep power meter visible
         if (Camera.gPlayerCameraState.action & Mario.ACT_FLAG_SWIMMING) {
-            if (this.sPowerMeterHUD.animation == this.POWER_METER_HIDDEN || this.sPowerMeterHUD.animation == this.POWER_METER_EMPHASIZED) {
-                this.sPowerMeterHUD.animation = this.POWER_METER_DEEMPHASIZING;
+            if (this.sPowerMeterHUD.animation == POWER_METER_HIDDEN || this.sPowerMeterHUD.animation == POWER_METER_EMPHASIZED) {
+                this.sPowerMeterHUD.animation = POWER_METER_DEEMPHASIZING;
                 this.sPowerMeterHUD.y = 166;
             }
             this.sPowerMeterVisibleTimer = 0;
@@ -204,22 +206,22 @@ class Hud {
     render_hud_power_meter() {
         const shownHealthWedges = LevelUpdate.gHudDisplay.wedges;
 
-        if (this.sPowerMeterHUD.animation != this.POWER_METER_HIDING) {
+        if (this.sPowerMeterHUD.animation != POWER_METER_HIDING) {
             this.handle_power_meter_actions(shownHealthWedges)
         }
 
-        if (this.sPowerMeterHUD.animation == this.POWER_METER_HIDDEN) {
+        if (this.sPowerMeterHUD.animation == POWER_METER_HIDDEN) {
             return;
         }
 
         switch (this.sPowerMeterHUD.animation) {
-            case this.POWER_METER_EMPHASIZED:
+            case POWER_METER_EMPHASIZED:
                 this.animate_power_meter_emphasized();
                 break;
-            case this.POWER_METER_DEEMPHASIZING:
+            case POWER_METER_DEEMPHASIZING:
                 this.animate_power_meter_deemphasizing();
                 break;
-            case this.POWER_METER_HIDING:
+            case POWER_METER_HIDING:
                 this.animate_power_meter_hiding();
                 break;
             default:
@@ -228,7 +230,7 @@ class Hud {
 
         this.render_dl_power_meter(shownHealthWedges);
 
-        this.sPowerMeterVisibleTimer += 1;
+        this.sPowerMeterVisibleTimer++;
     }
 
     render_hud_mario_lives() {
@@ -301,27 +303,27 @@ class Hud {
         }
 
         Gbi.gSPDisplayList(Game.gDisplayList, dl_hud_img_begin);
-        this.render_hud_tex_lut(x, y, cameraLUT[this.GLYPH_CAM_CAMERA]);
+        this.render_hud_tex_lut(x, y, cameraLUT[GLYPH_CAM_CAMERA]);
 
 
         switch (this.sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
             case CAM_STATUS_MARIO:
-                this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_MARIO_HEAD]);
+                this.render_hud_tex_lut(x + 16, y, cameraLUT[GLYPH_CAM_MARIO_HEAD]);
                 break;
             case CAM_STATUS_LAKITU:
-                this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_LAKITU_HEAD]);
+                this.render_hud_tex_lut(x + 16, y, cameraLUT[GLYPH_CAM_LAKITU_HEAD]);
                 break;
             case CAM_STATUS_FIXED:
-                this.render_hud_tex_lut(x + 16, y, cameraLUT[this.GLYPH_CAM_FIXED]);
+                this.render_hud_tex_lut(x + 16, y, cameraLUT[GLYPH_CAM_FIXED]);
                 break;
         }
 
         switch (this.sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
             case CAM_STATUS_C_DOWN:
-                this.render_hud_small_tex_lut(x + 4, y + 16, cameraLUT[this.GLYPH_CAM_ARROW_DOWN]);
+                this.render_hud_small_tex_lut(x + 4, y + 16, cameraLUT[GLYPH_CAM_ARROW_DOWN]);
                 break;
             case CAM_STATUS_C_UP:
-                this.render_hud_small_tex_lut(x + 4, y - 8, cameraLUT[this.GLYPH_CAM_ARROW_UP]);
+                this.render_hud_small_tex_lut(x + 4, y - 8, cameraLUT[GLYPH_CAM_ARROW_UP]);
                 break;
         }
 
@@ -332,7 +334,7 @@ class Hud {
         const hudDisplayFlags = LevelUpdate.gHudDisplay.flags;
 
         if (hudDisplayFlags == LevelUpdate.HUD_DISPLAY_NONE || hudDisplayFlags == undefined) {
-            this.sPowerMeterHUD.animation = this.POWER_METER_HIDDEN
+            this.sPowerMeterHUD.animation = POWER_METER_HIDDEN
             this.sPowerMeterStoredHealth = 8
             this.sPowerMeterVisibleTimer = 0
         } else {
