@@ -290,6 +290,23 @@ export const BULLY_STYPE_CHILL    = 16
 export const CELEB_STAR_ACT_SPIN_AROUND_MARIO = 0
 export const CELEB_STAR_ACT_FACE_CAMERA       = 1
 
+/* Bomp (both variants) */
+    /* oAction */
+export const BOMP_ACT_WAIT = 0
+export const BOMP_ACT_POKE_OUT = 1
+export const BOMP_ACT_EXTEND = 2
+export const BOMP_ACT_RETRACT = 3
+
+/* WF Sliding Brick Platform */
+    /* oBehParams2ndByte */
+export const WF_SLID_BRICK_PTFM_BP_MOV_VEL_10 = 1
+export const WF_SLID_BRICK_PTFM_BP_MOV_VEL_15 = 2
+export const WF_SLID_BRICK_PTFM_BP_MOV_VEL_20 = 3
+    /* oAction */
+export const WF_SLID_BRICK_PTFM_ACT_WAIT = 0
+export const WF_SLID_BRICK_PTFM_ACT_EXTEND = 1
+export const WF_SLID_BRICK_PTFM_ACT_RETRACT = 2
+
 /* Arrow Lift */
 export const oArrowLiftDisplacement        = 0x1B
 export const oArrowLiftUnk100              = 0x1E

@@ -56,6 +56,7 @@ import * as _blue_coin                from "./behaviors/blue_coin.inc"
 import * as _bobomb                   from "./behaviors/bobomb.inc"
 import * as _boo                      from "./behaviors/boo.inc"
 import * as _boo_cage                 from "./behaviors/boo_cage.inc"
+import * as _bomp                     from "./behaviors/bomp.inc"
 import * as _bowling_ball             from "./behaviors/bowling_ball.inc"
 import * as _breakable_box            from "./behaviors/breakable_box.inc"
 import * as _breakable_box_small      from "./behaviors/breakable_box_small.inc"
@@ -117,6 +118,7 @@ import * as _reds_star_marker         from "./behaviors/reds_star_marker.inc"
 import * as _rotating_platform        from "./behaviors/rotating_platform.inc"
 import * as _scuttlebug               from "./behaviors/scuttlebug.inc"
 import * as _seesaw_platform          from "./behaviors/seesaw_platform.inc"
+import * as _sliding_platform         from "./behaviors/sliding_platform.inc"
 import * as _sound_ambient            from "./behaviors/sound_ambient.inc"
 import * as _sound_birds              from "./behaviors/sound_birds.inc"
 import * as _sound_spawner            from "./behaviors/sound_spawner.inc"
@@ -212,6 +214,9 @@ import { bbh_seg7_collision_tilt_floor_platform } from "../levels/bbh/tilting_tr
 import { bbh_seg7_collision_mesh_elevator } from "../levels/bbh/mesh_elevator/collision.inc"
 import { bbh_seg7_collision_coffin } from "../levels/bbh/coffin/collision.inc"
 import { blue_coin_switch_seg8_collision_08000E98 } from "../actors/blue_coin_switch/collision.inc"
+import { wf_seg7_collision_sliding_brick_platform } from "../levels/wf/sliding_platform/collision.inc"
+import { wf_seg7_collision_large_bomp } from "../levels/wf/large_bomp/collision.inc"
+import { wf_seg7_collision_small_bomp } from "../levels/wf/small_bomp/collision.inc"
 
 export const OBJ_LIST_PLAYER = 0     //  (0) mario
 export const OBJ_LIST_UNUSED_1 = 1    //  (1) (unused)
@@ -2693,6 +2698,39 @@ const bhvStarKeyCollectionPuffSpawner = [
     END_LOOP(),
 ]
 
+const bhvSmallBomp = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvSmallBomp'),
+    OR_INT(oFlags, OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wf_seg7_collision_small_bomp),
+    CALL_NATIVE('bhv_small_bomp_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_small_bomp_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+const bhvLargeBomp = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvLargeBomp'),
+    OR_INT(oFlags, OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_COLLISION_DATA(wf_seg7_collision_large_bomp),
+    CALL_NATIVE('bhv_large_bomp_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_large_bomp_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
+const bhvWfSlidingPlatform = [
+    BEGIN(OBJ_LIST_SURFACE, 'bhvWfSlidingPlatform'),
+    OR_INT(oFlags, (OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_COLLISION_DATA(wf_seg7_collision_sliding_brick_platform),
+    CALL_NATIVE('bhv_wf_sliding_platform_init'),
+    BEGIN_LOOP(),
+        CALL_NATIVE('bhv_wf_sliding_platform_loop'),
+        CALL_NATIVE('SurfaceLoad.load_object_collision_model'),
+    END_LOOP(),
+]
+
 const bhvPitBowlingBall = [
     BEGIN(OBJ_LIST_GENACTOR, 'bhvPitBowlingBall'),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3479,6 +3517,7 @@ gLinker.behaviors.bhvJumpingBox = bhvJumpingBox
 gLinker.behaviors.bhvKickableBoard = bhvKickableBoard
 gLinker.behaviors.bhvKingBobomb = bhvKingBobomb
 gLinker.behaviors.bhvKoopaShellUnderwater = bhvKoopaShellUnderwater
+gLinker.behaviors.bhvLargeBomp = bhvLargeBomp;
 gLinker.behaviors.bhvLaunchDeathWarp = bhvLaunchDeathWarp
 gLinker.behaviors.bhvLaunchStarCollectWarp = bhvLaunchStarCollectWarp
 gLinker.behaviors.bhvLeafParticleSpawner = bhvLeafParticleSpawner
@@ -3531,6 +3570,7 @@ gLinker.behaviors.bhvShallowWaterWave = bhvShallowWaterWave
 gLinker.behaviors.bhvSignOnWall = bhvSignOnWall
 gLinker.behaviors.bhvSingleCoinGetsSpawned = bhvSingleCoinGetsSpawned
 gLinker.behaviors.bhvSlidingPlatform2 = bhvSlidingPlatform2
+gLinker.behaviors.bhvSmallBomp = bhvSmallBomp;
 gLinker.behaviors.bhvSmallBully = bhvSmallBully
 gLinker.behaviors.bhvSmallParticle = bhvSmallParticle
 gLinker.behaviors.bhvSmallParticleBubbles = bhvSmallParticleBubbles
@@ -3597,6 +3637,7 @@ gLinker.behaviors.bhvWaveTrail = bhvWaveTrail
 gLinker.behaviors.bhvWFBreakableWallLeft = bhvWFBreakableWallLeft
 gLinker.behaviors.bhvWFBreakableWallRight = bhvWFBreakableWallRight
 gLinker.behaviors.bhvWFRotatingWoodenPlatform = bhvWFRotatingWoodenPlatform
+gLinker.behaviors.bhvWfSlidingPlatform = bhvWfSlidingPlatform
 gLinker.behaviors.bhvWhitePuffExplosion = bhvWhitePuffExplosion
 gLinker.behaviors.bhvWingCap = bhvWingCap
 gLinker.behaviors.bhvWoodenPost = bhvWoodenPost
